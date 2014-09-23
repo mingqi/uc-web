@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Reset your password - UCLogs</title>
+    {% include ../include/inheader %}
+    <link rel="stylesheet" href="/css/compiled/reset.css" type="text/css" media="screen" />
+</head>
+<body>
+    
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+    {% include ../include/navbar %}
+    </div>
+
+    <div id="reset_pwd" class="reset_page">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 box_wrapper">
+                    <div class="col-md-12">
+                        <div class="box">
+                            <div class="head">
+                                <h4>重置你的密码</h4>
+                                <div class="line"></div>
+                            </div>
+                            <div class="form">
+                                <form action="/account/postResetPwd" method="post" id="mainForm" style="text-align:left">
+                                    <input type="hidden" name="email" value="{%= query.email %}" />
+                                    <input type="hidden" name="date" value="{%= query.date %}" />
+                                    <input type="hidden" name="key" value="{%= query.key %}" />
+                                    <div class="form-group">
+                                        Email: {%= query.email %}
+                                    </div>
+                                    <div class="form-group">
+                                        <label>密码</label>
+                                        <input class="form-control" type="password" name="password" required/>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>重复密码</label>
+                                        <input class="form-control" type="password" name="password2" required/>
+                                    </div>
+
+                                    <input type="submit" value="重置密码"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include ../include/footer %}
+
+    <script>
+        $(function() {
+            $('#mainForm').submit(function(event) {
+                if($('[name=password]').val() !== $('[name=password2]').val()) {
+                    alert('Passwords is not the same.');
+                    event.preventDefault();
+                }
+            })
+        })
+    </script>
+</body>
+</html>

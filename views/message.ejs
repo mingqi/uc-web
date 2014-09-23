@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>UCLogs</title>
+    {% include include/inheader %}
+</head>
+<body>
+    
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+    {% include include/navbar %}
+    </div>
+
+    <div class="container main">
+		<div class="row">
+		    <div class="col-md-12">
+			    <div class="section_header">
+	                <h3>{%= message %}</h3>
+	            </div>
+	            
+		        <a class="ui black button" href="javascript:history.back()">返回上一页</a>
+		    </div>
+		</div>
+    </div>
+    
+    {% include include/footer %}
+</body>
+</html>

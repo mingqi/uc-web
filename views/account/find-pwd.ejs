@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>找回密码 - UCLogs</title>
+    {% include ../include/inheader %}
+    <link rel="stylesheet" href="/css/compiled/reset.css" type="text/css" media="screen" />
+</head>
+<body>
+    
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+    {% include ../include/navbar %}
+    </div>
+
+    <div id="reset_pwd" class="reset_page">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12 box_wrapper">
+                    <div class="col-md-12">
+                        <div class="box">
+                            <div class="head">
+                                <h4>填入你的 Email 地址，来重置密码</h4>
+                                <div class="line"></div>
+                            </div>
+                            <div class="form">
+                                <form action="/account/postFindPwd" method="post">
+                                    <input type="email" placeholder="Email 地址" class="control-form" name="email" required/>
+
+                                    <input type="submit" value="重置密码"/>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% include ../include/footer %}
+</body>
+</html>

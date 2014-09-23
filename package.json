@@ -1,0 +1,39 @@
+{
+  "name": "monitorat",
+  "version": "0.1.0",
+  "description": "monitorat website",
+  "main": "app.js",
+  "repository": "",
+  "keywords": [
+    "Node.js",
+    "Eclipse",
+    "Nodeclipse"
+  ],
+  "author": "yanxi",
+  "readmeFilename": "README.md",
+  "dependencies": {
+      "express": "4.3.1",
+      "morgan": "~1.2.3",
+      "body-parser" : "~1.6.5",
+      "cookie-parser": "*",
+      "connect-multiparty": "*",
+      "ejs": "*",
+      "mongoose": "3.8.1",
+      "underscore": "*",
+      "underscore.string": "*",
+      "async": "*",
+      "date-format-lite": "*",
+      "nodemailer" : "~1.1.1",
+      "request": "*",
+      "generate-key": "*"
+    },
+    "devDependencies" : {
+        "node-sass": "~0.7.0",
+        "grunt": "~0.4.1",
+        "grunt-contrib-watch": "~0.5.3",
+        "grunt-contrib-sass": "~0.7.0"
+    },
+    "scripts" : {
+        "test": "mocha -R spec"
+    }
+}

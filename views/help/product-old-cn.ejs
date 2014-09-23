@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>产品 - UCLogs</title>
+    {% include ../include/inheader %}
+    <link rel="stylesheet" type="text/css" href="/css/lib/animate.css" media="screen, projection" />
+    <link rel="stylesheet" href="/css/compiled/help.css" type="text/css" media="screen" />
+</head>
+<body>
+    
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+    {% include ../include/navbar %}
+    </div>
+
+    <div id="help_post">
+        <div class="container">
+            <div class="row">
+                <div class="col-sm-8">
+                    <div class="post_content">
+                        <h2 id="overview">概述</h2>
+                        <p>
+                            MetricsAt 是云服务平台，可以帮您收集应用程序的数据，图形化展示数据，并监控你的应用程序。 这一切对你将非常容易，你需要做的仅仅是告诉我们你的数据在哪里。我们的引擎会自动收集你的数据到我们的服务器，并生成各种统计图像报表。当数据停止更新，或者超过设定的阈值时，我们的报警系统会自动提醒你，不会让你因为应用程序问题而遭到损失。
+                        </p>
+
+                        <h4 id="metrics">收集数据</h4>
+                        <p>目前我们支持三种方式来收集应用程序的数据：日志文件、数据库查询、shell命令。</p>
+                        <ul>
+                          <li>日志文件：监控日志文件，通过设置正则表达式，从日志中过滤并且得到你的数据。</li>
+                          <li>数据库查询：通过执行特定的 Sql 语句或者 Mongo 脚本来获取数据。</li>
+                          <li>Shell 命令：在的服务器上定期运行shell命令。例如，您可以输入 <strong>'ls -1 /you/path/ | wc -l'</strong> 来获取和监控一个文件夹下得文件数目。</li>
+                        </ul>
+
+                        <h4 id="alert">报警</h4>
+                        <p>当数据停止更新，或者超过设定的阈值时，MetricsAt 会通过 Email 或者 PagerDuty 自动提醒你，不会让你因为应用程序问题而遭到损失。
+                        </p>
+
+                        <h2 id="how">如何工作</h2>
+                        <h4>注册</h4>
+                        <img class="post_pic img-responsive" src="/s/img/help/signup.png" style="width:360px; margin-bottom:20px" />
+                        <p>注册 MetricsAt 是完全免费的，不需要任何信用卡信息。而且使用我们的服务是不需要任何费用的。</p>
+
+                        <h4>在服务器上安装 Agent</h4>
+                        <img class="post_pic img-responsive" src="/s/img/help/agent.png" style="margin-bottom:20px" />
+                        <p>在你的服务器上安装 Agent，来收集应用程序数据。按照提示输入命令即可，安装过程非常简单。</p>
+
+                        <h4>配置你的数据来源</h4>
+                        <img class="post_pic img-responsive" src="/s/img/help/config.png" style="margin-bottom:20px" />
+                        <p>输入你的数据相关信息，奇遇事情全部交给我们即可。</p>
+
+
+                        <h4>搞定，查看你的数据报表</h4>
+                        <img class="post_pic img-responsive" src="/s/img/help/metric.png" style="margin-bottom:20px" />
+                        <p>几分钟后，你就可以根据时间段、不同指标来查看数据报表。</p>
+
+                        <h4>设置报警</h4>
+                        <img class="post_pic img-responsive" src="/s/img/help/alert.png" style="margin-bottom:20px" />
+                        <p>当数据停止更新，或者超过设定的阈值时，会自动提醒你，不会让你因为应用程序问题而遭到损失。</p>
+
+                        <h2 id="free">完全免费</h2>
+                        <p>是的，我们完全免费！无需硬件投入，无需授权费用，没有收费计划。我们商业模式是免费，以后将会针对更强大的功能推出收费计划。但目前所有功能都是免费的，并且没有任何使用限制。</p>
+                    </div>
+                </div>
+                
+                <!-- SideBar -->
+                <div class="col-sm-4">
+                    <div class="sidebar">
+                        <div class="box last">
+                            <div class="sidebar_header">
+                                <h4>菜单</h4>
+                            </div>
+
+                            <ul class="sidebar_menu">
+                                <ul>
+                                    <li><a href="#overview">概述</a></li>
+                                    <li><a href="#how">如何工作</a></li>
+                                    <li><a href="#free">完全免费</a></li>
+                                </ul>
+                            </ul>
+                        </div>
+                        
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    
+    {% include ../include/footer %}
+</body>
+</html>

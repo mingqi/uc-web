@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Product - UCLogs</title>
+{% include ../include/inheader %}
+<link rel="stylesheet" type="text/css" href="/css/lib/animate.css" media="screen, projection" />
+<link rel="stylesheet" href="/css/compiled/help.css" type="text/css" media="screen" />
+<link rel="stylesheet" href="/css/compiled/features.css" type="text/css" media="screen" />
+
+<style>
+.img-responsive {
+    border: 7px solid #fff;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px 1px #cfcfcf;
+    border-bottom:0;
+}
+</style>
+
+</head>
+<body>
+    
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+        {% include ../include/navbar %}
+    </div>
+
+    <div id="features" class="features_page">
+        <div class="container">
+            <!-- Feature Wrapper -->
+            <div class="feature_wrapper option1">
+                <div class="section_header">
+                    <h3>Overview</h3>
+                </div>
+
+                <p>MetricsAt is a cloud-based service, which can measure and monitor any data from your applications. By installing the software, the Metrics At Agent, your data will be automatically collected and sent to our central cluster. Not only will the central cluster provide you with a metric report with graphics efficiently, but the alert system will also notify you of crossing-over thresholds immediately.</p>
+
+                <div class="row feature">
+                    <div class="col-sm-8 info">
+                        <h3 id="metrics">
+                            Collect and Measure Data
+                        </h3>
+                        <p>
+                            Currently we provide three methods to collect your application datum: log files, database queries and shell commands.
+                        </p>
+                        <ul>
+                          <li>Log Files: Monitor your log files, filter and extract data by your specified regular expressions.</li>
+                          <li>Database queries: Execute periodically your specified query statements (SQL or Mongo).</li>
+                          <li>Shell commands: Periodically run your specified shell commands in your host. (For example, under a directory, you can input <code>ls -1 /you/path/ | wc -l</code> to metric and monitor how many files in the directory).</li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-4 info">
+                        <h3 id="alert">
+                            Alert function
+                        </h3>
+                        <p>
+                            If thresholds are crossed over, the Alert function will notify you automatically by email or  PagerDuty. 
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feature Wrapper -->
+            <div class="feature_wrapper option1">
+                <div class="section_header">
+                    <h3>Get it work. It's simple as 1-2-3.</h3>
+                </div>
+
+                <div class="row feature">
+                    <div class="col-sm-6 pic-right">
+                        <img src="/s/img/help/agent.png" class="img-responsive" />
+                    </div>
+                    <div class="col-sm-6 info info-left">
+                        <h3>
+                            <span class="label label-primary" style="font-size:20px">1</span>
+                            Install the MetricsAt Agent on your server
+                        </h3>
+                        <p>
+                            Install the Agent on your target server so that the essential data will be collected from your applications and sent to our central cluster.
+                        </p>
+                    </div>
+                </div>
+                <div class="row feature">
+                    <div class="col-sm-6">
+                        <img src="/s/img/help/config.png" class="img-responsive" />
+                    </div>
+                    <div class="col-sm-6 info">
+                        <h3>
+                            <span class="label label-primary" style="font-size:20px">2</span>
+                            Tell us where is your data
+                        </h3>
+                        <p>
+                            Input essential information, we will take care of the rest.
+                        </p>
+                    </div>
+                </div>
+                <div class="row feature">
+                    <div class="col-sm-7 pic-right">
+                        <img src="/s/img/help/metric.png" class="pull-right img-responsive" />
+                    </div>
+                    <div class="col-sm-5 info info-left">
+                        <h3>
+                            <span class="label label-primary" style="font-size:20px">3.a</span>
+                            That’s It. Here is your metrics
+                        </h3>
+                        <p>
+                            You will get the metric in few minutes, and can view the metrics by aggregator, time range and granularity.
+                        </p>
+                    </div>                    
+                </div>
+                <div class="row feature last">
+                    <div class="col-sm-7 pic-right">
+                        <img src="/s/img/help/alert.png" class="img-responsive" />
+                    </div>
+                    <div class="col-sm-5 info info-left">
+                        <h3>
+                            <span class="label label-primary" style="font-size:20px">3.b</span>
+                            Setup Alert
+                        </h3>
+                        <p>
+                            Assign conditions and notifications for your metrics. The Alert function will work.
+                        </p>
+                    </div>
+                </div>
+            </div>
+                
+
+            <!-- Feature Wrapper -->
+            <div class="feature_wrapper option1">
+                <div class="section_header">
+                    <h3 id="free">Absolutely Free</h3>
+                </div>
+
+                <p>
+                    Yes, we are absolutely free. No hardware cost, no license charge, no price plan. Our business model is freemium. We will charge for future power feature, but currently all features are absolutely free without any limitation.
+                </p>
+            </div>
+
+            <div style="margin:0 0 20px" class="text-center">
+                <a class="btn btn-primary btn-lg" href="/account/register" style="font-family: verdana; font-weight: bold;">{%= __('try_it_free') %}</a>
+            </div>
+        </div>
+    </div>
+    
+    {% include ../include/footer %}
+</body>
+</html>

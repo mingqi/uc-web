@@ -1,0 +1,50 @@
+<script>
+var setService = function($scope, serviceConfig) {
+    $scope.serviceConfigs = $scope.serviceConfigs || [];
+    if (!_.some($scope.serviceConfigs, function(old, i) {
+        if (old._id === serviceConfig._id) {
+            $scope.serviceConfigs.splice(i, 1, serviceConfig);
+            return true;
+        }
+    })) {
+        // new
+        $scope.serviceConfigs.push(serviceConfig);
+    }
+};
+
+var serviceCates = [{
+    type: 'email',
+    name: 'Email',
+    description: 'Send event notifications via email.',
+    props: [{
+        name: 'Email address',
+        key: 'email',
+        type: 'text',
+        pattern: /\w+@[-\w]+\.\w+/,
+        require: true
+    }],
+    searchService: {
+        type: 'email'
+    }
+}, {
+    type: 'pagerduty',
+    name: 'PagerDuty',
+    description: 'Configure PagerDuty to receive notifications via phone, SMS and email.',
+    props: [{
+        name: 'Service key',
+        key: 'serviceKey',
+        type: 'text',
+        require: true
+    }, {
+        name: 'Description',
+        key: 'description',
+        type: 'text',
+        require: true
+    }],
+    searchService: {
+        type: 'pagerduty'
+    }
+}];
+
+var serviceCateMap = _.indexBy(serviceCates, 'type');
+</script>

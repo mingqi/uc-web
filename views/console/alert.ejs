@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="consoleApp">
+<head>
+<title>Alert Setting - UCLogs</title>
+
+{% include include/inhead %}
+    
+<script src="/s/angular/angular.min.js"></script>
+<script src="/s/angular-tablesort.js"></script>
+<script src="/s/async.js"></script>
+
+{% include include/service.js.ejs %}
+
+<link rel="stylesheet" href="/s/tablesort.css" />
+<style>
+tr.disabled {
+    color: rgba(128, 128, 128, 0.5);
+}
+</style>
+
+<script>
+var setAlertConfig = function($scope, alertConfig) {
+    $scope.alertConfigs = $scope.alertConfigs || [];
+    if (!_.some($scope.alertConfigs, function(old, i) {
+        if (old._id === alertConfig._id) {
+            $scope.alertConfigs.splice(i, 1, alertConfig);
+            return true;
+        }
+    })) {
+        // new
+        $scope.alertConfigs.push(alertConfig);
+    }
+};
+var deleteAlertConfig = function($scope, alertConfig) {
+    $scope.alertConfigs = $scope.alertConfigs || [];
+    $scope.alertConfigs = _.reject($scope.alertConfigs, function(old) {
+        return old._id === alertConfig._id;
+    });
+};
+var getAggregators = function(monitor) {
+    var avg = {
+        name : 'Avarage',
+        key : 'avg'
+    };
+    var types = {
+        dbquery : [avg],
+        script : [avg],
+        log : [avg, {
+            name : 'Count',
+            key : 'count'
+        }]
+    };
+    return types[monitor.type];
+}
+angular.module('consoleApp', ['tableSort'])
+.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    var changingTab;
+    $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+    $scope.serviceCates = serviceCates;
+    $scope.monitors = [];
+    $scope.page = {};
+    var venderPage = function() {
+        var locationSearch = $location.search();
+        if (locationSearch.id) {
+            // change tab
+            if (changingTab) {
+                $scope.currentConfig.tab = locationSearch.tab;
+                changingTab = false;
+                return;
+            }
+
+            // edit
+            var alertConfig = _.indexBy($scope.alertConfigs, '_id')[locationSearch.id];
+            if (!alertConfig) {
+                return;
+            }
+            $scope.currentConfig = {
+                _id : alertConfig._id,
+                name : alertConfig.name,
+                description : alertConfig.description,
+                enabled : alertConfig.enabled,
+                errors: {},
+                condition : {
+                    monitor : alertConfig.condition.monitor,
+                    aggregator : alertConfig.condition.aggregator,
+                    aggregators : getAggregators(alertConfig.condition.monitor),
+                    conditionType : alertConfig.condition.conditionType,
+                    threshold : alertConfig.condition.threshold,
+                    durationType : (alertConfig.condition.duration > 0 ? 'duration' : 'immediately'),
+                    duration : alertConfig.condition.duration
+                },
+                tab : locationSearch.tab || 'basic'
+            };
+
+            // select service
+            _.each($scope.serviceConfigs, function(service) {
+                service.selected = _.contains(alertConfig.notifications, service._id);
+            });
+
+            $scope.page = {
+                status : 'setting',
+                operation : 'edit'
+            };
+        } else if (locationSearch.operation == 'add') {
+            $scope.currentConfig = {
+                step : 1,
+                enabled : true,
+                errors: {},
+                condition : {
+                    conditionType : 'above',
+                    durationType : 'duration',
+                    duration : 5,
+                }
+            };
+            _.each($scope.serviceConfigs, function(service) {
+                service.selected = false;
+            });
+            $scope.page = {
+                status : 'setting',
+                operation : 'add'
+            };
+        } else {
+            $scope.page.status = 'list';
+        }        
+    };
+    async.auto({
+        monitors: function(callback) {
+            $http.get('/console/ajax/getMonitors').success(function(monitors) {
+                $scope.monitors = monitors;
+                callback();
+            }).error(function(json) {
+                callback(json.error || 'get monitors error');
+            });
+        },
+        services: function(callback) {
+            $http.get('/console/ajax/getServices').success(function(services) {
+                _.each(services, function(service) {
+                    setService($scope, service);
+                });
+                callback();
+            }).error(function(json) {
+                callback(json.error || 'get services error');
+            });
+        }
+    }, function(err, results) {
+        if (err) {
+            return alert(err);
+        }
+        var monitorMap = _.indexBy($scope.monitors, '_id');
+        $http.get('/console/ajax/getAlertConfigs').success(function(alertConfigs) {
+            _.each(alertConfigs, function(alertConfig) {
+                alertConfig.condition.monitor = monitorMap[alertConfig.condition.monitorId];
+                setAlertConfig($scope, alertConfig);
+            });
+            venderPage();
+            $scope.$on('$locationChangeSuccess', venderPage);
+        }).error(function(json) {
+            alert(json.error || 'get alert configs error');
+        });
+    });
+
+    var showAlertList = function() {
+        _.each($location.search(), function(value, key) {
+            $location.search(key, null);
+        });
+    };
+    $scope.newAlertConfig = function() {
+        $location.search('operation', 'add');
+    };
+    $scope.changeMonitor = function() {
+        var monitor = $scope.currentConfig.condition.monitor;
+        $scope.currentConfig.condition.aggregators = getAggregators(monitor);
+        $scope.currentConfig.condition.aggregator = $scope.currentConfig.condition.aggregators[0].key;
+    };
+    $scope.changeTab = function(tab) {
+        if ($location.search().tab === tab) {
+            return;
+        }
+        changingTab = true;
+        $location.search('tab', tab);
+    };
+    $scope.cancel = function() {
+        showAlertList();
+    };
+    $scope.validateBasic = function(member) {
+        var result = true;
+        if (member == 'name' || !member) {
+            if (!$scope.currentConfig.name) {
+                $scope.currentConfig.errors.name = "Please provide a valid name";
+                result = false;
+            } else {
+                $scope.currentConfig.errors.name = null;
+            }
+        }
+        return result;
+    };
+    $scope.validateCondition = function(member) {
+        var result = true;
+        if (member == 'monitor' || !member) {
+            if (!$scope.currentConfig.condition.monitor) {
+                $scope.currentConfig.errors.monitor = "Please select a metric";
+                result = false;
+            } else {
+                $scope.currentConfig.errors.monitor = null;
+            }
+        }
+        if (member == 'threshold' || !member) {
+            var threshold = 0;
+            if ($scope.currentConfig.condition.conditionType != 'stop' &&
+                    !($scope.currentConfig.condition.threshold+"").match(/^[0-9.]+$/)) {
+                $scope.currentConfig.errors.threshold = "The threshold must be a number";
+                result = false;
+            } else {
+                $scope.currentConfig.errors.threshold = null;
+            }
+        }
+        if (member == 'duration' || !member) {
+            var durationIsOk = true;
+            if ($scope.currentConfig.condition.durationType == 'duration') {
+                if (!($scope.currentConfig.condition.duration+"").match(/^\d+$/)) {
+                    $scope.currentConfig.errors.duration = "he duration must be a number";
+                    result = durationIsOk = false;
+                } else {
+                    var duration = parseInt($scope.currentConfig.condition.duration);
+                    if (duration > 60 || duration < 1) {
+                        $scope.currentConfig.errors.duration = "The duration must be between 1 and 60 minutes";
+                        result = durationIsOk = false;
+                    }
+                }
+            }
+            if (durationIsOk) {
+                $scope.currentConfig.errors.duration = null;
+            }
+        }        
+        return result;
+    };
+    $scope.validateNotifications = function() {
+        var notifications = _.chain($scope.serviceConfigs).filter(function(service) {
+            return service.selected;
+        }).map(function(service) {
+            return service._id;
+        }).value();
+        if (!notifications.length) {
+            $scope.currentConfig.errors.notifications = "You must select a notification service.";
+            return false;
+        }
+        $scope.currentConfig.errors.notifications = null;
+        return notifications;
+    };
+    $scope.toStep = function(to) {
+        if (to == 0) {
+            return $scope.cancel();
+        } else if (to == 4) {
+            return $scope.submit();
+        }
+        if (to == 2 && !$scope.validateBasic()) {
+            return;
+        }
+        if (to == 3 && !$scope.validateCondition()) {
+            return;
+        }
+        $scope.currentConfig.step = to;
+    };
+    $scope.editAlertConfig = function(id) {
+        $location.search('id', id);
+    };
+    $scope.submit = function() {
+        var notifications = $scope.validateNotifications();
+        if (!$scope.validateBasic()) {
+            if ($scope.currentConfig._id) {
+                $scope.changeTab('basic');
+            }
+            return;
+        }
+        if (!$scope.validateCondition()) {
+            if ($scope.currentConfig._id) {
+                $scope.changeTab('condition');
+            }
+            return;
+        }
+        if (!notifications) {
+            if ($scope.currentConfig._id) {
+                $scope.changeTab('notifications');
+            }
+            return;
+        }
+        var alertConfig = {
+            _id : $scope.currentConfig._id,
+            name : $scope.currentConfig.name,
+            description : $scope.currentConfig.description,
+            enabled : $scope.currentConfig.enabled,
+            condition : {
+                monitorId : $scope.currentConfig.condition.monitor._id,
+                metric : $scope.currentConfig.condition.monitor.sid,
+                aggregator : $scope.currentConfig.condition.aggregator,
+                conditionType : $scope.currentConfig.condition.conditionType,
+                threshold : $scope.currentConfig.condition.threshold,
+                duration : $scope.currentConfig.condition.durationType === 'duration'
+                    ? parseInt($scope.currentConfig.condition.duration)
+                    : 0
+            },
+            notifications : notifications
+        };
+        ma.wait();
+        $http.post('/console/ajax/upsertAlertConfig', {
+            alertConfig : alertConfig
+        }).success(function(alertConfig) {
+            var monitorMap = _.indexBy($scope.monitors, '_id');
+            alertConfig.condition.monitor = monitorMap[alertConfig.condition.monitorId];
+            setAlertConfig($scope, alertConfig);
+            showAlertList();
+            ma.done();
+        }).error(function(json) {
+            if (json.error) {
+                alert(json.error);
+            }
+            ma.done();
+        });
+    };
+    $scope.deleteAlertConfig = function(alertConfig) {
+        if (!confirm('Confirm to remove alert : ' + alertConfig.name)) {
+            return;
+        }
+        ma.wait();
+        $http.post('/console/ajax/deleteAlertConfig', {
+            id : alertConfig._id
+        }).success(function(json) {
+            deleteAlertConfig($scope, alertConfig);
+            ma.done();
+        }).error(function(json) {
+            if (json.error) {
+                alert(json.error);
+            }
+            ma.done();
+        });
+    };
+    $scope.createService = function(cate) {
+        $scope.currentCate = cate;
+        $('#service-form').modal('show');
+        $scope.newService = {
+            type: cate.type,
+            serviceInfo: {}
+        };
+    };
+    $scope.submitCreateService = function() {
+        if (!$scope.newService.title) {
+            return alert('Title can not be empty.');
+        }
+        if (_.some($scope.currentCate.props, function(prop) {
+            if (prop.require && !$scope.newService.serviceInfo[prop.key]) {
+                alert(prop.name + ' can not be empty.');
+                return true;
+            }
+        })) {
+            return;
+        }
+        $http.post('/console/ajax/upsertService', {
+            serviceConfig : $scope.newService
+        }).success(function(serviceConfig) {
+            serviceConfig.selected = true;
+            setService($scope, serviceConfig);
+            $('#service-form').modal('hide');
+        }).error(function(json) {
+            if (json.error) {
+                alert(json.error);
+            }
+        });
+    };
+    $scope.changeEnabled = function(alertConfig) {
+        ma.wait();
+        $http.post('/console/ajax/upsertAlertConfig', {
+            alertConfig : alertConfig
+        }).success(function(alertConfig) {
+            ma.done();
+        }).error(function(json) {
+            if (json.error) {
+                alert(json.error);
+            }
+            ma.done();
+        });
+    }
+}]);
+</script>
+</head>
+
+<body ng-controller="Ctrl">
+{% include include/navbar %}
+
+<div class="main-container" id="main-container">
+    <script type="text/javascript">
+        try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+    </script>
+
+    <div class="main-container-inner">
+        <a class="menu-toggler" id="menu-toggler">
+            <span class="menu-text"></span>
+        </a>
+
+        {% include include/siderbar %}
+
+        <div class="main-content">
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12">
+                        <!-- PAGE CONTENT BEGINS -->
+                        <div ng-include="'newButton'" ng-if="page.status == 'list'"></div>
+                        <div ng-include="'setting'" ng-if="page.status == 'setting'"></div>
+                        
+                        <div class="space-8"></div>
+                        <div ng-include="'alertConfigs'" ng-if="page.status == 'list'"></div>
+                        <!-- PAGE CONTENT ENDS -->
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div><!-- /.main-content -->
+
+    </div><!-- /.main-container-inner -->
+
+    <a id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+        <i class="icon-double-angle-up icon-only bigger-110"></i>
+    </a>
+</div><!-- /.main-container -->
+
+<div id="service-form" class="modal" tabindex="-1">
+    <div class="modal-dialog" style="max-width:400px">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="blue bigger">Create a new {{currentCate.name}} service</h4>
+            </div>
+
+            <div class="modal-body overflow-visible">
+                <div class="row">
+                    <div class="col-xs-12 col-sm-12">
+                        <div class="form-group">
+                            <label>Title (*)</label>
+
+                            <div>
+                                <input class="form-control" type="text" ng-model="newService.title" />
+                            </div>
+                        </div>
+
+                        <div class="space-4"></div>
+                        <div class="form-group" ng-repeat="prop in currentCate.props">
+                            <label>{{prop.name}} <span ng-if="prop.require">(*)</span></label>
+                            <input class="form-control" type="text" ng-model="newService.serviceInfo[prop.key]"/>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-sm" data-dismiss="modal">
+                    <i class="icon-remove"></i>
+                    Cancel
+                </button>
+
+                <button class="btn btn-sm btn-primary" ng-click="submitCreateService()">
+                    <i class="icon-ok"></i>
+                    Save
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/ng-template" id="newButton">
+<div class="btn-group">
+<button class="btn btn-info" ng-click="newAlertConfig()">
+         <i class="fa fa-plus"></i>
+         Create a new Alert
+     </button
+</div>
+</script>
+
+<script type="text/ng-template" id="setting">
+<div ng-if="currentConfig._id">
+    <div class="widget-box transparent">
+        <div class="widget-header">
+            <h4 class="lighter">
+                Edit Alert
+            </h4>
+
+            <div class="widget-toolbar no-border">
+                <ul class="nav nav-tabs" id="recent-tab">
+                    <li ng-class="{active : currentConfig.tab=='basic'}" ng-click="currentConfig.tab='basic'">
+                        <a ng-click="changeTab('basic')">Basic</a>
+                    </li>
+                    <li ng-class="{active : currentConfig.tab=='condition'}" ng-click="currentConfig.tab='condition'">
+                        <a ng-click="changeTab('condition')">Condition</a>
+                    </li>
+                    <li ng-class="{active : currentConfig.tab=='notifications'}" ng-click="currentConfig.tab='notifications'">
+                        <a ng-click="changeTab('notifications')">Notifications</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div class="space-16"></div>
+</div>
+
+<div ng-if="!currentConfig._id">
+    <h4> Add a new Alert </h4>
+    <div id="fuelux-wizard" class="row-fluid" data-target="#step-container" style="margin:30px 0">
+        <ul class="wizard-steps">
+            <li class="active">
+                <span class="step">1</span>
+                <span class="title">Basic infomation</span>
+            </li>
+
+            <li ng-class="{active : currentConfig.step >= 2}">
+                <span class="step">2</span>
+                <span class="title">Condition</span>
+            </li>
+
+            <li>
+                <span class="step">3</span>
+                <span class="title">Notifications</span>
+            </li>
+
+            <li>
+                <span class="step">4</span>
+                <span class="title">Finish</span>
+            </li>
+        </ul>
+    </div>
+    <hr/>
+</div>
+
+<div class="form-horizontal">
+    <div ng-if="currentConfig.tab=='basic' || currentConfig.step==1">
+        <div class="form-group" ng-class="{'has-error': currentConfig.errors.name}">
+            <label class="col-sm-3 control-label no-padding-right">Alert Name</label>
+            <div class="col-sm-9">
+                <div class="clearfix">
+                    <input type="text" ng-model="currentConfig.name" ng-blur="validateBasic('name')" class="col-xs-10 col-sm-7" />
+                </div>
+                <div class="help-block" ng-if="currentConfig.errors.name">{{currentConfig.errors.name}}</div>
+            </div>
+        </div>
+        <div class="space-4"></div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right">Description</label>
+            <div class="col-sm-9">
+                <input type="text" placeholder="optional" ng-model="currentConfig.description" class="col-xs-10 col-sm-7" />
+            </div>
+        </div>
+        <div class="space-4"></div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right">Enabled</label>
+            <div class="col-sm-9">
+                <label>
+                    <input ng-model="currentConfig.enabled" class="ace ace-switch ace-switch-5" type="checkbox" />
+                    <span class="lbl"></span>
+                </label>
+            </div>
+        </div>
+        <div class="space-4"></div>
+    </div>
+
+    <div ng-if="currentConfig.tab=='condition' || currentConfig.step==2">
+        <div class="form-group" ng-class="{'has-error': currentConfig.errors.monitor}">
+            <label class="col-sm-3 control-label no-padding-right">Select a monitor
+            </label>
+            <div class="col-sm-9">
+                <div class="clearfix">
+                    <select ng-model="currentConfig.condition.monitor" ng-change="changeMonitor(); validateCondition('monitor')" class="col-xs-10 col-sm-7" ng-options="monitor as monitor.name for monitor in monitors">
+                        <option value="">Please select</option>
+                    </select>
+                </div>
+                <div class="help-block" ng-if="currentConfig.errors.monitor">{{currentConfig.errors.monitor}}</div>
+            </div>
+        </div>
+
+        <div ng-if="currentConfig.condition.conditionType!='stop'
+                && currentConfig.condition.aggregators.length > 1">
+            <div class="form-group">
+                <label class="col-sm-3 control-label no-padding-right">Select a metric
+                </label>
+                <div class="col-sm-9">
+                    <select ng-model="currentConfig.condition.aggregator" class="col-xs-10 col-sm-7"
+                            ng-options="aggregator.key as aggregator.name for aggregator in currentConfig.condition.aggregators">
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="col-sm-3 control-label no-padding-right">Condition type</label>
+            <div class="col-sm-9">
+                <select ng-model="currentConfig.condition.conditionType" class="col-xs-10 col-sm-7">
+                    <option value="above">goes above</option>
+                    <option value="below">falls below</option>
+                    <option value="stop">stops reporting</option>
+                </select>
+            </div>
+        </div>
+        <div class="space-4"></div>
+
+        <div ng-if="currentConfig.condition.conditionType!='stop'">
+            <div class="form-group" ng-class="{'has-error': currentConfig.errors.threshold}">
+                <label class="col-sm-3 control-label no-padding-right">Threshold</label>
+                <div class="col-sm-9">
+                    <div class="clearfix">
+                        <input type="text" ng-model="currentConfig.condition.threshold" class="col-xs-5 col-sm-3" ng-blur="validateCondition('threshold')" />
+                        <select ng-model="currentConfig.condition.durationType" class="col-xs-4 col-sm-3 col-xs-offset-1 col-sm-offset-1">
+                            <option value="immediately">immediately</option>
+                            <option value="duration">for a duration</option>
+                        </select>
+                    </div>
+                    <div class="help-block" ng-if="currentConfig.errors.threshold">{{currentConfig.errors.threshold}}</div>
+                </div>
+            </div>
+            <div class="space-4"></div>
+        </div>
+
+        <div class="form-group" ng-if="currentConfig.condition.durationType=='duration'" ng-class="{'has-error': currentConfig.errors.duration}">
+            
+            <label class="col-sm-3 control-label no-padding-right">Duration</label>
+            <div class="col-xs-5 col-sm-3">
+                <div class="input-group clearfix">
+                    <input type="text" class="form-control" ng-model="currentConfig.condition.duration" ng-blur="validateCondition('duration')">
+                    <span class="input-group-addon">minutes</span>
+                </div>
+                <div class="help-block" ng-if="currentConfig.errors.duration">{{currentConfig.errors.duration}}</div>
+            </div>
+        </div>
+        <div class="space-4"></div>
+    </div>
+
+    <div ng-if="currentConfig.tab=='notifications' || currentConfig.step==3">
+        <h4>Select one or more services to notify when this alert fires.</h4>
+        <div class="has-error" ng-if="currentConfig.errors.notifications">
+            <div class="help-block">{{currentConfig.errors.notifications}}</div>
+        </div>
+        <div class="space-10"></div>
+        <div class="col-sm-1"></div>
+        <div class="col-sm-5" ng-repeat="cate in serviceCates">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">{{cate.name}} service</h3>
+                </div>
+                <div class="panel-body">
+                    <p>Configure mail services or <a href="/console/notification#?cate={{cate.type}}">edit</a> this service.</p>
+                    <div ng-repeat="service in serviceConfigs | filter:cate.searchService:true">
+                        <label>
+                            <input type="checkbox" class="ace" ng-model="service.selected" />
+                            <span class="lbl"> {{service.title}}</span>
+                        </label>
+                    </div>
+                    <div style="margin: 10px 0 0 0">
+                        <a href="" ng-click="createService(cate)">Create a new</a>
+                    </div>
+
+                    <div class="has-error" ng-if="(currentConfig.hosts|filter:searchSelectedHost).length==0">
+                        <div class="help-block">You haven't select any host</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+    <div class="form-actions center" ng-if="!currentConfig._id">
+        <button class="btn btn-sm btn-prev" ng-click="toStep(currentConfig.step - 1)">
+            <i class="icon-arrow-left"></i>
+            <span ng-if="currentConfig.step==1">Cancel</span>
+            <span ng-if="currentConfig.step>1">Prev</span>
+        </button>
+        &nbsp; &nbsp; &nbsp; &nbsp;
+        <button class="btn btn-sm btn-success btn-next" ng-click="toStep(currentConfig.step + 1)">
+            <span ng-if="currentConfig.step<3">Next</span>
+            <span ng-if="currentConfig.step==3">Submit</span>
+            <i class="icon-arrow-right icon-on-right"></i>
+        </button>
+    </div>
+
+    <div class="form-actions center" ng-if="currentConfig._id">
+        <button class="btn btn-sm btn-prev" ng-click="cancel()">
+            <i class="icon-arrow-left"></i>
+            <span>Cancel</span>
+        </button>
+        &nbsp; &nbsp; &nbsp; &nbsp;
+        <button class="btn btn-sm btn-success btn-next" ng-click="submit()">
+            <span>Submit</span>
+            <i class="icon-arrow-right icon-on-right"></i>
+        </button>
+    </div>
+</div>
+</script>
+
+<script type="text/ng-template" id="alertConfigs">
+<table id="sample-table-1" class="table table-striped table-bordered table-hover" ts-wrapper>
+    <thead>
+        <tr>
+            <th ts-criteria="name">Name</th>
+            <th ts-criteria="condition.monitor.name">Monitor</th>
+            <th ts-criteria="condition.aggregator">Aggregator</th>
+            <th ts-criteria="condition.conditionType">Condition</th>
+            <th ts-criteria="condition.duration">Duration</th>
+            <th ts-criteria="enabled">Enabled</th>
+            <th>Operation</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr ng-repeat="alertConfig in alertConfigs" ts-repeat ng-class="{disabled: !alertConfig.enabled}">
+            <td>{{alertConfig.name}}</td>
+            <td><a href="/console/metric?monitorId={{alertConfig.condition.monitor._id}}">
+                {{alertConfig.condition.monitor.name}}</a>
+            </td>
+            <td>{{alertConfig.condition.aggregator}}</td>
+            <td>
+                <span ng-if="alertConfig.condition.conditionType=='above'">
+                    &gt;{{alertConfig.condition.threshold}}
+                </span>
+                <span ng-if="alertConfig.condition.conditionType=='below'">
+                    &lt;{{alertConfig.condition.threshold}}
+                </span>
+                <span ng-if="alertConfig.condition.conditionType=='stop'">
+                    stop reporting
+                </span>
+            </td>
+            <td ng-if="alertConfig.condition.duration == 0">Immediately</td>
+            <td ng-if="alertConfig.condition.duration > 0">{{alertConfig.condition.duration}} minutes</td>
+            <td>
+                <label>
+                    <input ng-model="alertConfig.enabled" class="ace ace-switch ace-switch-5" type="checkbox" ng-change="changeEnabled(alertConfig)">
+                    <span class="lbl"></span>
+                </label>
+            </td>
+            <td>
+                <div class="btn-group">
+                    <button class="btn btn-xs btn-info" ng-click="editAlertConfig(alertConfig._id)">
+                        <i class="icon-edit bigger-120"></i>
+                    </button>
+
+                    <button class="btn btn-xs btn-danger" ng-click="deleteAlertConfig(alertConfig)">
+                        <i class="icon-trash bigger-120"></i>
+                    </button>
+                </div>
+            </td>
+        </tr>
+    </tbody>
+</table>
+</script>
+
+{% include include/footer %}
+</body>
+</html>
