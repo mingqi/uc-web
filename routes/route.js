@@ -12,10 +12,6 @@ exports.home = function(req, res, next) {
 
 exports.help = function(req, res, next) {
     var page = req.params.page;
-    var localeView = 'help/' + page + '-' + req.i18n.locale;
-    if (fs.existsSync(path.join(__dirname, '../views', localeView + '.ejs'))) {
-        return res.render(localeView);
-    }
     res.render('help/' + req.params.page);
 };
 
@@ -25,7 +21,7 @@ exports.forceLogin = function(req, res, next) {
         return next();
     }
 
-    var error = "sign_in_before_continue";
+    var error = "继续之前请先登录";
     if (req.xhr) {
         return next(new QiriError(error));
     }

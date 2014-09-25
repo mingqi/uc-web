@@ -138,7 +138,7 @@ angular.module('consoleApp', [])
             $scope.chartCount.highChart.showLoading();
         }
 
-        $http.post("http://dev.metricsat.com:9200/demo/talog/_search", {
+        $http.post("http://dev.UCLogs.com:9200/demo/talog/_search", {
           query: $scope.page.query,
           size: 100,
           aggs: {
@@ -211,7 +211,7 @@ angular.module('consoleApp', [])
     $scope.toggleField = function(field) {
       if (!field.buckets) {
         field.loading = true;
-        $http.post("http://dev.metricsat.com:9200/demo/talog/_search", {
+        $http.post("http://dev.UCLogs.com:9200/demo/talog/_search", {
           "query": $scope.page.query,
           "aggs": {
             "unique_number_for_attributes": {
@@ -240,7 +240,7 @@ angular.module('consoleApp', [])
             },
           }
         };
-        $http.post("http://dev.metricsat.com:9200/demo/talog/_search", data).success(function(json) {
+        $http.post("http://dev.UCLogs.com:9200/demo/talog/_search", data).success(function(json) {
           attr.loading = false;
           attr.buckets = json.aggregations.attribute_values.buckets;
         });
@@ -294,7 +294,7 @@ angular.module('consoleApp', [])
       if ($scope.chartStat.highChart) {
           $scope.chartStat.highChart.showLoading();
       }
-      $http.post("http://dev.metricsat.com:9200/demo/talog/_search", {
+      $http.post("http://dev.UCLogs.com:9200/demo/talog/_search", {
           query: $scope.page.query,
           size: 100,
           aggs: {
@@ -354,7 +354,7 @@ angular.module('consoleApp', [])
       if ($scope.currentPage == page) {
         return;
       }
-      $http.post("http://dev.metricsat.com:9200/demo/talog/_search", {
+      $http.post("http://dev.UCLogs.com:9200/demo/talog/_search", {
           query: $scope.page.query,
           size: 100,
           from: (page - 1) * 100

@@ -765,9 +765,9 @@ angular.module('consoleApp', ['tableSort'])
                             <span style="margin-left:10px">Add yum repository</span>
                         </h4>
                         <p>Configure the New Relic apt repository:</p>
-                        <div class="well well-sm">sudo sh -c "echo deb http://apt.uclogs.com/ stable main >> /etc/apt/sources.list.d/metricsat.list"</div>
+                        <div class="well well-sm">sudo sh -c "echo deb http://apt.uclogs.com/ stable main >> /etc/apt/sources.list.d/UCLogs.list"</div>
                         <p>Trust the key:</p>
-                        <div class="well well-sm">wget -O- http://apt.uclogs.com/metricsat-apt-repo.gpg | sudo apt-key add -</div>
+                        <div class="well well-sm">wget -O- http://apt.uclogs.com/UCLogs-apt-repo.gpg | sudo apt-key add -</div>
                         <p>Update the local package list:</p>
                         <div class="well well-sm">sudo apt-get update</div>
 

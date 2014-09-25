@@ -41,6 +41,7 @@ angular.module('consoleApp', [])
     };
 })
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $scope.dateRange = $('#daterange').val();
     _.extend($scope, {
       _: _,

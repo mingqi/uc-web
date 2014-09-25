@@ -88,7 +88,7 @@ exports.postLogin = function(req, res, next) {
             setLoginCookie(res, results.existUser);
             return req.xhr ? res.json({}) : res.redirect(rd);
         } else {
-            var error = 'email_or_pwd_error';
+            var error = 'Email 或者密码错误';
             if (req.xhr) {
                 return res.json({
                     error : error
@@ -132,13 +132,13 @@ exports.postRegister = function(req, res, next) {
     };
 
     if (!user.email.match(/^[\w\.-]+@[\w\.-]+\.[a-z]{2,4}$/)) {
-        return renderError('email_invalid');
+        return renderError('邮箱地址不符合规则');
     }
     if (user.password.length < 6) {
-        return renderError('password_less_than_6');
+        return renderError('密码长度不能小于6');
     }
     if (user.password != password2) {
-        return renderError('password_not_same');
+        return renderError('两次输入密码不一致');
     }
     async.auto({
         existUser : function(callback) {
@@ -161,7 +161,7 @@ exports.postRegister = function(req, res, next) {
             return next(err);
         }
         if (results.existUser) {
-            var error = 'email_taken_please_change';
+            var error = 'Email 已经注册过，请更换';
             return renderError(error);
         } else {
             setLoginCookie(res, results.newUser);
@@ -203,8 +203,8 @@ exports.postFindPwd = function(req, res, next) {
             var url = getUrl();
             utils.sendMail({
                 to : email,
-                subject : 'Reset your password',
-                html : 'Please click the link to reset your password: <a href="' + url + '">' + url + '</a>, the link is valid in 2 days.',
+                subject : '重置你的密码',
+                html : '请点击下面链接重置你的密码: <a href="' + url + '">' + url + '</a>，两日内有效。',
             }, function(err, response) {
                 if (err) {
                     console.error(err);
@@ -217,11 +217,11 @@ exports.postFindPwd = function(req, res, next) {
         }
         if (!results.existUser) {
             return res.render('message', {
-                message : 'email_not_registered'
+                message : 'Email 邮箱没有注册过'
             });
         } else {
             return res.render('message', {
-                message : 'check_email_to_reset_pwd'
+                message : '请检查你的邮箱来重置密码'
             });
         }
     });
@@ -242,7 +242,7 @@ exports.resetPwd = function(req, res, next) {
 exports.postResetPwd = function(req, res, next) {
     if (!validateResetPwdKey(req.body)) {
         return res.render('message', {
-            message : 'The link is invalid or expired.'
+            message : '链接无效或者已过期'
         });
     }
 
@@ -251,7 +251,7 @@ exports.postResetPwd = function(req, res, next) {
 
     if (password.length < 6) {
         return res.render('message', {
-            message : 'password_less_than_6'
+            message : '密码长度不能小于6'
         });
     }
 
@@ -270,7 +270,7 @@ exports.postResetPwd = function(req, res, next) {
             return next(err);
         }
         return res.render('message', {
-            message : 'pwd_modified_success'
+            message : '密码修改成功'
         });
     });
 };

@@ -38,7 +38,7 @@ exports.error = function(err, req, res, next) {
             });
         } else {
             res.render('message', {
-                message : "server_unknow_error",
+                message : "服务器错误",
                 visitor : req.visitor
             });
         }
@@ -46,10 +46,6 @@ exports.error = function(err, req, res, next) {
 };
 
 exports.notFound = function(req, res, next) {
-    if (req.path === '/') {
-        var locale = req.signedCookies.lang || 'en';
-        return res.redirect('/' + locale + '/');
-    }
     next(new QiriError(404));
 };
 

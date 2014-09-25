@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Product - UCLogs</title>
+<title>产品 - UCLogs</title>
 {% include ../include/inheader %}
 <link rel="stylesheet" type="text/css" href="/css/lib/animate.css" media="screen, projection" />
 <link rel="stylesheet" href="/css/compiled/help.css" type="text/css" media="screen" />
@@ -20,7 +20,7 @@
 <body>
     
     <div class="navbar navbar-inverse navbar-static-top" role="navigation">
-        {% include ../include/navbar %}
+    {% include ../include/navbar %}
     </div>
 
     <div id="features" class="features_page">
@@ -28,31 +28,30 @@
             <!-- Feature Wrapper -->
             <div class="feature_wrapper option1">
                 <div class="section_header">
-                    <h3>Overview</h3>
+                    <h3>概述</h3>
                 </div>
 
-                <p>MetricsAt is a cloud-based service, which can measure and monitor any data from your applications. By installing the software, the Metrics At Agent, your data will be automatically collected and sent to our central cluster. Not only will the central cluster provide you with a metric report with graphics efficiently, but the alert system will also notify you of crossing-over thresholds immediately.</p>
+                <p>UCLogs 是云服务平台，可以帮您收集应用程序的数据，图形化展示数据，并监控你的应用程序。 这一切对你将非常容易，你需要做的仅仅是告诉我们你的数据在哪里。我们的引擎会自动收集你的数据到我们的服务器，并生成各种统计图像报表。当数据停止更新，或者超过设定的阈值时，我们的报警系统会自动提醒你，不会让你因为应用程序问题而遭到损失。</p>
+                
 
                 <div class="row feature">
                     <div class="col-sm-8 info">
                         <h3 id="metrics">
-                            Collect and Measure Data
+                            收集数据
                         </h3>
-                        <p>
-                            Currently we provide three methods to collect your application datum: log files, database queries and shell commands.
-                        </p>
+                        <p>目前我们支持三种方式来收集应用程序的数据：日志文件、数据库查询、shell命令。</p>
                         <ul>
-                          <li>Log Files: Monitor your log files, filter and extract data by your specified regular expressions.</li>
-                          <li>Database queries: Execute periodically your specified query statements (SQL or Mongo).</li>
-                          <li>Shell commands: Periodically run your specified shell commands in your host. (For example, under a directory, you can input <code>ls -1 /you/path/ | wc -l</code> to metric and monitor how many files in the directory).</li>
+                          <li>日志文件：监控日志文件，通过设置正则表达式，从日志中过滤并且得到你的数据。</li>
+                          <li>数据库查询：通过执行特定的 Sql 语句或者 Mongo 脚本来获取数据。</li>
+                          <li>Shell 命令：在的服务器上定期运行shell命令。例如，您可以输入 <code>ls -1 /you/path/ | wc -l</code> 来获取和监控一个文件夹下得文件数目。</li>
                         </ul>
                     </div>
                     <div class="col-sm-4 info">
                         <h3 id="alert">
-                            Alert function
+                            报警
                         </h3>
                         <p>
-                            If thresholds are crossed over, the Alert function will notify you automatically by email or  PagerDuty. 
+                            当数据停止更新，或者超过设定的阈值时，UCLogs 会通过 Email 或者 PagerDuty 自动提醒你，不会让你因为应用程序问题而遭到损失。
                         </p>
                     </div>
                 </div>
@@ -61,7 +60,7 @@
             <!-- Feature Wrapper -->
             <div class="feature_wrapper option1">
                 <div class="section_header">
-                    <h3>Get it work. It's simple as 1-2-3.</h3>
+                    <h3>使用非常简单，只需3步</h3>
                 </div>
 
                 <div class="row feature">
@@ -71,10 +70,10 @@
                     <div class="col-sm-6 info info-left">
                         <h3>
                             <span class="label label-primary" style="font-size:20px">1</span>
-                            Install the MetricsAt Agent on your server
+                            在服务器上安装 Agent
                         </h3>
                         <p>
-                            Install the Agent on your target server so that the essential data will be collected from your applications and sent to our central cluster.
+                            你的服务器上安装 Agent，来收集应用程序数据。按照提示输入命令即可，安装过程非常简单。
                         </p>
                     </div>
                 </div>
@@ -85,10 +84,10 @@
                     <div class="col-sm-6 info">
                         <h3>
                             <span class="label label-primary" style="font-size:20px">2</span>
-                            Tell us where is your data
+                            配置你的数据来源
                         </h3>
                         <p>
-                            Input essential information, we will take care of the rest.
+                            输入你的数据相关信息，其余事情全部交给我们即可。
                         </p>
                     </div>
                 </div>
@@ -99,10 +98,10 @@
                     <div class="col-sm-5 info info-left">
                         <h3>
                             <span class="label label-primary" style="font-size:20px">3.a</span>
-                            That’s It. Here is your metrics
+                            搞定，查看你的数据报表
                         </h3>
                         <p>
-                            You will get the metric in few minutes, and can view the metrics by aggregator, time range and granularity.
+                            几分钟后，你就可以根据时间段、不同指标来查看数据报表。
                         </p>
                     </div>                    
                 </div>
@@ -113,10 +112,10 @@
                     <div class="col-sm-5 info info-left">
                         <h3>
                             <span class="label label-primary" style="font-size:20px">3.b</span>
-                            Setup Alert
+                            设置报警
                         </h3>
                         <p>
-                            Assign conditions and notifications for your metrics. The Alert function will work.
+                            当数据停止更新，或者超过设定的阈值时，会自动提醒你，不会让你因为应用程序问题而遭到损失。
                         </p>
                     </div>
                 </div>
@@ -126,16 +125,16 @@
             <!-- Feature Wrapper -->
             <div class="feature_wrapper option1">
                 <div class="section_header">
-                    <h3 id="free">Absolutely Free</h3>
+                    <h3 id="free">完全免费</h3>
                 </div>
 
                 <p>
-                    Yes, we are absolutely free. No hardware cost, no license charge, no price plan. Our business model is freemium. We will charge for future power feature, but currently all features are absolutely free without any limitation.
+                    是的，我们完全免费！无需硬件投入，无需授权费用，没有收费计划。我们商业模式是免费，以后将会针对更强大的功能推出收费计划。但目前所有功能都是免费的，并且没有任何使用限制。
                 </p>
             </div>
 
             <div style="margin:0 0 20px" class="text-center">
-                <a class="btn btn-primary btn-lg" href="/account/register" style="font-family: verdana; font-weight: bold;">{%= __('try_it_free') %}</a>
+                <a class="btn btn-primary btn-lg" href="/account/register" style="font-family: verdana; font-weight: bold;">免费试用</a>
             </div>
         </div>
     </div>

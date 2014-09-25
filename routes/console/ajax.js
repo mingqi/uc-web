@@ -390,7 +390,11 @@ exports.deleteService = function(req, res, next) {
 
 exports.search = function(req, res, next) {
     request.post({
-        url: 'http://dev.uclogs.com:9200/demo/talog/_search',
+        url: 'http://106.185.38.213:9200/demo/talog/_search',
         json: req.body
+    }, function(error, response, body) {
+        if (error) {
+            return next(error);
+        }
     }).pipe(res);
 };
