@@ -12,6 +12,8 @@ var langRouter = express.Router();
 
 module.exports = exports = router;
 
+router.use(middleware.fixSafariBug);
+
 router.use('/s', middleware.static('s'));
 router.use('/assets', middleware.static('ace/assets'));
 router.use('/css', middleware.static('cc/css'));
