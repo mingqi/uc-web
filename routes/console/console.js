@@ -41,7 +41,7 @@ exports.alert = function(req, res, next) {
 };
 
 exports.config = function(req, res, next) {
-    res.render("console/overview", {
+    res.render("console/config", {
         page : 'config'
     });
 };

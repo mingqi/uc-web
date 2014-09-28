@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="consoleApp">
+<head>
+<title>配置日志 - UCLogs</title>
+
+{% include include/inhead %}
+
+<script src="/s/angular/angular.min.js"></script>
+<script>
+angular.module('consoleApp', [])
+.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+    
+}]);
+</script>
+</head>
+    <body>
+        {% include include/navbar %}
+
+        <div class="main-container" id="main-container">
+            <script type="text/javascript">
+                try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+            </script>
+
+            <div class="main-container-inner">
+                <a class="menu-toggler" id="menu-toggler" href="#">
+                    <span class="menu-text"></span>
+                </a>
+
+                <div class="sidebar" id="sidebar" style="height:0">
+                    <script type="text/javascript">
+                        try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
+                    </script>
+
+                    
+                    <ul class="nav nav-list">
+                      <li class="active">
+                        <a>
+                          <i class="icon-none fa fa-eye"></i>
+                          <span class="menu-text">查看所有配置</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a>
+                          <i class="icon-none fa fa-plus"></i>
+                          <span class="menu-text">添加服务器</span>
+                        </a>
+                      </li>
+                      <li>
+                        <a>
+                          <i class="icon-none fa fa-file-text"></i>
+                          <span class="menu-text">添加日志文件</span>
+                        </a>
+                      </li>
+                    </ul>
+                </div>
+
+                <div class="main-content">
+                    
+
+                    <div class="page-content">
+                        <div class="page-header">
+                            <h1>
+                                Console
+                                <small>
+                                    <i class="icon-double-angle-right"></i>
+                                    Overview
+                                </small>
+                            </h1>
+                        </div><!-- /.page-header -->
+
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <!-- PAGE CONTENT BEGINS -->
+
+                                <!-- PAGE CONTENT ENDS -->
+                            </div><!-- /.col -->
+                        </div><!-- /.row -->
+                    </div><!-- /.page-content -->
+                </div><!-- /.main-content -->
+
+                
+            </div><!-- /.main-container-inner -->
+
+            <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+                <i class="icon-double-angle-up icon-only bigger-110"></i>
+            </a>
+        </div><!-- /.main-container -->
+
+        {% include include/footer %}
+
+        <!-- inline scripts related to this page -->
+    </body>
+</html>
