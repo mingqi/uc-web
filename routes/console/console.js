@@ -40,14 +40,16 @@ exports.alert = function(req, res, next) {
     });
 };
 
-exports.notification = function(req, res, next) {
-    res.render("console/notification", {
-        page : 'notification'
+exports.config = function(req, res, next) {
+    res.render("console/overview", {
+        page : 'config'
     });
 };
 
 exports.search = function(req, res, next) {
-    res.render("console/search")
+    res.render("console/search", {
+        page: 'search'
+    });
 };
 
 exports.demo = function(req, res, next) {

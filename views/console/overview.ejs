@@ -26,23 +26,20 @@ angular.module('consoleApp', [])
                     <span class="menu-text"></span>
                 </a>
 
-                {% include include/siderbar %}
+                <div class="sidebar" id="sidebar" style="height:0">
+                    <script type="text/javascript">
+                        try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
+                    </script>
+
+                    
+                    <ul class="nav nav-list" ng-include="'navList'"></ul>
+                    <script type="text/ng-template" id="navList">
+                    
+                    </script>
+                </div>
 
                 <div class="main-content">
-                    <div class="breadcrumbs" id="breadcrumbs">
-                        <script type="text/javascript">
-                            try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
-                        </script>
-
-                        <ul class="breadcrumb">
-                            <li>
-                                <i class="icon-home home-icon"></i>
-                                <a href="/">Home</a>
-                            </li>
-                            <li class="active">Console</li>
-                        </ul><!-- .breadcrumb -->
-
-                    </div>
+                    
 
                     <div class="page-content">
                         <div class="page-header">

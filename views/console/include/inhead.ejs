@@ -55,11 +55,44 @@
 <style>
 a {cursor: pointer;}
 .navbar {
-  background-color: #252528
+  background-color: #252528;
 }
-.ace-nav>li>a {background-color: transparent}
+.ace-nav>li>a {
+  padding: 0 20px 0 15px;
+  background-color: transparent;
+}
 
 .ace-nav > li:hover > a {
- background-color: #666;
+ background-color: #5E5E6B;
+ border-bottom: 3px solid gray;
+}
+
+.ace-nav > li.active > a {
+  background-color: #5E5E6B !important;
+  border-bottom: 3px solid #d76847;
+}
+
+.ace-nav>li:first-child {
+  margin-left:30px;
+}
+.pull-right .ace-nav>li:last-child>a{
+  padding-right:0;
+}
+
+
+.main-content {
+    margin-left: 260px;
+}
+.sidebar {
+    width: 260px;
+}
+.sidebar:before {
+    width: 260px;
+}
+.nav-list>li>.submenu li>.submenu>li a {
+  color: #aeaeae;
+}
+.table thead:first-child tr:first-child th {
+  white-space: nowrap;
 }
 </style>
