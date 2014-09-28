@@ -745,9 +745,7 @@
     // #feature_slider {
     //     display: none;
     // }
-    #feature_slider .slide#ideas .info h2 {
-        font-size: 25px;
-    }
+    
 
     #features {
         .section_header {
@@ -848,6 +846,10 @@
 }
 
 @media (max-width: 480px) {
+    #feature_slider .slide#ideas .info h2 {
+        font-size: 25px;
+    }
+    
     #showcase {
         .features_op1_row {
             .feature {
