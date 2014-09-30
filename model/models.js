@@ -23,34 +23,12 @@ conn.on('open', function () {
 
 var schemas = {};
 
-var metricPointSchema = {
-    user_id : String,
-    metric : String,
-    aggregator : String,
-    interval : String,
-    point_time : Date,
-    value : Number,
-    dimensions: Schema.Types.Mixed  // [[name,value], ...]
-};
-
 var collections = {
     User : {
         email : String,         // uniq
         passwordMd5 : String,   // use md5 for security
         roles : [String],       // admin, pro
         licenseKey : String,    // [0-9a-zA-Z]{20}
-    },
-    Monitor : {
-        userId : String,
-        sid : String,
-        name : String,
-        description: String,
-        type : String,
-        hosts : [String],
-        lastModified : Date,
-        agentStatus : String,   // ok, fail
-        agentMessage : String,
-        config : Schema.Types.Mixed,
     },
     Host : {
         userId : String,
@@ -59,36 +37,12 @@ var collections = {
         lastPushDate : Date,
         serverInfo : Schema.Types.Mixed
     },
-    NotificationService : {
-        userId : String,
-        type : String,  // email, pagerduty, ...
-        title : String,
-        serviceInfo : Schema.Types.Mixed,
-    },
-    AlertConfig : {
-        userId : String,
-        name : String,
-        description : String,   // optional
-        runbookUrl : String,    // optional
-        enabled : Boolean,
-        condition : {
-            monitorId : String,
-            metric : String,
-            aggregator : String,
-            conditionType : String, // above, below, stop
-            threshold : Number,
-            duration : Number,  // 分钟
-        },
-        notifications : [ String ],  // notificationServiceId
-    },
-    MonitorStatus: {
-        collection: 'monitorStatuses',
+    LogConfig : {
         userId: String,
-        monitorId: String,
-        host: String,
-        status: String,
-        message: String,
-        lastReportDate: Date,
+        config: [{
+            hostId: String,
+            files: [String]
+        }]
     }
 };
 
@@ -98,13 +52,6 @@ _(collections).each(function(schema, name) {
     schemas[name] = mongoose.Schema(collections[name], {
         strict : true,
         collection: collectionName
-    });
-});
-
-_(['1m', '5m', '15m', '1h', '1d']).each(function(time) {
-    schemas['MetricPoint' + time] = mongoose.Schema(metricPointSchema, {
-        strict : true,
-        collection : 'metric_point_' + time
     });
 });
 

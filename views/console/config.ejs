@@ -6,88 +6,153 @@
 {% include include/inhead %}
 
 <script src="/s/angular/angular.min.js"></script>
+<script src="/s/angular-tablesort.js"></script>
+
+<link rel="stylesheet" href="/s/tablesort.css" />
+
 <script>
-angular.module('consoleApp', [])
+var logConfigs = [{
+  hostId: "host1",
+  hostname: "test-web-01.uclogs.com",
+  files: ["/var/logs/web.log", "/var/logs/app.log", "/var/logs/apache.log"]
+}, {
+  hostId: "host2",
+  hostname: "test-web-02.uclogs.com",
+  files: ["/var/logs/web.log", "/var/logs/app.log", "/var/logs/nginx.log"]
+}];
+
+angular.module('consoleApp', ['tableSort'])
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
-    
+  _.extend($scope, {
+    page: {},
+    logConfigs: logConfigs,
+    platforms: [{
+        key: 'redhat',
+        name: 'Red Hat or CentOS'
+    }, {
+        key: 'debian',
+        name: 'Ubuntu or Debian'
+    }, {
+        key: 'linux',
+        name: 'Others linux'
+    }]
+  });
+
+  var venderPage = function() {
+      var locationSearch = $location.search();
+      $scope.mainContent = locationSearch.tab || 'seeConfigs';
+  };
+
+  venderPage();
+  $scope.$on('$locationChangeSuccess', venderPage);
+
+  $scope.changeTab = function(tab) {
+      if ($location.search().tab === tab) {
+          return;
+      }
+      $location.search('tab', tab);
+  };
 }]);
 </script>
 </head>
-    <body>
-        {% include include/navbar %}
+<body ng-controller="Ctrl">
+{% include include/navbar %}
 
-        <div class="main-container" id="main-container">
-            <script type="text/javascript">
-                try{ace.settings.check('main-container' , 'fixed')}catch(e){}
-            </script>
+<div class="main-container" id="main-container">
 
-            <div class="main-container-inner">
-                <a class="menu-toggler" id="menu-toggler" href="#">
-                    <span class="menu-text"></span>
+    <div class="main-container-inner">
+        <a class="menu-toggler" id="menu-toggler" href="#">
+            <span class="menu-text"></span>
+        </a>
+
+        <div class="sidebar" id="sidebar" style="height:0">
+            
+            <ul class="nav nav-list">
+              <li ng-class="{active: mainContent == 'seeConfigs'}">
+                <a ng-click="changeTab('seeConfigs')">
+                  <i class="icon-none fa fa-eye"></i>
+                  <span class="menu-text">查看所有配置</span>
                 </a>
+              </li>
+              <li ng-class="{active: mainContent == 'addHost'}">
+                <a ng-click="changeTab('addHost')">
+                  <i class="icon-none fa fa-plus"></i>
+                  <span class="menu-text">添加服务器</span>
+                </a>
+              </li>
+              <li ng-class="{active: mainContent == 'addFile'}">
+                <a ng-click="changeTab('addFile')">
+                  <i class="icon-none fa fa-file-text"></i>
+                  <span class="menu-text">添加日志文件</span>
+                </a>
+              </li>
+            </ul>
+        </div>
 
-                <div class="sidebar" id="sidebar" style="height:0">
-                    <script type="text/javascript">
-                        try{ace.settings.check('sidebar' , 'fixed')}catch(e){}
-                    </script>
+        <div class="main-content">
+            <div class="page-content">
+                <div class="row">
+                    <div class="col-xs-12" style="margin-top:15px" ng-include="mainContent">
 
-                    
-                    <ul class="nav nav-list">
-                      <li class="active">
-                        <a>
-                          <i class="icon-none fa fa-eye"></i>
-                          <span class="menu-text">查看所有配置</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a>
-                          <i class="icon-none fa fa-plus"></i>
-                          <span class="menu-text">添加服务器</span>
-                        </a>
-                      </li>
-                      <li>
-                        <a>
-                          <i class="icon-none fa fa-file-text"></i>
-                          <span class="menu-text">添加日志文件</span>
-                        </a>
-                      </li>
-                    </ul>
-                </div>
+                    </div><!-- /.col -->
+                </div><!-- /.row -->
+            </div><!-- /.page-content -->
+        </div><!-- /.main-content -->
 
-                <div class="main-content">
-                    
+        
+    </div><!-- /.main-container-inner -->
 
-                    <div class="page-content">
-                        <div class="page-header">
-                            <h1>
-                                Console
-                                <small>
-                                    <i class="icon-double-angle-right"></i>
-                                    Overview
-                                </small>
-                            </h1>
-                        </div><!-- /.page-header -->
+    <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+        <i class="fa fa-angle-double-up icon-only bigger-110"></i>
+    </a>
+</div><!-- /.main-container -->
 
-                        <div class="row">
-                            <div class="col-xs-12">
-                                <!-- PAGE CONTENT BEGINS -->
+{% include include/footer %}
 
-                                <!-- PAGE CONTENT ENDS -->
-                            </div><!-- /.col -->
-                        </div><!-- /.row -->
-                    </div><!-- /.page-content -->
-                </div><!-- /.main-content -->
+<script type="text/ng-template" id="seeConfigs">
+  <table class="table table-striped table-bordered table-hover" ts-wrapper>
+    <thead>
+        <tr>
+            <th style="position: relative; height: 42px;">
+              主机名称 &nbsp;
+              <a ng-click="page.isFileHiden=1" ng-if="!page.isFileHiden">隐藏文件</a>
+              <a ng-click="page.isFileHiden=0" ng-if="page.isFileHiden">显示文件</a>
+              <div class="nav-search">
+                <span class="input-icon">
+                    <input type="text" placeholder="过滤主机" class="nav-search-input" ng-model="page.searchHost" />
+                    <i class="icon-none nav-search-icon fa fa-search"></i>
+                </span>
+              </div>
+            </th>
+            <th style="position: relative; height: 42px;" ng-if="!page.isFileHiden">
+              日志文件
+              <div class="nav-search">
+                <span class="input-icon">
+                    <input type="text" placeholder="过滤文件" class="nav-search-input" ng-model="page.searchFile" />
+                    <i class="icon-none nav-search-icon fa fa-search"></i>
+                </span>
+              </div>
+            </th>
+        </tr>
+    </thead>
 
-                
-            </div><!-- /.main-container-inner -->
-
-            <a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
-                <i class="icon-double-angle-up icon-only bigger-110"></i>
-            </a>
-        </div><!-- /.main-container -->
-
-        {% include include/footer %}
-
-        <!-- inline scripts related to this page -->
-    </body>
+    <tbody>
+        <tr ng-repeat="config in logConfigs | filter:{hostname:page.searchHost} | filter:{files:page.searchFile}"
+          ts-repeat>
+            <td>{{config.hostname}}</td>
+            <td ng-if="!page.isFileHiden">
+              <ul style="margin-bottom:0">
+                <li ng-repeat="file in config.files | filter:page.searchFile">{{file}}</li>
+              </ul>
+            </td>
+        </tr>
+    </tbody>
+  </table>
+</script>
+<script type="text/ng-template" id="addHost">
+  {% include config-addHost %}
+</script>
+<script type="text/ng-template" id="addFile">
+</script>
+</body>
 </html>
