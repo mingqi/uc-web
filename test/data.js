@@ -15,13 +15,11 @@ db.hosts.insert({
 })
 
 db.hosts.insert({
-	userId: '542b79a16246d50000000002',
 	hostname: 'dev-web-03.uclogs.com',
 	files: ["/var/logs/tomcat.log", "/var/logs/error.log", "/var/logs/ngxin.log"],
 })
 
 db.hosts.insert({
-	userId: '542b79a16246d50000000002',
 	hostname: 'dev-web-04.uclogs.com',
 	files: ["/var/logs/tomcat.log", "/var/logs/error.log", "/var/logs/access.log"],
 })

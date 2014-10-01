@@ -18,8 +18,12 @@
 }
 </style>
 <script src="/s/angular/angular.min.js"></script>
+<script src="/s/angular-tablesort.js"></script>
+
+<link rel="stylesheet" href="/s/tablesort.css" />
+
 <script>
-angular.module('consoleApp', [])
+angular.module('consoleApp', ['tableSort'])
 .filter('isEmpty', function () {
         var bar;
         return function (obj) {
@@ -486,7 +490,7 @@ var drawChart = function(chart, series) {
 
               <div id="resultList" style="overflow-x:auto" ng-if="page.searchResult">
 
-                <table class="table table-striped table-bordered table-hover">
+                <table class="table table-striped table-bordered table-hover" ts-wrapper>
                   <thead>
                       <tr>
                           <th>时间</th>
@@ -497,7 +501,7 @@ var drawChart = function(chart, series) {
                   </thead>
 
                   <tbody>
-                      <tr ng-repeat="hit in page.searchResult.hits.hits">
+                      <tr ng-repeat="hit in page.searchResult.hits.hits" ts-repeat>
                           <td style="white-space: nowrap;">
                             {{moment(moment.utc(hit._source.timestamp).toDate())
                               .format('YYYY-MM-DDTHH:mm:ss')}}</td>
