@@ -71,10 +71,12 @@ angular.module('consoleApp', ['tableSort'])
       if (!confirm('确实要删除吗？')) {
         return;
       }
+      ma.wait();
       $http.post('/console/ajax/deleteFile', {
         hostId: host._id,
         file: file
       }).success(function(host) {
+        ma.done();
         setObject($scope.hosts, host);
       });
   };
@@ -98,12 +100,14 @@ angular.module('consoleApp', ['tableSort'])
       return;
     }
 
+    ma.wait();
     $http.post('/console/ajax/addFiles', {
       hostIds: hostIds,
       newFiles: _.map($scope.newFiles, function(file) {
         return file.path;
       })
     }).success(function(hosts) {
+      ma.done();
       $scope.changeTab('seeConfigs');
       _.each(hosts, function(host) {
         setObject($scope.hosts, host);
