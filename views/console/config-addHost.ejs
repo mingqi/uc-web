@@ -1,115 +1,117 @@
-<div class="form-group" style="margin-bottom:25px">
-    <select ng-model="page.platform"
-            ng-options="platform.key as platform.name for platform in platforms">
-        <option value="">请选择主机平台</option>
-    </select>
-</div>
-<div ng-if="page.platform=='debian'">
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">1.</span> 
-        <span style="margin-left:10px">Add yum repository</span>
-    </h4>
-    <p>Configure the New Relic apt repository:</p>
-    <div class="well well-sm">sudo sh -c "echo deb http://apt.uclogs.com/ stable main >> /etc/apt/sources.list.d/UCLogs.list"</div>
-    <p>Trust the key:</p>
-    <div class="well well-sm">wget -O- http://apt.uclogs.com/UCLogs-apt-repo.gpg | sudo apt-key add -</div>
-    <p>Update the local package list:</p>
-    <div class="well well-sm">sudo apt-get update</div>
+<div class="col-sm-12">
+    <div class="form-group" style="margin-bottom:25px">
+        <select ng-model="page.platform"
+                ng-options="platform.key as platform.name for platform in platforms">
+            <option value="">请选择主机平台</option>
+        </select>
+    </div>
+    <div ng-if="page.platform=='debian'">
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">1.</span> 
+            <span style="margin-left:10px">Add yum repository</span>
+        </h4>
+        <p>Configure the New Relic apt repository:</p>
+        <div class="well well-sm">sudo sh -c "echo deb http://apt.uclogs.com/ stable main >> /etc/apt/sources.list.d/UCLogs.list"</div>
+        <p>Trust the key:</p>
+        <div class="well well-sm">wget -O- http://apt.uclogs.com/UCLogs-apt-repo.gpg | sudo apt-key add -</div>
+        <p>Update the local package list:</p>
+        <div class="well well-sm">sudo apt-get update</div>
 
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">2.</span> 
-        <span style="margin-left:10px">Install the Host Agent package</span>
-    </h4>
-    <div class="well well-sm">sudo apt-get install ma-agent</div>
-</div>
-<div ng-if="page.platform=='redhat'">
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">1.</span> 
-        <span style="margin-left:10px">Add yum repository</span>
-    </h4>
-    <div class="well well-sm">curl -L http://download.uclogs.com/shell/install_yum_repo.sh | sh</div>
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">2.</span> 
+            <span style="margin-left:10px">Install the Host Agent package</span>
+        </h4>
+        <div class="well well-sm">sudo apt-get install ma-agent</div>
+    </div>
+    <div ng-if="page.platform=='redhat'">
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">1.</span> 
+            <span style="margin-left:10px">Add yum repository</span>
+        </h4>
+        <div class="well well-sm">curl -L http://download.uclogs.com/shell/install_yum_repo.sh | sh</div>
 
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">2.</span> 
-        <span style="margin-left:10px">Install the Host Agent package</span>
-    </h4>
-    <div class="well well-sm">sudo yum install ma-agent</div>
-</div>
-
-<div ng-if="page.platform=='redhat' || page.platform=='debian'">
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">3.</span> 
-        <span style="margin-left:10px">Configure & start the Host Agent daemon</span>
-    </h4>
-    <p>Set license key: /etc/ma-agent/ma-agent.conf:</p>
-    <div class="well well-sm">sudo /opt/ma-agent/bin/license-key --set {%- visitor.licenseKey %}</div>
-    <p>Start daemon:</p>
-    <div class="well well-sm">sudo /etc/init.d/ma-agent start</div>
-
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">4.</span> 
-        <span style="margin-left:10px">That’s it. Refresh the hosts list.</span>
-    </h4>
-    <p>In the few seconds your host will appear in the host list. If you are not seeing host in 30 seconds, or you are having other installatiion issues. You can get help by support@uclogs.com</p>
-    <a ng-click="refreshHosts()">Refresh the hosts</a>
-</div>
-<div ng-if="page.platform=='linux'">
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">1.</span> 
-        <span style="margin-left:10px">Download & unzip the latest release</span>
-    </h4>
-    <p>Download the latest release from: <a target="_blank" href="http://download.uclogs.com/ma-agent/release">http://download.uclogs.com/ma-agent/release</a>
-        <br/>Unzip the software:
-    </p>
-    <div class="well well-sm">tar -xzvf ma-agent-&lt;version&gt;.tar.gz</div>
-
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">2.</span> 
-        <span style="margin-left:10px">Copy files to a reasonable location (e.g. /opt/ma-agent)</span>
-    </h4>
-    <div class="well well-sm">
-        sudo mkdir -p /opt/ma-agent<br>
-        sudo cp -r ma-agent-&lt;version&gt;/* /opt/ma-agent/
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">2.</span> 
+            <span style="margin-left:10px">Install the Host Agent package</span>
+        </h4>
+        <div class="well well-sm">sudo yum install ma-agent</div>
     </div>
 
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">3.</span> 
-        <span style="margin-left:10px">Setup config</span>
-    </h4>
-    <p>copy configuration files</p>
-    <div class="well well-sm">
-        sudo mkdir -p /etc/ma-agent<br/>
-        sudo cp -r  /opt/ma-agent/res/etc/ma-agent/* /etc/ma-agent/
+    <div ng-if="page.platform=='redhat' || page.platform=='debian'">
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">3.</span> 
+            <span style="margin-left:10px">Configure & start the Host Agent daemon</span>
+        </h4>
+        <p>Set license key: /etc/ma-agent/ma-agent.conf:</p>
+        <div class="well well-sm">sudo /opt/ma-agent/bin/license-key --set {%- visitor.licenseKey %}</div>
+        <p>Start daemon:</p>
+        <div class="well well-sm">sudo /etc/init.d/ma-agent start</div>
+
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">4.</span> 
+            <span style="margin-left:10px">That’s it. Refresh the hosts list.</span>
+        </h4>
+        <p>In the few seconds your host will appear in the host list. If you are not seeing host in 30 seconds, or you are having other installatiion issues. You can get help by support@uclogs.com</p>
+        <a ng-click="refreshHosts()">Refresh the hosts</a>
     </div>
+    <div ng-if="page.platform=='linux'">
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">1.</span> 
+            <span style="margin-left:10px">Download & unzip the latest release</span>
+        </h4>
+        <p>Download the latest release from: <a target="_blank" href="http://download.uclogs.com/ma-agent/release">http://download.uclogs.com/ma-agent/release</a>
+            <br/>Unzip the software:
+        </p>
+        <div class="well well-sm">tar -xzvf ma-agent-&lt;version&gt;.tar.gz</div>
 
-    <p>Set license key</p>
-    <div class="well well-sm">sudo /opt/ma-agent/bin/license-key --set {%- visitor.licenseKey %}</div>
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">2.</span> 
+            <span style="margin-left:10px">Copy files to a reasonable location (e.g. /opt/ma-agent)</span>
+        </h4>
+        <div class="well well-sm">
+            sudo mkdir -p /opt/ma-agent<br>
+            sudo cp -r ma-agent-&lt;version&gt;/* /opt/ma-agent/
+        </div>
 
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">4.</span> 
-        <span style="margin-left:10px">Install startup scripts (Optional)</span>
-    </h4>
-    <p>UCLogs provides the RedHat and Debian startup scripts as a base for your own startup scripts. Edit the scripts as needed, and then copy them to the appropriate location on your system; for example, /etc/init.d. Be sure to run any commands required to ensure the server monitor restarts after a system shutdown.
-    </p>
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">3.</span> 
+            <span style="margin-left:10px">Setup config</span>
+        </h4>
+        <p>copy configuration files</p>
+        <div class="well well-sm">
+            sudo mkdir -p /etc/ma-agent<br/>
+            sudo cp -r  /opt/ma-agent/res/etc/ma-agent/* /etc/ma-agent/
+        </div>
 
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">5.</span> 
-        <span style="margin-left:10px">Start the Host Agent daemon</span>
-    </h4>
-    <p>Use your startup scripts, e.g.:</p>
-    <div class="well well-sm">
-        /etc/init.d/ma-agent start
+        <p>Set license key</p>
+        <div class="well well-sm">sudo /opt/ma-agent/bin/license-key --set {%- visitor.licenseKey %}</div>
+
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">4.</span> 
+            <span style="margin-left:10px">Install startup scripts (Optional)</span>
+        </h4>
+        <p>UCLogs provides the RedHat and Debian startup scripts as a base for your own startup scripts. Edit the scripts as needed, and then copy them to the appropriate location on your system; for example, /etc/init.d. Be sure to run any commands required to ensure the server monitor restarts after a system shutdown.
+        </p>
+
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">5.</span> 
+            <span style="margin-left:10px">Start the Host Agent daemon</span>
+        </h4>
+        <p>Use your startup scripts, e.g.:</p>
+        <div class="well well-sm">
+            /etc/init.d/ma-agent start
+        </div>
+
+        <p>or start ma-agent daemon from command line:</p>
+        <div class="well well-sm">
+            sudo /opt/ma-agent/bin/ma-agent start -s
+        </div>
+
+        <h4>
+            <span class="label label-primary arrowed-right" style="float:left;">6.</span> 
+            <span style="margin-left:10px">That’s it. Refresh the hosts list.</span>
+        </h4>
+        <p>In the few seconds your host will appear in the host list. If you are not seeing host in 30 seconds, or you are having other installatiion issues. You can get help by support@uclogs.com</p>
+        <a ng-click="refreshHosts()">Refresh the hosts</a>
     </div>
-
-    <p>or start ma-agent daemon from command line:</p>
-    <div class="well well-sm">
-        sudo /opt/ma-agent/bin/ma-agent start -s
-    </div>
-
-    <h4>
-        <span class="label label-primary arrowed-right" style="float:left;">6.</span> 
-        <span style="margin-left:10px">That’s it. Refresh the hosts list.</span>
-    </h4>
-    <p>In the few seconds your host will appear in the host list. If you are not seeing host in 30 seconds, or you are having other installatiion issues. You can get help by support@uclogs.com</p>
-    <a ng-click="refreshHosts()">Refresh the hosts</a>
 </div>
