@@ -11,12 +11,35 @@
 <link rel="stylesheet" href="/s/tablesort.css" />
 
 <script>
+var setObject = function(list, object) {
+  list = list || [];
+  if (!_.some(list, function(old, i) {
+      if (old._id === object._id) {
+          list.splice(i, 1, object);
+          return true;
+      }
+  })) {
+      // new
+      list.push(object);
+  }
+};
+var removeObject = function(list, object) {
+  list = list || [];
+  _.some(list, function(old, i) {
+    if (old._id === object._id) {
+      list.splice(i, 1);
+      return true;
+    }
+  })
+}
+
 angular.module('consoleApp', ['tableSort'])
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
   $http.get('/console/ajax/getHosts').success(function(hosts) {
       _.extend($scope, {
         page: {},
         hosts: hosts,
+        newFiles: [],
         platforms: [{
             key: 'redhat',
             name: 'Red Hat or CentOS'
@@ -43,6 +66,47 @@ angular.module('consoleApp', ['tableSort'])
       }
       $location.search('tab', tab);
   };
+
+  $scope.deleteFile = function(host, file) {
+      if (!confirm('确实要删除吗？')) {
+        return;
+      }
+      $http.post('/console/ajax/deleteFile', {
+        hostId: host._id,
+        file: file
+      }).success(function(host) {
+        setObject($scope.hosts, host);
+      });
+  };
+
+  $scope.submitAddFiles = function() {
+    var hostIds = _.chain($scope.hosts).filter(function(host) {
+      return host.selectedWhenAddFile;
+    }).map(function(host) {
+      return host._id;
+    }).value();
+
+    if (!hostIds.length) {
+      return;
+    }
+
+    $http.post('/console/ajax/addFiles', {
+      hostIds: hostIds,
+      newFiles: _.map($scope.newFiles, function(file) {
+        return file.path;
+      })
+    }).success(function(hosts) {
+      $scope.changeTab('seeConfigs');
+      _.each(hosts, function(host) {
+        setObject($scope.hosts, host);
+      });
+
+      $scope.newFiles = [];
+      _.extend($scope.hosts, {
+        selectedWhenAddFile: false
+      });
+    });
+  };
 }]);
 </script>
 </head>
@@ -68,7 +132,7 @@ angular.module('consoleApp', ['tableSort'])
               <li ng-class="{active: mainContent == 'addHost'}">
                 <a ng-click="changeTab('addHost')">
                   <i class="icon-none fa fa-plus"></i>
-                  <span class="menu-text">添加服务器</span>
+                  <span class="menu-text">添加主机</span>
                 </a>
               </li>
               <li ng-class="{active: mainContent == 'addFile'}">
@@ -128,12 +192,20 @@ angular.module('consoleApp', ['tableSort'])
     </thead>
 
     <tbody>
-        <tr ng-repeat="config in hosts | filter:{hostname:page.searchHost} | filter:{files:page.searchFile}"
-          ts-repeat>
-            <td>{{config.hostname}}</td>
+        <tr ng-repeat="host in hosts | filter:{hostname:page.searchHost} | filter:{files:page.searchFile||undefined}"
+            ts-repeat>
+            <td>
+              {{host.hostname}}
+              <span class="text-danger" ng-if="!host.isActive">(未激活)</span>
+            </td>
             <td ng-if="!page.isFileHiden">
               <ul style="margin-bottom:0">
-                <li ng-repeat="file in config.files | filter:page.searchFile">{{file}}</li>
+                <li ng-repeat="file in host.files | filter:page.searchFile | orderBy:'toString()'">
+                  {{file}}
+                  <a ng-click="deleteFile(host, file)">
+                    <i class="fa fa-times" style="font-size:14px"></i>
+                  </a>
+                </li>
               </ul>
             </td>
         </tr>
@@ -144,6 +216,7 @@ angular.module('consoleApp', ['tableSort'])
   {% include config-addHost %}
 </script>
 <script type="text/ng-template" id="addFile">
+  {% include config-addFile %}
 </script>
 </body>
 </html>

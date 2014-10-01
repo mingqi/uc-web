@@ -14,17 +14,36 @@ db.hosts.insert({
 	files: ["/var/logs/web.log", "/var/logs/app.log", "/var/logs/nginx.log"],
 })
 
-db.logconfigs.insert({
+db.hosts.insert({
 	userId: '542b79a16246d50000000002',
-    hostId: '542b86ced486e035d39a7a7e',
-    files: ["/var/logs/web.log", "/var/logs/app.log", "/var/logs/apache.log"],
+	hostname: 'dev-web-03.uclogs.com',
+	files: ["/var/logs/tomcat.log", "/var/logs/error.log", "/var/logs/ngxin.log"],
 })
 
-db.logconfigs.insert({
+db.hosts.insert({
 	userId: '542b79a16246d50000000002',
-    hostId: '542b86ead486e035d39a7a7f',
-    files: ["/var/logs/web.log", "/var/logs/app.log", "/var/logs/nginx.log"],
+	hostname: 'dev-web-04.uclogs.com',
+	files: ["/var/logs/tomcat.log", "/var/logs/error.log", "/var/logs/access.log"],
 })
+
+
+db.hosts.insert({
+	userId: '542b79a16246d50000000002',
+	hostname: 'app-01.tushucheng.com',
+})
+
+
+db.hosts.insert({
+	userId: '542b79a16246d50000000002',
+	hostname: 'app-02.tushucheng.com',
+})
+
+
+db.hosts.insert({
+	userId: '542b79a16246d50000000002',
+	hostname: 'app-03.tushucheng.com',
+})
+
 
 /////////
 

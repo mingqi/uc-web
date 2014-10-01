@@ -1,0 +1,94 @@
+<div class="col-sm-12">
+    <h4>
+        <span class="label label-primary arrowed-right" style="float:left;">1.</span> 
+        <span style="margin-left:10px">选择主机</span>
+    </h4>
+    <div style="height:20px"></div>
+</div>
+
+<div class="col-sm-6">
+    
+    <div class="panel panel-default">
+        <div class="panel-heading">
+            <h3 class="panel-title">全部主机 &nbsp;
+                <i class="fa fa-refresh" ng-click="refreshHosts()" style="cursor:pointer" title="refresh hosts"></i>
+            </h3>
+            <div class="nav-search" ng-if="hosts.length > 2">
+                <span class="input-icon">
+                    <input type="text" placeholder="Search hosts" class="nav-search-input" ng-model="page.searchHostWhenAddFile" />
+                    <i class="icon-none fa fa-search nav-search-icon"></i>
+                </span>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="checkbox" ng-if="!hosts.length">
+                没有任何主机
+            </div>
+            <div ng-repeat="host in hosts | filter:{hostname:page.searchHostWhenAddFile}">
+                <label>
+                    <input name="form-field-checkbox" type="checkbox" class="ace" ng-model="host.selectedWhenAddFile"/>
+                    <span class="lbl">
+                        {{host.hostname}}
+                        <span class="text-danger" ng-if="!host.isActive">(inactive)</span>
+                    </span>
+                </label>
+            </div>
+            <div style="margin: 10px 0 0 0">
+                <a ng-click="changeTab('addHost')">添加主机</a>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-sm-6" ng-init="searchSelectedHost={selectedWhenAddFile:true}">
+    <div class="panel panel-success" ng-class="
+        {'panel-danger': (hosts | filter:searchSelectedHost).length==0}
+    ">
+        <div class="panel-heading">
+            <h3 class="panel-title">已选的主机</h3>
+        </div>
+        <div class="panel-body">
+            <div ng-repeat="host in hosts">
+                <label ng-if="host.selectedWhenAddFile">
+                    <input name="form-field-checkbox" type="checkbox" class="ace" ng-model="host.selectedWhenAddFile" />
+                    <span class="lbl">
+                        {{host.hostname}}
+                        <span class="text-danger" ng-if="!host.isActive">(inactive)</span>
+                    </span>
+                </label>
+            </div>
+
+            <div class="has-error" ng-if="(hosts|filter:searchSelectedHost).length==0">
+                <div class="help-block">你没有选择任何主机</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="clearfix"></div>
+
+<div class="col-sm-12">
+    <h4>
+        <span class="label label-primary arrowed-right" style="float:left;">2.</span> 
+        <span style="margin-left:10px">添加日志路径
+            <a ng-click="newFiles.push({path: ''})">
+              <i class="fa fa-plus"></i>
+            </a>
+        </span>
+    </h4>
+    <div style="height:20px"></div>
+
+    <div class="form-group" ng-repeat="file in newFiles">
+        <input type="text" class="col-xs-10 col-sm-8" ng-model="file.path"/>
+        <div class="col-xs-2 col-sm-4 ng-scope">
+            <a ng-click="newFiles.splice($index, 1)">
+              <i class="fa fa-times" style="font-size:14px"></i>
+            </a>
+        </div>
+        <div class="clearfix"></div>
+    </div>
+
+    <button class="btn btn-sm btn-success btn-next" ng-click="submitAddFiles()" ng-if="newFiles.length">
+        提 交
+        <i class="fa fa-arrow-right icon-none icon-on-right"></i>
+    </button>
+</div>
