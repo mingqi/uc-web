@@ -68,7 +68,7 @@ angular.module('consoleApp', ['tableSort'])
   };
 
   $scope.deleteFile = function(host, file) {
-      if (!confirm('确实要删除吗？')) {
+      if (!confirm('停止收集日志文件:\n\n' + host.hostname + ':' + file)) {
         return;
       }
       ma.wait();
