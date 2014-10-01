@@ -79,6 +79,14 @@ angular.module('consoleApp', ['tableSort'])
       });
   };
 
+  $scope.refreshHosts = function() {
+    ma.wait();
+    $http.get('/console/ajax/getHosts').success(function(hosts) {
+        $scope.hosts = hosts;
+        ma.done();
+    });
+  };
+
   $scope.submitAddFiles = function() {
     var hostIds = _.chain($scope.hosts).filter(function(host) {
       return host.selectedWhenAddFile;
@@ -165,7 +173,6 @@ angular.module('consoleApp', ['tableSort'])
 {% include include/footer %}
 
 <script type="text/ng-template" id="seeConfigs">
-<div class="col-sm-12">
   <table class="table table-striped table-bordered table-hover" ts-wrapper>
     <thead>
         <tr>
@@ -212,7 +219,6 @@ angular.module('consoleApp', ['tableSort'])
         </tr>
     </tbody>
   </table>
-</div>
 </script>
 <script type="text/ng-template" id="addHost">
   {% include config-addHost %}
