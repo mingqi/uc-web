@@ -35,11 +35,7 @@ var collections = {
         hostname : String,
         version : String,
         lastPushDate : Date,
-        serverInfo : Schema.Types.Mixed
-    },
-    LogConfig : {
-        userId: String,
-        hostId: String,
+        serverInfo : Schema.Types.Mixed,
         files: [String]
     }
 };

@@ -11,40 +11,31 @@
 <link rel="stylesheet" href="/s/tablesort.css" />
 
 <script>
-var logConfigs = [{
-  hostId: "host1",
-  hostname: "test-web-01.uclogs.com",
-  files: ["/var/logs/web.log", "/var/logs/app.log", "/var/logs/apache.log"]
-}, {
-  hostId: "host2",
-  hostname: "test-web-02.uclogs.com",
-  files: ["/var/logs/web.log", "/var/logs/app.log", "/var/logs/nginx.log"]
-}];
-
 angular.module('consoleApp', ['tableSort'])
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
-  _.extend($scope, {
-    page: {},
-    logConfigs: logConfigs,
-    platforms: [{
-        key: 'redhat',
-        name: 'Red Hat or CentOS'
-    }, {
-        key: 'debian',
-        name: 'Ubuntu or Debian'
-    }, {
-        key: 'linux',
-        name: 'Others linux'
-    }]
+  $http.get('/console/ajax/getHosts').success(function(hosts) {
+      _.extend($scope, {
+        page: {},
+        hosts: hosts,
+        platforms: [{
+            key: 'redhat',
+            name: 'Red Hat or CentOS'
+        }, {
+            key: 'debian',
+            name: 'Ubuntu or Debian'
+        }, {
+            key: 'linux',
+            name: 'Others linux'
+        }]
+      });
+      venderPage();
+      $scope.$on('$locationChangeSuccess', venderPage);
   });
 
   var venderPage = function() {
       var locationSearch = $location.search();
       $scope.mainContent = locationSearch.tab || 'seeConfigs';
   };
-
-  venderPage();
-  $scope.$on('$locationChangeSuccess', venderPage);
 
   $scope.changeTab = function(tab) {
       if ($location.search().tab === tab) {
@@ -137,7 +128,7 @@ angular.module('consoleApp', ['tableSort'])
     </thead>
 
     <tbody>
-        <tr ng-repeat="config in logConfigs | filter:{hostname:page.searchHost} | filter:{files:page.searchFile}"
+        <tr ng-repeat="config in hosts | filter:{hostname:page.searchHost} | filter:{files:page.searchFile}"
           ts-repeat>
             <td>{{config.hostname}}</td>
             <td ng-if="!page.isFileHiden">

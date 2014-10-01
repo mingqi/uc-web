@@ -398,3 +398,19 @@ exports.search = function(req, res, next) {
         }
     }).pipe(res);
 };
+
+exports.getHosts = function(req, res, next) {
+    var visitor = req.visitor;
+    async.auto({
+        hosts: function(callback) {
+            m.Host.find({
+                userId: visitor.id
+            }, callback);
+        }
+    }, function(err, results) {
+        if (err) {
+            return next(err);
+        }
+        res.json(results.hosts);
+    });
+};
