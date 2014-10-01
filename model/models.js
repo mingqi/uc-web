@@ -39,10 +39,8 @@ var collections = {
     },
     LogConfig : {
         userId: String,
-        config: [{
-            hostId: String,
-            files: [String]
-        }]
+        hostId: String,
+        files: [String]
     }
 };
 
