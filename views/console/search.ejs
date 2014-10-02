@@ -219,15 +219,20 @@ angular.module('consoleApp', ['tableSort'])
       if (!field.buckets) {
         field.loading = true;
         $http.post("/console/ajax/search", {
-          "query": $scope.page.query,
-          "aggs": {
-            "unique_number_for_attributes": {
-              "terms": {
-                "field": field.key,
-                "size": 300
+          esBody: {
+            query: $scope.page.query,
+            size: 0,
+            aggs: {
+              unique_number_for_attributes: {
+                terms: {
+                  field: field.key,
+                  size: 300
+                }
               }
             }
-          }
+          },
+          begin: $scope.begin,
+          end: $scope.end
         }).success(function(json) {
           field.loading = false;
           field.buckets = json.aggregations
@@ -282,9 +287,13 @@ angular.module('consoleApp', ['tableSort'])
         return;
       }
       $http.post("/console/ajax/search", {
-          query: $scope.page.query,
-          size: 100,
-          from: (page - 1) * 100
+          esBody: {
+            query: $scope.page.query,
+            size: 100,
+            from: (page - 1) * 100
+          },
+          begin: $scope.begin,
+          end: $scope.end
       }).success(function(json) {
           $scope.page.searchResult = json;
           $scope.currentPage = page;
