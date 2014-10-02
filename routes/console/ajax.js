@@ -7,7 +7,7 @@ var moment = require('moment');
 
 var QiriError = require('../../lib/qiri-err');
 var config = require('../../config');
-var m = require('../../model/models');
+var m = require('../../lib/models');
 
 var esClient = new elasticsearch.Client({
   hosts: config.es.hosts,

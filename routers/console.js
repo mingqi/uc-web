@@ -1,7 +1,7 @@
 var express = require('express');
 
 var routes = require('../routes/route');
-var middleware = require('../middlewares/middleware');
+var middleware = require('../lib/middleware');
 
 var router = express.Router();
 

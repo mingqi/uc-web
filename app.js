@@ -7,7 +7,7 @@ var ejs = require('ejs');
 require("date-format-lite");
 
 var config = require('./config');
-var middleware = require('./middlewares/middleware');
+var middleware = require('./lib/middleware');
 var router = require('./routers/index');
 var routes = require('./routes/route');
 

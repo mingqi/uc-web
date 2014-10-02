@@ -4,7 +4,7 @@ var cookieParser = require('cookie-parser');
 var path = require('path');
 
 var routes = require('../routes/route');
-var middleware = require('../middlewares/middleware');
+var middleware = require('../lib/middleware');
 var config = require('../config');
 
 var router = express.Router();

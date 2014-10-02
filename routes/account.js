@@ -12,7 +12,7 @@ var querystring = require("querystring");
 var rand = require("generate-key");
 
 var config = require('../config');
-var m = require('../model/models');
+var m = require('../lib/models');
 var QiriError = require('../lib/qiri-err');
 var utils = require('../lib/utils');
 

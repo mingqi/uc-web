@@ -1,6 +1,6 @@
 var async = require('async');
 
-var m = require('../../model/models');
+var m = require('../../lib/models');
 var QiriError = require('../../lib/qiri-err');
 
 module.exports = exports = function(req, res, next) {
