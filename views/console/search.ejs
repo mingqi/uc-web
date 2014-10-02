@@ -167,7 +167,7 @@ angular.module('consoleApp', ['tableSort'])
           end: end
         }).success(function(json) {
           $scope.page.searchResult = json;
-          var buckets = json.aggregations.event_over_time.buckets;
+          var buckets = json.aggregations ? json.aggregations.event_over_time.buckets : [];
           var data = [];
           if (buckets.length == 0) {
             for (var date = begin; date <= end; date += interval) {
@@ -230,7 +230,9 @@ angular.module('consoleApp', ['tableSort'])
           }
         }).success(function(json) {
           field.loading = false;
-          field.buckets = json.aggregations.unique_number_for_attributes.buckets;
+          field.buckets = json.aggregations
+            ? json.aggregations.unique_number_for_attributes.buckets
+            : [];
         });
       }
       field.show = !field.show;
