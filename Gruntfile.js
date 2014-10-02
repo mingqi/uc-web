@@ -23,24 +23,23 @@ module.exports = function(grunt) {
       },
       compile: {
         files: {
-          'public/s/console/log_pattern.js': 'public/s/console/uncompressed/log_pattern.coffee',
+          'uncompressed/console/log_pattern.js': 'uncompressed/console/log_pattern.coffee',
         }
       },
     },
 
     uglify: {
       options: {
-        sourceMap: true,
-        sourceMapIncludeSources: true,
+        sourceMap: false,
       },
       compile: {
         files: {
           'public/s/console/search.min.js': [
-            'public/s/console/log_pattern.js',
-            'public/s/console/uncompressed/search.js',
+            'uncompressed/console/log_pattern.js',
+            'uncompressed/console/search.js',
           ],
           'public/s/console/config.min.js': [
-            'public/s/console/uncompressed/config.js',
+            'uncompressed/console/config.js',
           ]
         }
       }
