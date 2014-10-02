@@ -196,7 +196,7 @@ angular.module('consoleApp', ['tableSort'])
             data: data
           }];
           drawChart($scope.chartCount, series);
-
+          setAutoRefresh();
           
           if (!opts.reserve) {
               _.map($scope.fields, function(field) {
@@ -660,7 +660,6 @@ var getDatePickerOpts = function() {
         minDate: moment().subtract(60, 'day'),
         maxDate: moment()
     };
-    var scope = angular.element($("body")).scope();
 
     if (isCustomerRange()) {
         // start & end isn't change
@@ -702,13 +701,15 @@ var setAutoRefresh = function() {
         clearInterval(window.refreshTimer);
     }
     window.refreshTimer = setInterval(function() {
-        datePickerOpts = getDatePickerOpts();
-        if (!datePickerOpts) {
+        var $scope = angular.element($("body")).scope();
+        if (!$scope.autoRefresh) {
             return;
         }
+
+        datePickerOpts = getDatePickerOpts();
         $('#daterange').data('daterangepicker').setOptions(datePickerOpts);
         setDateRange();
-    }, 1000 * 61);
+    }, 1000 * 60);
 };
 </script>
 </body>
