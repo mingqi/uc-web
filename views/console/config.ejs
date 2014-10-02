@@ -84,6 +84,10 @@ angular.module('consoleApp', ['tableSort'])
   $scope.refreshHosts = function() {
     ma.wait();
     $http.get('/console/ajax/getHosts').success(function(hosts) {
+        var oldHostMap = _.indexBy($scope.hosts, '_id');
+        _.each(hosts, function(host) {
+          host.selectedWhenAddFile = oldHostMap[host._id] && oldHostMap[host._id].selectedWhenAddFile;
+        });        
         $scope.hosts = hosts;
         ma.done();
     });
