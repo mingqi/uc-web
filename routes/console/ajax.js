@@ -1,11 +1,18 @@
 var _ = require('underscore');
+var _s = require('underscore.string');
 var async = require('async');
 var ObjectId = require('mongoose').Types.ObjectId;
-var request = require('request');
-var _s = require('underscore.string');
+var elasticsearch = require('elasticsearch');
+var moment = require('moment');
 
 var QiriError = require('../../lib/qiri-err');
+var config = require('../../config');
 var m = require('../../model/models');
+
+var esClient = new elasticsearch.Client({
+  hosts: config.es.hosts,
+  log: config.es.log,
+});
 
 module.exports = exports = function(req, res, next) {
     var action = req.params.action;
@@ -16,14 +23,27 @@ module.exports = exports = function(req, res, next) {
 };
 
 exports.search = function(req, res, next) {
-    request.post({
-        url: 'http://106.185.38.213:9200/demo/talog/_search',
-        json: req.body
-    }, function(error, response, body) {
+    var visitor = req.visitor;
+    var begin = moment(req.body.begin).startOf('day');
+    var end = moment(req.body.end);
+    var esBody = req.body.esBody;
+
+    var index = [];
+    while (begin.isBefore(end)) {
+        index.push('uclogs-' + begin.format('YYYYMMDD'));
+        begin = begin.add(1, 'day');
+    }
+
+    esClient.search({
+        index: index.join(','),
+        ignoreUnavailable: true,
+        body: esBody
+    }, function(error, response) {
         if (error) {
             return next(error);
         }
-    }).pipe(res);
+        return res.json(response);
+    });
 };
 
 exports.getHosts = function(req, res, next) {

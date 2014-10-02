@@ -25,7 +25,9 @@
       "date-format-lite": "*",
       "nodemailer" : "~1.1.1",
       "request": "*",
-      "generate-key": "*"
+      "generate-key": "*",
+      "elasticsearch": "~2.4.3",
+      "moment": "*"
     },
     "devDependencies" : {
         "node-sass": "~0.7.0",

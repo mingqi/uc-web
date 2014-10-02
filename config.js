@@ -7,11 +7,22 @@ var stageConfig = {
         mongodb: "mongodb://127.0.0.1/uclogs?poolSize=10&bufferMaxEntries=0",
         domain: 'dev.uclogs.com',
         port : 5001,
+        es: {
+            hosts: ['es-dev-1.uclogs.com:9200'],
+            log: 'trace'
+        }
     },
     production : {
         mongodb : "mongodb://mongo-01.uclogs.com/uclogs?poolSize=10&bufferMaxEntries=0",
         domain: 'www.uclogs.com',
-        port: 5002
+        port: 5002,
+        es: {
+            hosts: ['es-dev-1:9200', 'es-dev-2:9200'],
+            log: [{
+              type: 'stdio',
+              levels: ['error', 'warning']
+            }]
+        }
     },
 };
 

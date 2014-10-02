@@ -151,17 +151,20 @@ angular.module('consoleApp', ['tableSort'])
         }
 
         $http.post("/console/ajax/search", {
-          query: $scope.page.query,
-          size: 100,
-          aggs: {
-            "event_over_time": {
-              "date_histogram": {
-                "field": "timestamp",
-                "interval": interval + "ms"
+          esBody: {
+            query: $scope.page.query,
+            size: 100,
+            aggs: {
+              "event_over_time": {
+                "date_histogram": {
+                  "field": "timestamp",
+                  "interval": interval + "ms"
+                }
               }
             }
-          }
-
+          },
+          begin: begin,
+          end: end
         }).success(function(json) {
           $scope.page.searchResult = json;
           var buckets = json.aggregations.event_over_time.buckets;
@@ -478,7 +481,8 @@ var drawChart = function(chart, series) {
 
               <div ng-if="page.searchResult">
                   <div class="col-sm-12">
-                      <h4 style="margin-top:0">{{page.searchResult.hits.total | number:0}} 条记录</h4>
+                      <h4 style="margin-top:0">{{page.searchResult.hits.total | number:0}} 条记录，
+                      用时 {{page.searchResult.took / 1000 | number}} 秒</h4>
                   </div>
                   
                   <div class="clearfix"></div>
@@ -627,25 +631,23 @@ Highcharts.setOptions({
     }
 });
 
-//var chosenLabel = 'Last 1 month';
-var chosenLabel = 'demo';
+var chosenLabel = '过去1小时';
 var dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSS';
 
 var isCustomerRange = function(label) {
     label = label || chosenLabel;
-    return label.indexOf('Last') === -1;
+    return label.indexOf('过去') === -1;
 };
 
 var getDatePickerOpts = function() {
     var ranges = {
-       'Last 1 hour': [moment().subtract(1, 'hour'), moment()],
-       'Last 6 hours': [moment().subtract(6, 'hour'), moment()],
-       'Last 1 day': [moment().subtract(1, 'day'), moment()],
-       'Last 1 week': [moment().subtract(1, 'week'), moment()],
-       'Last 1 month': [moment().subtract(1, 'month'), moment()],
-       'Last 3 month': [moment().subtract(3, 'month'), moment()],
-       demo: [moment('2014-09-03T23:00:00.000Z'), moment('2014-09-05T00:00:00.000Z')],
-       demo: [moment('2014-09-04T07:00:00.000Z'), moment('2014-09-04T08:00:00.000Z')]
+       '过去1小时': [moment().subtract(1, 'hour'), moment()],
+       '过去6小时': [moment().subtract(6, 'hour'), moment()],
+       '昨天': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
+       '过去1天': [moment().subtract(1, 'day'), moment()],
+       '过去1周': [moment().subtract(1, 'week'), moment()],
+       '过去15天': [moment().subtract(1, 'month'), moment()],
+       '过去2月': [moment().subtract(2, 'month'), moment()]
     };
     var result = {
         opens: 'left',
@@ -654,11 +656,13 @@ var getDatePickerOpts = function() {
         timePickerIncrement: 15,
         ranges: ranges,
         format: dateFormat,
+        minDate: moment().subtract(15, 'day'),
+        minDate: moment().subtract(60, 'day'),
         maxDate: moment()
     };
     var scope = angular.element($("body")).scope();
 
-    if (isCustomerRange() && chosenLabel != 'demo') {
+    if (isCustomerRange()) {
         // start & end isn't change
         var picker = $('#daterange').data('daterangepicker');
         return _.extend(result, {
