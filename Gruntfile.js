@@ -28,6 +28,18 @@ module.exports = function(grunt) {
       }
     },
 
+    cssmin: {
+      options: {
+        keepSpecialComments: 0,
+      },
+      compile: {
+        files: {
+          'public/s/tablesort.min.css': 'public/s/tablesort.css',
+          'public/ace/assets/css/daterangepicker.min.css': 'public/ace/assets/css/daterangepicker.css'
+        }
+      }
+    },
+
     coffee: {
       options: {
         bare: true
@@ -51,7 +63,10 @@ module.exports = function(grunt) {
           ],
           'public/s/console/config.min.js': [
             'uncompressed/console/config.js',
-          ]
+          ],
+          'public/ace/assets/js/date-time/daterangepicker.min.js':
+            'public/ace/assets/js/date-time/daterangepicker.js',
+          'public/s/angular-tablesort.min.js': 'public/s/angular-tablesort.js'
         }
       }
     },
