@@ -17,6 +17,17 @@ module.exports = function(grunt) {
       }
     },
 
+    less: {
+      options: {
+        compress: true
+      },
+      compile: {
+        files: {
+          'public/ace/assets/css/ace.min.css': 'public/ace/assets/css/less/ace.less',
+        }
+      }
+    },
+
     coffee: {
       options: {
         bare: true
@@ -59,8 +70,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-coffee');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-less');
 
-  grunt.registerTask('css', ['sass']);
+  grunt.registerTask('css', ['sass', 'less']);
   grunt.registerTask('js', ['coffee', 'uglify']);
   grunt.registerTask('default', ['css', 'js', 'watch']);
 };
