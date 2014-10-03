@@ -1181,7 +1181,6 @@ blockquote.pull-right {
   position: relative;
   float: left !important;
   /* different colors */
-
 }
 .ace-nav > li:first-child {
   border-left: none;
@@ -1378,7 +1377,6 @@ blockquote.pull-right {
 }
 .ace-nav li:last-child a [class^="icon-"] {
   /* the arrow indicating "See more" on each dropdown , and the icons of user menu */
-
   display: inline-block;
   width: 1.25em;
   text-align: center;
@@ -1472,8 +1470,8 @@ blockquote.pull-right {
     float: none !important;
   }
   /*.navbar .navbar-inner {
-    border-bottom-width:0;
-   }*/
+  border-bottom-width:0;
+ }*/
   .ace-nav {
     display: block;
     float: none !important;
@@ -1689,7 +1687,6 @@ blockquote.pull-right {
 }
 .nav-search .nav-search-input + .dropdown-menu {
   /* the typeahead menu*/
-
   min-width: 0;
   left: 0;
   right: 0;
@@ -1797,7 +1794,6 @@ blockquote.pull-right {
 }
 .sidebar.menu-min .nav-search .nav-search-icon {
   /* inside minimized sidebar */
-
   border: 1px solid;
   border-radius: 32px;
   background-color: #FFF;
@@ -1868,7 +1864,6 @@ blockquote.pull-right {
 }
 .sidebar:before {
   /* the grey background of sidebar */
-
   content: "";
   display: block;
   width: 190px;
@@ -1930,11 +1925,8 @@ li [class*=" icon-"],
 }
 .nav-list > li {
   /* the submenu indicator arrow */
-
   /* menu active/open states */
-
   /* submenu */
-
 }
 .nav-list > li > a {
   display: block;
@@ -2023,12 +2015,10 @@ li [class*=" icon-"],
 }
 .nav-list > li.active > a:hover:before {
   /* no left side menu item border on active state */
-
   display: none;
 }
 .nav-list > li.active:after {
   /* the border on right of active item */
-
   display: inline-block;
   content: "";
   position: absolute;
@@ -2058,7 +2048,6 @@ li [class*=" icon-"],
   margin-left: 0;
   position: relative;
   /* optional icon before each item */
-
 }
 .nav-list > li .submenu > li > a {
   display: block;
@@ -2101,7 +2090,6 @@ li [class*=" icon-"],
 }
 .nav-list > li > .submenu > li:before {
   /* the horizontal line */
-
   content: "";
   display: inline-block;
   position: absolute;
@@ -2132,7 +2120,6 @@ li [class*=" icon-"],
 }
 .nav-list li .submenu {
   /* needed for webkit based browsers to slideToggle without problem */
-
   overflow: hidden;
 }
 .nav-list li.active > a:after {
@@ -2151,23 +2138,19 @@ li [class*=" icon-"],
 }
 .nav-list li.active.open > .submenu > li.active.open > a.dropdown-toggle:after {
   /* don't display caret on active open item who is open and has children */
-
   display: none;
 }
 .nav-list li.active > .submenu > li.active > a:after {
   /** don't display caret on active item whose parent is not open
 	useful for hiding the caret when submenu is sliding up */
-
   display: none;
 }
 .nav-list li.active.open > .submenu > li.active > a:after {
   /* display caret on active item whose parent is open */
-
   display: block;
 }
 .nav-list li.active.no-active-child > a:after {
   /* show caret for active menu item with childs which is not open(i.e. no submenu item is active) */
-
   display: inline-block !important;
 }
 .nav-list a .badge,
@@ -2307,13 +2290,11 @@ li [class*=" icon-"],
 }
 .nav-list > li > .submenu li > .submenu > li > a {
   /*3rd level*/
-
   margin-left: 20px;
   padding-left: 22px;
 }
 .nav-list > li > .submenu li > .submenu > li > .submenu > li > a {
   /*4th level*/
-
   margin-left: 20px;
   padding-left: 38px;
 }
@@ -2426,7 +2407,6 @@ li [class*=" icon-"],
 }
 .menu-min .nav-list > li > a:hover:before {
   /* the right side border on hover */
-
   width: 2px;
 }
 .menu-min .nav-list > li:hover > a {
@@ -2453,7 +2433,6 @@ li [class*=" icon-"],
 }
 .menu-min .nav-list > li.active > a:after {
   /* the caret */
-
   border-width: 10px 6px;
   top: 8px;
 }
@@ -2479,7 +2458,6 @@ li [class*=" icon-"],
 }
 .menu-min .nav-list > li > .submenu:before {
   /* hide the tree like submenu in minimized mode */
-
   display: none;
 }
 .menu-min .nav-list > li > .submenu li:before {
@@ -2522,7 +2500,6 @@ li [class*=" icon-"],
 }
 .menu-min .sidebar-collapse {
   /* minimized collapse button */
-
 }
 .menu-min .sidebar-collapse:before {
   left: 5px;
@@ -2537,13 +2514,11 @@ li [class*=" icon-"],
 }
 .menu-min .nav-list > li > .submenu li > .submenu > li > a {
   /*3rd level*/
-
   margin-left: 0px;
   padding-left: 30px;
 }
 .menu-min .nav-list > li > .submenu li > .submenu > li > .submenu > li > a {
   /*4th level*/
-
   margin-left: 0px;
   padding-left: 45px;
 }
@@ -2571,7 +2546,6 @@ li [class*=" icon-"],
     bottom: auto;
     top: auto !important;
     /*so that it's applied even if it's .sidebar-fixed */
-  
     margin-top: 40px;
     border: 1px solid #CCC;
     border-left-width: 0;
@@ -3481,9 +3455,7 @@ fieldset[disabled] .btn-light.active {
 /* button groups */
 .btn-group > .btn {
   /* caret inside buttons */
-
   /* dropdown toggle */
-
 }
 .btn-group > .btn,
 .btn-group > .btn + .btn {
@@ -3534,7 +3506,6 @@ fieldset[disabled] .btn-light.active {
   margin: 0 1px 0 0;
   border-width: 3px;
   /* the border under an active button in button groups */
-
 }
 .btn-group > .btn.active:after,
 .btn-group + .btn.active:after {
@@ -3547,7 +3518,6 @@ fieldset[disabled] .btn-light.active {
 .btn-group + .btn-large {
   border-width: 4px;
   /* the border under an active button in button groups */
-
 }
 .btn-group > .btn-large.active:after,
 .btn-group + .btn-large.active:after {
@@ -3560,7 +3530,6 @@ fieldset[disabled] .btn-light.active {
 .btn-group + .btn-sm {
   border-width: 2px;
   /* the border under an active button in button groups */
-
 }
 .btn-group > .btn-sm.active:after,
 .btn-group + .btn-sm.active:after {
@@ -3573,7 +3542,6 @@ fieldset[disabled] .btn-light.active {
 .btn-group + .btn-xs {
   border-width: 1px;
   /* the border under an active button in button groups */
-
 }
 .btn-group > .btn-xs.active:after,
 .btn-group + .btn-xs.active:after {
@@ -3586,7 +3554,6 @@ fieldset[disabled] .btn-light.active {
 .btn-group + .btn-minier {
   border-width: 1px;
   /* the border under an active button in button groups */
-
 }
 .btn-group > .btn-minier.active:after,
 .btn-group + .btn-minier.active:after {
@@ -3648,7 +3615,7 @@ fieldset[disabled] .btn-light.active {
 .btn-app.btn-primary,
 .btn-app.btn-primary.no-hover:hover,
 .btn-app.btn-primary.disabled:hover {
-  background: #2a8bcc !important;
+  background: #2a8bcb !important;
   background-image: -webkit-gradient(linear, left 0%, left 100%, from(#3b98d6), to(#197ec1)) !important;
   background-image: -webkit-linear-gradient(top, #3b98d6, 0%, #197ec1, 100%) !important;
   background-image: -moz-linear-gradient(top, #3b98d6 0%, #197ec1 100%) !important;
@@ -3688,7 +3655,7 @@ fieldset[disabled] .btn-light.active {
 .btn-app.btn-success,
 .btn-app.btn-success.no-hover:hover,
 .btn-app.btn-success.disabled:hover {
-  background: #86b558 !important;
+  background: #85b558 !important;
   background-image: -webkit-gradient(linear, left 0%, left 100%, from(#8ebf60), to(#7daa50)) !important;
   background-image: -webkit-linear-gradient(top, #8ebf60, 0%, #7daa50, 100%) !important;
   background-image: -moz-linear-gradient(top, #8ebf60 0%, #7daa50 100%) !important;
@@ -3875,9 +3842,7 @@ fieldset[disabled] .btn-light.active {
 }
 .btn.btn-app {
   /* badge & label inside buttons */
-
   /* active state */
-
 }
 .btn.btn-app.btn-sm {
   width: 80px;
@@ -4709,7 +4674,6 @@ fieldset[disabled] .btn-light.active {
   box-shadow: 0 2px 4px rgba(30, 30, 100, 0.25);
   border-color: #bcd4e5;
   /* user info on top navbar icons */
-
 }
 .dropdown-navbar > li {
   padding: 0 8px;
@@ -5266,7 +5230,6 @@ input[type=radio].ace + .lbl::before {
   border: 1px solid #c8c8c8;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   /*, inset 0px -15px 10px -12px rgba(0,0,0,0.05);*/
-
   border-radius: 0;
   display: inline-block;
   text-align: center;
@@ -5342,9 +5305,7 @@ input[type=checkbox].ace.ace-switch {
   width: 55px;
   height: 25px;
   /* switch style 4 & 5 */
-
   /* switch style 6 */
-
 }
 input[type=checkbox].ace.ace-switch + .lbl {
   margin: 0 4px;
@@ -5359,7 +5320,6 @@ input[type=checkbox].ace.ace-switch + .lbl::before {
   line-height: 18px;
   line-height: 21px\9;
   /*ie9*/
-
   height: 20px;
   overflow: hidden;
   border-radius: 12px;
@@ -5664,7 +5624,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-input .file-label:before {
   /* the button */
-
   display: inline-block;
   content: attr(data-title);
   position: absolute;
@@ -5685,7 +5644,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-input .file-label .file-name {
   /* the file name container */
-
   display: inline-block;
   height: 28px;
   max-width: 80%;
@@ -5700,7 +5658,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-input .file-label .file-name:after {
   /* the file name */
-
   display: inline-block;
   content: attr(data-title);
 }
@@ -5750,7 +5707,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-input .remove {
   /* the remove button */
-
   position: absolute;
   right: -8px;
   top: 6px;
@@ -5781,7 +5737,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-multiple .file-label:before {
   /* the button */
-
   display: inline-block;
   content: attr(data-title);
   position: relative;
@@ -5839,12 +5794,10 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-multiple .file-label .file-name:after {
   /* the file name */
-
   display: none;
 }
 .ace-file-multiple .file-label.selected .file-name:after {
   /* the file name */
-
   display: inline-block;
   white-space: pre;
 }
@@ -5898,7 +5851,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .ace-file-multiple .file-label .file-name.large:after {
   /* image caption */
-
   position: absolute;
   top: auto;
   bottom: 0;
@@ -5955,7 +5907,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 /* IE9 needs this like IE8 to prevent "ACCESS denied" errors! */
 .ace-file-input input[type=file] {
   /*must be visible and on top for ie8/9 to actually work */
-
   width: 100% \0/;
   height: 30px \0/;
   position: absolute \0/;
@@ -6422,7 +6373,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .tabs-below > .nav-tabs {
   /* tabs below */
-
   top: auto;
   margin-bottom: 0;
   margin-top: -1px;
@@ -6447,7 +6397,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 .tabs-left > .nav-tabs > li > a,
 .tabs-right > .nav-tabs > li > a {
   /* tabs left */
-
   min-width: 60px;
 }
 .tabs-left > .nav-tabs {
@@ -6478,7 +6427,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .tabs-right > .nav-tabs {
   /* tabs right */
-
   top: auto;
   margin-bottom: 0;
   border-color: #c5d0dc;
@@ -6506,7 +6454,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .nav-tabs > li > a {
   /* icon and badges */
-
 }
 .nav-tabs > li > a > .badge {
   padding: 0 4px;
@@ -6528,7 +6475,6 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
 }
 .nav-tabs > li.open .dropdown-toggle {
   /* dropdown in tabs */
-
   background-color: #4F99C6;
   border-color: #4F99C6;
   color: #FFF;
@@ -6754,7 +6700,8 @@ input[type=checkbox].ace.ace-switch.ace-switch-7:checked + .lbl::after {
   padding-top: 0;
   padding-bottom: 0;
 }
-/* tables */th,
+/* tables */
+th,
 td,
 .table-bordered {
   border-radius: 0 !important;
@@ -6819,7 +6766,8 @@ td .lbl:only-child {
   opacity: 0.75;
   filter: alpha(opacity=75);
 }
-/* dataTables */.dataTables_length select {
+/* dataTables */
+.dataTables_length select {
   width: 70px;
   height: 25px;
   padding: 2px 3px;
@@ -7014,9 +6962,7 @@ td .lbl:only-child {
   float: right;
   position: relative;
   /* widget toolbar basic buttons */
-
   /* toolbar buttons */
-
 }
 .widget-header-large > .widget-toolbar {
   line-height: 48px;
@@ -7032,7 +6978,6 @@ td .lbl:only-child {
 }
 .widget-toolbar:before {
   /* border on left ot it! */
-
   display: inline-block;
   content: "";
   position: absolute;
@@ -7570,13 +7515,11 @@ td .lbl:only-child {
 }
 .widget-toolbox:first-child {
   /* the toolbox coming before content */
-
   padding: 2px;
   border-bottom: 1px solid #CCC;
 }
 .widget-toolbox:last-child {
   /* the toolbox coming after content */
-
   padding: 2px;
   border-top: 1px solid #CCC;
 }
@@ -7811,7 +7754,6 @@ td .lbl:only-child {
 		border-left-color:#F7F0EF;
 	}
 	*/
-
 }
 .tooltip-error + .popover .popover-title {
   background-color: #F7F0EF;
@@ -7836,7 +7778,6 @@ td .lbl:only-child {
 		border-left-color:#F4EEE3;
 	}
 	*/
-
 }
 .tooltip-warning + .popover .popover-title {
   background-color: #F4EEE3;
@@ -7861,7 +7802,6 @@ td .lbl:only-child {
 		border-left-color:#E8F2E3;
 	}
 	*/
-
 }
 .tooltip-success + .popover .popover-title {
   background-color: #E8F2E3;
@@ -7886,7 +7826,6 @@ td .lbl:only-child {
 		border-left-color:#E5EDF8;
 	}
 	*/
-
 }
 .tooltip-info + .popover .popover-title {
   background-color: #E5EDF8;
@@ -8113,7 +8052,6 @@ td .lbl:only-child {
 }
 .infobox .infobox-content:first-child {
   /* like in small infoboxes that have no number data etc */
-
   font-weight: bold;
 }
 .infobox > .infobox-data {
@@ -8352,7 +8290,6 @@ td .lbl:only-child {
 }
 .infobox {
   /* stat trend indicators and badges */
-
 }
 .infobox > .infobox-progress {
   padding-top: 0;
@@ -8407,7 +8344,6 @@ td .lbl:only-child {
 }
 .infobox > .stat.stat-success {
   /*pointing up*/
-
   color: #77C646;
 }
 .infobox > .stat.stat-success:before {
@@ -8418,7 +8354,6 @@ td .lbl:only-child {
 }
 .infobox > .stat.stat-important {
   /*pointing down*/
-
   color: #E4564F;
 }
 .infobox > .stat.stat-important:before {
@@ -8533,7 +8468,6 @@ td .lbl:only-child {
 /* pricing table */
 .pricing-box {
   /* the purchase button */
-
 }
 .pricing-box:not(:first-child) {
   padding-left: 7px;
@@ -8556,7 +8490,6 @@ td .lbl:only-child {
 }
 .pricing-box .widget-header {
   /* the title */
-
   text-align: center;
   padding-left: 0;
 }
@@ -8709,10 +8642,8 @@ td .lbl:only-child {
   transition: all .3s ease;
   -o-transition: none;
   /* too slow */
-
   -webkit-transition: none;
   /* works in chrome but not in safari, never scales back to 1! */
-
 }
 .login-layout .widget-box .widget-main {
   padding: 16px 36px 36px;
@@ -8875,7 +8806,6 @@ td .lbl:only-child {
   margin: 2px;
   border: 2px solid #333;
   /* the custom text on hover */
-
 }
 .ace-thumbnails > li > :first-child {
   display: block;
@@ -8989,14 +8919,12 @@ td .lbl:only-child {
 }
 .ace-thumbnails > li > :first-child > .text:before {
   /* makes the inner text become vertically centered*/
-
   content: '';
   display: inline-block;
   height: 100%;
   vertical-align: middle;
   margin-right: 0;
   /* Adjusts for spacing */
-
 }
 .ace-thumbnails > li > :first-child > .text > .inner {
   padding: 4px 0;
@@ -9327,7 +9255,6 @@ li.item-default {
 }
 .profile-info-value > span + span:before {
   /* for a list of values (such as location city & country) put a comma between them */
-
   display: inline;
   content: ",";
   margin-left: 1px;
@@ -10172,7 +10099,6 @@ ul.attachment-list > li {
 }
 .timeline-container:before {
   /* the vertical line running through icons */
-
   content: "";
   display: block;
   position: absolute;
@@ -10371,7 +10297,6 @@ ul.attachment-list > li {
 .fc-event-skin {
   border: none !important;
   /* default BORDER color */
-
   background-color: #ABBAC3;
   padding: 0 0 1px 2px;
 }
@@ -10462,7 +10387,6 @@ ul.attachment-list > li {
 }
 .external-event > [class*="icon-"]:first-child {
   /* the move & drag icon */
-
   display: inline-block;
   height: 32px;
   width: 32px;
@@ -10511,7 +10435,6 @@ ul.attachment-list > li {
 .chosen-select {
   display: inline !important;
   /* for validation plugin to work it must be displayed */
-
   visibility: hidden;
   opacity: 0;
   position: absolute;
@@ -10655,10 +10578,8 @@ ul.attachment-list > li {
 .chosen-container .chosen-results li.highlighted {
   background: #86BD6F;
   /* green */
-
   background: #4492C9;
   /* blue1 */
-
   background: #316AC5;
   color: #FFF;
 }
@@ -11112,7 +11033,6 @@ ul.attachment-list > li {
 }
 .wizard-steps li:before {
   /* the line running through each step*/
-
   display: block;
   content: "";
   width: 100%;
@@ -11582,7 +11502,6 @@ ul.attachment-list > li {
 .wysiwyg-toolbar .btn-group > .btn,
 .wysiwyg-toolbar .btn-group > .inline > .btn {
   /* sometimes we need to put .btn inside an .inline.position-relative for dropdowns to show up in correct position */
-
   float: none;
   padding-left: 0;
   padding-right: 0;
@@ -11684,28 +11603,20 @@ ul.attachment-list > li {
   position: relative;
   background: #87B87F;
   /* Old browsers */
-
   background: -moz-linear-gradient(top, #cf3e73 10%, #ffffff 20%, #2283c5 30%, #ffffff 40%, #87b87f 50%, #ffffff 60%, #ffb752 70%, #ffffff 80%, #d15b47 90%, #ffffff 100%);
   /*  FF3.6+ */
-
   background: -webkit-gradient(linear, left top, left bottom, color-stop(10%, #cf3e73), color-stop(20%, #ffffff), color-stop(30%, #2283c5), color-stop(40%, #ffffff), color-stop(50%, #87b87f), color-stop(60%, #ffffff), color-stop(70%, #ffb752), color-stop(80%, #ffffff), color-stop(90%, #d15b47), color-stop(100%, #ffffff));
   /* Chrome,Safari4+ */
-
   background: -webkit-linear-gradient(top, #cf3e73 10%, #ffffff 20%, #2283c5 30%, #ffffff 40%, #87b87f 50%, #ffffff 60%, #ffb752 70%, #ffffff 80%, #d15b47 90%, #ffffff 100%);
   /* Chrome10+,Safari5.1+ */
-
   background: -o-linear-gradient(top, #cf3e73 10%, #ffffff 20%, #2283c5 30%, #ffffff 40%, #87b87f 50%, #ffffff 60%, #ffb752 70%, #ffffff 80%, #d15b47 90%, #ffffff 100%);
   /* Opera11.10+ */
-
   background: -ms-linear-gradient(top, #cf3e73 10%, #ffffff 20%, #2283c5 30%, #ffffff 40%, #87b87f 50%, #ffffff 60%, #ffb752 70%, #ffffff 80%, #d15b47 90%, #ffffff 100%);
   /* IE10+ */
-
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#CF3E73', endColorstr='#FFB752', GradientType=0);
   /* IE6-9 */
-
   background: linear-gradient(top, #cf3e73 10%, #ffffff 20%, #2283c5 30%, #ffffff 40%, #87b87f 50%, #ffffff 60%, #ffb752 70%, #ffffff 80%, #d15b47 90%, #ffffff 100%);
   /* W3C */
-
 }
 .wysiwyg-toolbar .dropdown-colorpicker > .dropdown-menu {
   top: inherit;
@@ -11749,7 +11660,6 @@ ul.attachment-list > li {
     border: 1px dotted #D00;
     overflow: visible !important;
     /* because it's image only, so it's ok */
-  
     display: inline-block !important;
     vertical-align: middle;
   }
@@ -13997,7 +13907,6 @@ th[aria-selected=true] .ui-jqgrid-sortable {
 }
 .draggable-placeholder {
   /* for when dragging items around */
-
   border: 2px dashed #D9D9D9 !important;
   background-color: #F7F7F7 !important;
 }
@@ -14106,7 +14015,6 @@ th[aria-selected=true] .ui-jqgrid-sortable {
   outline: 0;
   outline: thin dotted \9;
   /* IE6-9 */
-
 }
 .tags[class*="span"] {
   float: none;
@@ -14156,7 +14064,6 @@ th[aria-selected=true] .ui-jqgrid-sortable {
 	background-color:#666;
   }
 */
-
 }
 .tags .tag:empty {
   display: none;

@@ -1,0 +1,9 @@
+.main-content {
+    margin-left: 260px;
+}
+.sidebar {
+    width: 260px;
+}
+.sidebar:before {
+    width: 260px;
+}

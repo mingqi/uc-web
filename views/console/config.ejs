@@ -4,6 +4,15 @@
 <title>配置日志 - UCLogs</title>
 
 {% include include/inhead %}
+
+<script src="/s/require.js"></script>
+<script>
+  require(['/b/js/config.js?1'], function() {
+    require(['jquery'], function($) {
+      alert(1);
+    });
+  });
+</script>
 </head>
 
 <body ng-controller="Ctrl">

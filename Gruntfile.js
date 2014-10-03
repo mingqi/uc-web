@@ -19,11 +19,11 @@ module.exports = function(grunt) {
 
     less: {
       options: {
-        compress: true
+        compress: false
       },
       compile: {
         files: {
-          'public/ace/assets/css/ace.min.css': 'public/ace/assets/css/less/ace.less',
+          'public/ace/assets/css/uncompressed/ace.css': 'public/ace/assets/css/less/ace.less',
         }
       }
     },
@@ -34,8 +34,21 @@ module.exports = function(grunt) {
       },
       compile: {
         files: {
-          'public/s/tablesort.min.css': 'public/s/tablesort.css',
-          'public/ace/assets/css/daterangepicker.min.css': 'public/ace/assets/css/daterangepicker.css'
+          'public/s/css/site.css': [
+            'public/cc/css/bootstrap/bootstrap.css',
+            'public/cc/css/compiled/bootstrap-overrides.css',
+            'public/cc/css/compiled/theme.css',
+          ],
+          'public/s/css/console.css': [
+            'public/ace/assets/css/uncompressed/bootstrap.css',
+            'public/ace/assets/css/uncompressed/ace.css',
+            'public/s/font-awesome-4.1.0/css/font-awesome.css',
+            'public/s/tablesort.css',
+          ],
+          'public/s/css/search.css': [
+            'public/ace/assets/css/daterangepicker.css',
+            'browser/css/console/search.css',
+          ]
         }
       }
     },
@@ -57,6 +70,11 @@ module.exports = function(grunt) {
       },
       compile: {
         files: {
+          'public/s/site.js': [
+              'public/cc/js/jquery.min.js',
+              'public/cc/js/bootstrap.min.js',
+              'public/cc/js/theme.js',
+          ],
           'public/s/console/search.min.js': [
             'uncompressed/console/log_pattern.js',
             'uncompressed/console/search.js',
@@ -78,6 +96,30 @@ module.exports = function(grunt) {
         files: ['public/cc/css/scss/*.scss'],
         tasks: ['sass']
       }
+    },
+
+    requirejs: {
+      // onefile: {
+      //   options: {
+      //     name: 'console/main',
+      //     mainConfigFile: 'browser/js/jsconfig.js',
+      //     optimize: 'uglify',
+      //     out: 'browser/js/mini/console.js',
+      //     preserveLicenseComments: false,
+      //   }
+      // },
+      whole: {
+        options: {
+          appDir: 'browser/js',
+          mainConfigFile: 'browser/js/config.js',
+          preserveLicenseComments: false,
+          optimizeCss: 'standard',
+          dir: 'public/s/js',
+          modules: [{
+            name: "console/main"
+          }]
+        }
+      }
     }
   });
 
@@ -87,6 +129,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-requirejs');
 
   grunt.registerTask('css', ['sass', 'less']);
   grunt.registerTask('js', ['coffee', 'uglify']);

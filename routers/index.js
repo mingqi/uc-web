@@ -14,6 +14,10 @@ module.exports = exports = router;
 
 router.use(middleware.fixSafariBug);
 
+if (config.env === 'development') {
+	router.use('/b', middleware.static('../browser'));
+}
+
 router.use('/s', middleware.static('s'));
 router.use('/assets', middleware.static('ace/assets'));
 router.use('/css', middleware.static('cc/css'));
