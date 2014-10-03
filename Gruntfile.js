@@ -59,7 +59,7 @@ module.exports = function(grunt) {
       },
       compile: {
         files: {
-          'uncompressed/console/log_pattern.js': 'uncompressed/console/log_pattern.coffee',
+          'browser/js/console/log_pattern.js': 'browser/coffee/log_pattern.coffee',
         }
       },
     },
@@ -75,16 +75,6 @@ module.exports = function(grunt) {
               'public/cc/js/bootstrap.min.js',
               'public/cc/js/theme.js',
           ],
-          'public/s/console/search.min.js': [
-            'uncompressed/console/log_pattern.js',
-            'uncompressed/console/search.js',
-          ],
-          'public/s/console/config.min.js': [
-            'uncompressed/console/config.js',
-          ],
-          'public/ace/assets/js/date-time/daterangepicker.min.js':
-            'public/ace/assets/js/date-time/daterangepicker.js',
-          'public/s/angular-tablesort.min.js': 'public/s/angular-tablesort.js'
         }
       }
     },

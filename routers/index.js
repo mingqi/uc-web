@@ -19,11 +19,8 @@ if (config.env === 'development') {
 }
 
 router.use('/s', middleware.static('s'));
-router.use('/assets', middleware.static('ace/assets'));
 router.use('/css', middleware.static('cc/css'));
-router.use('/fonts', middleware.static('cc/fonts'));
 router.use('/img', middleware.static('cc/img'));
-router.use('/js', middleware.static('cc/js'));
 router.use('/nocache', express.static(path.join(__dirname, '../public', 'nocache')));
 router.get('/favicon.ico', express.static(path.join(__dirname, '../public')));
 
