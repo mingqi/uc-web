@@ -7,6 +7,7 @@ lib/bootstrap.js
 lib/angular.js
 lib/angular-tablesort.js
 lib/ace.js
+lib/jquery.scrollTo.min.js
 console/main.js
 console/logconfig.js
 
@@ -19,6 +20,7 @@ lib/bootstrap.js
 lib/angular.js
 lib/angular-tablesort.js
 lib/ace.js
+lib/jquery.scrollTo.min.js
 console/main.js
 lib/highstock.js
 lib/daterangepicker.js
