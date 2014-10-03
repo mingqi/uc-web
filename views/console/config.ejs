@@ -6,13 +6,11 @@
 {% include include/inhead %}
 
 {% if (debug) { %}
-  <script src="/b/js/config.js"></script>
+<script src="/b/js/config.js"></script>
 {% } else { %}
-  <script>var require={urlArgs: "v=16", baseUrl: "/s/js"}</script>
+<script>var require={urlArgs: "v=16", baseUrl: "/s/js"}</script>
 {% } %}
-
-<script data-main="console/logconfig" src="/s/require.js"></script>
-
+<script data-main="console/logconfig" src="/s/js/lib/require.js"></script>
 </head>
 
 <body ng-controller="Ctrl">

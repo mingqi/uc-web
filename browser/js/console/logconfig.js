@@ -1,5 +1,5 @@
-require(['jquery', 'underscore', 'angular', 'con'],
-function($, _, ng) {
+require(['jquery', 'underscore', 'con'],
+function($, _) {
 
 var setObject = function(list, object) {
   list = list || [];
@@ -23,7 +23,7 @@ var removeObject = function(list, object) {
   })
 }
 
-ng.module('consoleApp', ['tableSort'])
+angular.module('consoleApp', ['tableSort'])
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
   $http.get('/console/ajax/getHosts').success(function(hosts) {
       _.extend($scope, {
@@ -115,6 +115,6 @@ ng.module('consoleApp', ['tableSort'])
   };
 }]);
 
-ng.bootstrap(document, ['consoleApp']);
+angular.bootstrap(document, ['consoleApp']);
 
 }); // end require ['jquery', ...]

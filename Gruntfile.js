@@ -117,6 +117,8 @@ module.exports = function(grunt) {
           dir: 'public/s/js',
           modules: [{
             name: "console/logconfig"
+          }, {
+            name: "console/search"
           }]
         }
       }

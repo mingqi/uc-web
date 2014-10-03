@@ -1,11 +1,19 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="consoleApp">
+<html lang="en">
 <head>
 <title>日志分析</title>
 
 {% include include/inhead %}
 
 <link rel="stylesheet" href="/s/css/search.css" />
+
+{% if (debug) { %}
+<script src="/b/js/config.js"></script>
+{% } else { %}
+<script>var require={urlArgs: "v=2", baseUrl: "/s/js"}</script>
+{% } %}
+
+<script data-main="console/search" src="/s/js/lib/require.js"></script>
 </head>
 
 <body ng-controller="Ctrl">
@@ -212,10 +220,9 @@
   </div><!-- /.modal-dialog -->
 </div><!-- /.modal -->
 
-<script src="/assets/js/date-time/moment.min.js"></script>
+<!-- <script src="/assets/js/date-time/moment.min.js"></script>
 <script src="/assets/js/date-time/daterangepicker.min.js"></script>
 <script src="/s/highstock.js"></script>
-
-<script src="/s/console/search.min.js"></script>
+ -->
 </body>
 </html>

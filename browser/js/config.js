@@ -1,6 +1,6 @@
 var require = {
 	baseUrl: '/b/js',
-	urlArgs: 'v=13',
+	urlArgs: 'v=' + +new Date,
 	paths: {
 		jquery: 'lib/jquery',
 		underscore: 'lib/underscore',
@@ -9,16 +9,24 @@ var require = {
 		'angular-tablesort': 'lib/angular-tablesort',
 		'scrollTo': 'lib/jquery.scrollTo.min',
 		ace: 'lib/ace',
-		con: 'console/main'
+		highstock: 'lib/highstock',
+		moment: 'lib/moment',
+		daterangepicker: 'lib/daterangepicker',
+		con: 'console/main',
+		pattern: 'console/log_pattern'
 	},
 
 	shim: {
 		bootstrap: ['jquery'],
+		moment: {
+			noGlobal: false
+		},
+		daterangepicker: ['jquery', 'moment'],
 		angular: {
 			exports: 'angular'
 		},
 		'angular-tablesort': ['angular'],
-		ace: ['jquery'],
+		ace: ['jquery', 'bootstrap'],
 		con: ['bootstrap', 'angular-tablesort', 'ace']
 	}
 };
