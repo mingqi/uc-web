@@ -105,6 +105,7 @@ module.exports = function(grunt) {
           mainConfigFile: 'browser/js/config.js',
           preserveLicenseComments: false,
           dir: 'public/s/js',
+          optimize: 'uglify',
           modules: [{
             name: "console/logconfig"
           }, {

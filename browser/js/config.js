@@ -7,7 +7,7 @@ var require = {
 		bootstrap: 'lib/bootstrap',
 		angular: 'lib/angular',
 		'angular-tablesort': 'lib/angular-tablesort',
-		scrollTo: 'lib/jquery.scrollTo.min',
+		scrollTo: 'lib/jquery.scrollTo',
 		ace: 'lib/ace',
 		highstock: 'lib/highstock',
 		moment: 'lib/moment',

@@ -1,5 +1,5 @@
-require(['jquery', 'underscore', 'moment', 'con', 'highstock', 'daterangepicker', 'pattern'],
-function($, _, moment) {
+require(['jquery', 'underscore', 'moment', 'scrollTo', 'con', 'highstock', 'daterangepicker', 'pattern'],
+function($, _, moment, $scrollTo) {
 
 var drawChart = function(chart, series) {
     if (chart.highChart) {
@@ -423,7 +423,7 @@ angular.module('consoleApp', ['tableSort'])
       }).success(function(json) {
           $scope.page.searchResult = json;
           $scope.currentPage = page;
-          $.scrollTo('#resultList', 500);
+          $scrollTo('#resultList', 500);
       })
 
     }
