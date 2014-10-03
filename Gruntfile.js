@@ -111,12 +111,12 @@ module.exports = function(grunt) {
       whole: {
         options: {
           appDir: 'browser/js',
+          baseUrl: '.',
           mainConfigFile: 'browser/js/config.js',
           preserveLicenseComments: false,
-          optimizeCss: 'standard',
           dir: 'public/s/js',
           modules: [{
-            name: "console/main"
+            name: "console/logconfig"
           }]
         }
       }

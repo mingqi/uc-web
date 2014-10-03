@@ -1,13 +1,10 @@
-<!-- basic scripts -->
-<script src="/assets/js/bootstrap.min.js"></script>
-
 <!-- ace scripts -->
-<script src="/assets/js/ace.min.js"></script>
+<!-- <script src="/assets/js/ace.min.js"></script> -->
 
 <!-- angular -->
-<script src="/s/angular/angular.min.js"></script>
+<!-- <script src="/s/angular/angular.min.js"></script>
 <script src="/s/angular-tablesort.min.js"></script>
-
+ -->
 <!-- please wait dialog -->
 <div class="modal" id="pleaseWaitDialog" tabindex="-1" role="dialog" aria-hidden="true" data-backdrop="static" data-keyboard="false">
   <div class="modal-dialog">
@@ -26,22 +23,3 @@
     </div>
   </div>
 </div>
-
-<script>
-var ma = window.ma || {};
-(function() {
-  var $modal = $('#pleaseWaitDialog');
-  
-  $modal
-    .on('shown.bs.modal', function () { $modal.addClass('fade') })
-    .on('hidden.bs.modal', function () { $modal.removeClass('fade') })
-  _.extend(ma, {
-    wait: function() {
-      $modal.modal();
-    },
-    done: function() {
-      $modal.modal('hide');
-    }
-  });
-})();
-</script>

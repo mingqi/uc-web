@@ -1,18 +1,18 @@
 <!DOCTYPE html>
-<html lang="en" ng-app="consoleApp">
+<html lang="en">
 <head>
 <title>配置日志 - UCLogs</title>
 
 {% include include/inhead %}
 
-<script src="/s/require.js"></script>
-<script>
-  require(['/b/js/config.js?1'], function() {
-    require(['jquery'], function($) {
-      alert(1);
-    });
-  });
-</script>
+{% if (debug) { %}
+  <script src="/b/js/config.js"></script>
+{% } else { %}
+  <script>var require={urlArgs: "v=16", baseUrl: "/s/js"}</script>
+{% } %}
+
+<script data-main="console/logconfig" src="/s/require.js"></script>
+
 </head>
 
 <body ng-controller="Ctrl">
@@ -124,6 +124,5 @@
   {% include config-addFile %}
 </script>
 
-<script src="/s/console/config.min.js"></script>
 </body>
 </html>
