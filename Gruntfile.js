@@ -1,3 +1,5 @@
+var rand = require("random-key");
+
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -113,6 +115,20 @@ module.exports = function(grunt) {
           }]
         }
       }
+    },
+
+    'string-replace': {
+      dist: {
+        files: {
+          'views/console/include/requirejs.ejs': 'views/console/include/requirejs-tmpl.ejs',
+        },
+        options: {
+          replacements: [{
+            pattern: '$jsVersion',
+            replacement: rand.generate(5)
+          }]
+        }
+      }
     }
   });
 
@@ -123,8 +139,10 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
+  grunt.loadNpmTasks('grunt-string-replace');
 
   grunt.registerTask('css', ['sass', 'less']);
   grunt.registerTask('js', ['coffee', 'uglify']);
+  grunt.registerTask('rjs', ['requirejs', 'string-replace']);
   grunt.registerTask('default', ['css', 'js', 'watch']);
 };

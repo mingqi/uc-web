@@ -9,7 +9,7 @@ var path = require('path');
 var _s = require('underscore.string');
 var nodemailer = require("nodemailer");
 var querystring = require("querystring");
-var rand = require("generate-key");
+var rand = require("random-key");
 
 var config = require('../config');
 var m = require('../lib/models');
@@ -153,7 +153,7 @@ exports.postRegister = function(req, res, next) {
             m.User.create({
                 email: user.email,
                 passwordMd5: getPwdMd5(user.password),
-                licenseKey : rand.generateKey(20),
+                licenseKey : rand.generate(20),
             }, callback);
         }]
     }, function(err, results) {

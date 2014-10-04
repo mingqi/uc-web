@@ -25,7 +25,7 @@
       "date-format-lite": "*",
       "nodemailer" : "~1.1.1",
       "request": "*",
-      "generate-key": "*",
+      "random-key": "~0.2.1",
       "elasticsearch": "~2.4.3",
       "moment": "*"
     },
@@ -37,7 +37,8 @@
         "grunt-contrib-coffee": "~0.11.1",
         "grunt-contrib-less": "~0.11.4",
         "grunt-contrib-cssmin": "~0.10.0",
-        "grunt-contrib-requirejs": "~0.4.4"
+        "grunt-contrib-requirejs": "~0.4.4",
+        "grunt-string-replace": "~1.0.0"
     },
     "scripts" : {
         "test": "mocha -R spec"

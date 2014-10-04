@@ -7,12 +7,7 @@
 
 <link rel="stylesheet" href="/s/css/search.css" />
 
-{% if (debug) { %}
-<script src="/b/js/config.js"></script>
-{% } else { %}
-<script>var require={urlArgs: "v=12", baseUrl: "/s/js"}</script>
-{% } %}
-
+{% include include/requirejs %}
 <script data-main="console/search" src="/s/js/lib/require.js"></script>
 </head>
 
