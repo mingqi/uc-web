@@ -118,13 +118,11 @@ module.exports = function(grunt) {
     'string-replace': {
       jsVersion: {
         files: {
-          //'views/console/include/requirejs.ejs': 'views/console/include/requirejs-tmpl.ejs',
-          //urlArgs: "20"
           'views/console/include/requirejs.ejs': 'views/console/include/requirejs.ejs'
         },
         options: {
           replacements: [{
-            pattern: /urlArgs:\s*['"](\d+)['"]/,
+            pattern: /urlArgs\s*:\s*['"](\d+)['"]/,
             replacement: function (p0, p1) {
               return 'urlArgs: "' + (parseInt(p1) + 1) + '"';
             }
