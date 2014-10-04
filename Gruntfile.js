@@ -1,5 +1,3 @@
-var rand = require("random-key");
-
 module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -118,14 +116,18 @@ module.exports = function(grunt) {
     },
 
     'string-replace': {
-      dist: {
+      jsVersion: {
         files: {
-          'views/console/include/requirejs.ejs': 'views/console/include/requirejs-tmpl.ejs',
+          //'views/console/include/requirejs.ejs': 'views/console/include/requirejs-tmpl.ejs',
+          //urlArgs: "20"
+          'views/console/include/requirejs.ejs': 'views/console/include/requirejs.ejs'
         },
         options: {
           replacements: [{
-            pattern: '$jsVersion',
-            replacement: rand.generate(5)
+            pattern: /urlArgs:\s*['"](\d+)['"]/,
+            replacement: function (p0, p1) {
+              return 'urlArgs: "' + (parseInt(p1) + 1) + '"';
+            }
           }]
         }
       }
