@@ -54,9 +54,6 @@ module.exports = function(grunt) {
     },
 
     coffee: {
-      options: {
-        bare: true
-      },
       compile: {
         files: {
           'browser/js/console/log_pattern.js': 'browser/coffee/log_pattern.coffee',

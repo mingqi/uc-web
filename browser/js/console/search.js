@@ -1,5 +1,6 @@
-require(['jquery', 'underscore', 'moment', 'scrollTo', 'con', 'highstock', 'daterangepicker', 'pattern'],
-function($, _, moment, $scrollTo) {
+require(['jquery', 'underscore', 'con', 'moment', 'scrollTo', 'pattern',
+         'highstock', 'daterangepicker', 'pattern'],
+function($, _, con, moment, $scrollTo, pattern) {
 
 var chosenLabel = '过去1小时';
 var dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSS';

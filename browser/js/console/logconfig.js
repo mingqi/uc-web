@@ -1,5 +1,5 @@
 require(['jquery', 'underscore', 'con'],
-function($, _) {
+function($, _, con) {
 
 var setObject = function(list, object) {
   list = list || [];
@@ -61,25 +61,25 @@ angular.module('consoleApp', ['tableSort'])
       if (!confirm('停止收集日志文件:\n\n' + host.hostname + ':' + file)) {
         return;
       }
-      ma.wait();
+      con.wait();
       $http.post('/console/ajax/deleteFile', {
         hostId: host._id,
         file: file
       }).success(function(host) {
-        ma.done();
+        con.done();
         setObject($scope.hosts, host);
       });
   };
 
   $scope.refreshHosts = function() {
-    ma.wait();
+    con.wait();
     $http.get('/console/ajax/getHosts').success(function(hosts) {
         var oldHostMap = _.indexBy($scope.hosts, '_id');
         _.each(hosts, function(host) {
           host.selectedWhenAddFile = oldHostMap[host._id] && oldHostMap[host._id].selectedWhenAddFile;
         });        
         $scope.hosts = hosts;
-        ma.done();
+        con.done();
     });
   };
 
@@ -94,14 +94,14 @@ angular.module('consoleApp', ['tableSort'])
       return;
     }
 
-    ma.wait();
+    con.wait();
     $http.post('/console/ajax/addFiles', {
       hostIds: hostIds,
       newFiles: _.map($scope.newFiles, function(file) {
         return file.path;
       })
     }).success(function(hosts) {
-      ma.done();
+      con.done();
       $scope.changeTab('seeConfigs');
       _.each(hosts, function(host) {
         setObject($scope.hosts, host);

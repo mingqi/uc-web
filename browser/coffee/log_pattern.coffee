@@ -1,43 +1,41 @@
+ESCAPE = ['\\','[',']','.', '^','$', '|', '?', '*', '+', '(', ')', '{', '}']
 
-pattern = ( pattern_str, end_flag ) ->
-  ESCAPE = ['\\','[',']','.', '^','$', '|', '?', '*', '+', '(', ')', '{', '}']
-  end_flag ?= false
+escape = (str) ->
+  for e in ESCAPE
+    str = str.replace(e, "\\#{e}")
 
-  escape = (str) ->
-    for e in ESCAPE
-      str = str.replace(e, "\\#{e}")
+  return str
+    
+parse = (statment, end_flag) ->
+  _p = /%(\w+)%/g
+  _attrs = while _r = _p.exec statment
+    _r[1] 
 
-    return str
-      
-  parse = (statment, end_flag) ->
+  return {
 
-    _p = /%(\w+)%/g
+    attributes : _attrs
 
-    _attrs = while _r = _p.exec statment
-      _r[1] 
+    toExtract :  (attribute) ->
+      _r = escape(statment).replace("%#{attribute}%", "(?<value>[a-zA-Z0-9_.-]+)")
+      _r = _r.replace(_p, '[a-zA-Z0-9_.-]+') 
+      return _r
 
-    return {
-
-      attributes : _attrs
-
-      toExtract :  (attribute) ->
-        _r = escape(statment).replace("%#{attribute}%", "(?<value>[a-zA-Z0-9_.-]+)")
-        _r = _r.replace(_p, '[a-zA-Z0-9_.-]+') 
-        return _r
-
-      toFilter : () ->
-        regexp = escape(statment).replace(_p, '[a-zA-Z0-9_.-]+')
-        if end_flag
-          regexp += '\\b'
-        return {
-          "script" : {
-            "script" : "pattern_filter"
-            "params" : {
-              "pattern" : regexp
-            }
+    toFilter : () ->
+      regexp = escape(statment).replace(_p, '[a-zA-Z0-9_.-]+')
+      if end_flag
+        regexp += '\\b'
+      return {
+        "script" : {
+          "script" : "pattern_filter"
+          "params" : {
+            "pattern" : regexp
           }
         }
-    }
+      }
+  }
+
+pattern = ( pattern_str, end_flag ) ->
+  end_flag ?= false
 
   if not pattern_str
     return {
@@ -120,3 +118,6 @@ pattern = ( pattern_str, end_flag ) ->
       else
         return pattern(new_pattern_str, false)
   }
+
+define () ->
+  pattern

@@ -1,1 +1,0 @@
-var ma=window.ma||{};(function(){var e=$("#pleaseWaitDialog");e.on("shown.bs.modal",function(){e.addClass("fade")}).on("hidden.bs.modal",function(){e.removeClass("fade")}),_.extend(ma,{wait:function(){e.modal()},done:function(){e.modal("hide")}})})();

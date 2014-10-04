@@ -7,22 +7,21 @@ lib/bootstrap.js
 lib/angular.js
 lib/angular-tablesort.js
 lib/ace.js
-lib/jquery.scrollTo.js
-console/main.js
+console/con.js
 console/logconfig.js
 
 console/search.js
 ----------------
 lib/jquery.js
 lib/underscore.js
-lib/moment.js
-lib/jquery.scrollTo.js
 lib/bootstrap.js
 lib/angular.js
 lib/angular-tablesort.js
 lib/ace.js
-console/main.js
+console/con.js
+lib/moment.js
+lib/jquery.scrollTo.js
+console/log_pattern.js
 lib/highstock.js
 lib/daterangepicker.js
-console/log_pattern.js
 console/search.js

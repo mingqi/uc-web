@@ -12,7 +12,7 @@ var require = {
 		highstock: 'lib/highstock',
 		moment: 'lib/moment',
 		daterangepicker: 'lib/daterangepicker',
-		con: 'console/main',
+		con: 'console/con',
 		pattern: 'console/log_pattern'
 	},
 
@@ -28,6 +28,6 @@ var require = {
 		},
 		'angular-tablesort': ['angular'],
 		ace: ['jquery', 'bootstrap'],
-		con: ['bootstrap', 'angular-tablesort', 'ace', 'scrollTo']
+		con: ['bootstrap', 'angular-tablesort', 'ace']
 	}
 };
