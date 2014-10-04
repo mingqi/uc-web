@@ -1,7 +1,7 @@
 {
-  "name": "monitorat",
+  "name": "uclogs",
   "version": "0.1.0",
-  "description": "monitorat website",
+  "description": "uclogs website",
   "main": "app.js",
   "repository": "",
   "keywords": [
