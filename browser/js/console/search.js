@@ -14,9 +14,6 @@ var drawChart = function(chart, series) {
             zoomType : 'x',
             events: {
                 selection: function(event) {
-                    // var $scope = angular.element($("body")).scope();
-                    // $scope.autoRefresh = false;
-
                     var format = '%Y-%m-%dT%H:%M:%S.%L';
                     var begin = Highcharts.dateFormat(format, event.xAxis[0].min);
                     var end = Highcharts.dateFormat(format, event.xAxis[0].max);
