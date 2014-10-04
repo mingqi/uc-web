@@ -1,6 +1,9 @@
 require(['jquery', 'underscore', 'moment', 'scrollTo', 'con', 'highstock', 'daterangepicker', 'pattern'],
 function($, _, moment, $scrollTo) {
 
+var chosenLabel = '过去1小时';
+var dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSS';
+
 var drawChart = function(chart, series) {
     if (chart.highChart) {
         chart.highChart.destroy();
@@ -11,10 +14,13 @@ var drawChart = function(chart, series) {
             zoomType : 'x',
             events: {
                 selection: function(event) {
+                    // var $scope = angular.element($("body")).scope();
+                    // $scope.autoRefresh = false;
+
                     var format = '%Y-%m-%dT%H:%M:%S.%L';
                     var begin = Highcharts.dateFormat(format, event.xAxis[0].min);
                     var end = Highcharts.dateFormat(format, event.xAxis[0].max);
-                    window.chosenLabel = '自定义范围';
+                    chosenLabel = '自定义范围';
                     $('#daterange').val(begin + ' - ' + end);
                     $('#daterange').trigger('change');
                 }
@@ -78,8 +84,6 @@ var drawChart = function(chart, series) {
     chart.highChart = new Highcharts.StockChart(opts);
 };
 
-$('[data-rel=tooltip]').tooltip({container: 'body'});
-
 Highcharts.setOptions({
     global : {
         timezoneOffset : new Date().getTimezoneOffset()
@@ -90,9 +94,6 @@ Highcharts.setOptions({
       //shortMonths: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
     }
 });
-
-var chosenLabel = '过去1小时';
-var dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSS';
 
 var isCustomerRange = function(label) {
     label = label || chosenLabel;
@@ -149,25 +150,11 @@ var getDatePickerOpts = function() {
 
 var datePickerOpts = getDatePickerOpts();
 
-$(function() {
-  $('#daterange').daterangepicker(datePickerOpts);
-  $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-      if (isCustomerRange() && !isCustomerRange(picker.chosenLabel)) {
-          // customer -> (not customer)
-          var $scope = angular.element($("body")).scope();
-          $scope.autoRefresh = true;
-      }
-      chosenLabel = picker.chosenLabel;
-      $('#daterange').trigger('change');
-  });
-});
-
 var setDateRange = function() {
     $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " - "
             + moment(datePickerOpts.endDate).format(dateFormat));
     $('#daterange').trigger('apply.daterangepicker', $('#daterange').data('daterangepicker'));
 };
-setDateRange();
 
 var setAutoRefresh = function() {
     if (window.refreshTimer) {
@@ -184,6 +171,21 @@ var setAutoRefresh = function() {
         setDateRange();
     }, 1000 * 60);
 };
+
+$(function() {
+  $('#daterange').daterangepicker(datePickerOpts);
+  $('[data-rel=tooltip]').tooltip({container: 'body'});
+  $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+      if (isCustomerRange() && !isCustomerRange(picker.chosenLabel)) {
+          // customer -> (not customer)
+          var $scope = angular.element($("body")).scope();
+          $scope.autoRefresh = true;
+      }
+      chosenLabel = picker.chosenLabel;
+      $('#daterange').trigger('change');
+  });
+  setDateRange();
+});
 
 angular.module('consoleApp', ['tableSort'])
 .filter('isEmpty', function () {
