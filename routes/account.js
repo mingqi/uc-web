@@ -106,12 +106,15 @@ exports.postLogin = function(req, res, next) {
 exports.register = function(req, res, next) {
     res.render('account/register', {
         user : null,
-        rd : req.query.rd || '/console/'
+        rd : req.query.rd || '/console/',
+        inviteCode: req.query.inviteCode || '',
+        needInviteCode: config.register.needInviteCode
     });
 };
 
 exports.postRegister = function(req, res, next) {
     var rd = req.body.rd || "/";
+    var inviteCode = req.body.inviteCode || '';
     var user = {
         email : (_s.trim(req.body.email) || "").toLowerCase(),
         password : _s.trim(req.body.password) || "",
@@ -127,7 +130,9 @@ exports.postRegister = function(req, res, next) {
         res.render('account/register', {
             user : user,
             rd : rd,
-            error : error
+            error : error,
+            inviteCode: inviteCode,
+            needInviteCode: config.register.needInviteCode
         });
     };
 
@@ -146,28 +151,53 @@ exports.postRegister = function(req, res, next) {
                 email : user.email
             }, callback);
         },
-        newUser : ['existUser', function(callback, results) {
+        inviteCode: function(callback) {
+            if (!config.register.needInviteCode) {
+                return callback(null);
+            }
+            m.InviteCode.findOne({
+                code: inviteCode,
+                goal: 'register',
+                userId: {
+                    $exists: false
+                }
+            }, function(err, inviteCode) {
+                if (err) {
+                    return callback(err);
+                }
+                if (!inviteCode) {
+                    return callback(new QiriError('验证码无效，或者已经使用过'));
+                }
+                callback(null, inviteCode);
+            });
+        },
+        newUser : ['existUser', 'inviteCode', function(callback, results) {
             if (results.existUser) {
-                return callback();
+                return callback(new QiriError('Email 已经注册过，请更换'));
             }
             m.User.create({
                 email: user.email,
                 passwordMd5: getPwdMd5(user.password),
                 licenseKey : rand.generate(20),
             }, callback);
+        }],
+        updateInviteCode: ['newUser', function(callback, results) {
+            if (!results.inviteCode) {
+                return callback(null);
+            }
+            m.InviteCode.update({
+                code: inviteCode
+            }, {
+                userId: results.newUser.id
+            }, callback);
         }]
     }, function(err, results) {
         if (err) {
-            return next(err);
+            return renderError(err.getMsg());
         }
-        if (results.existUser) {
-            var error = 'Email 已经注册过，请更换';
-            return renderError(error);
-        } else {
-            setLoginCookie(res, results.newUser);
 
-            req.xhr ? res.json({}) : res.redirect(rd);
-        }
+        setLoginCookie(res, results.newUser);
+        req.xhr ? res.json({}) : res.redirect(rd);
     });
 };
 
