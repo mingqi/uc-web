@@ -9,6 +9,9 @@
 
 {% include include/requirejs %}
 <script data-main="console/search" src="/s/js/lib/require.js"></script>
+<style>
+em {color: red}
+</style>
 </head>
 
 <body ng-controller="Ctrl">
@@ -68,7 +71,6 @@
         <div class="main-content">
 
             <div class="page-content">
-
               <div class="col-sm-5">
                   <div class="input-group">
                       <input class="form-control input-mask-date" type="text" ng-model="page.keywords" ng-enter="search()">
@@ -83,7 +85,7 @@
               <div class="col-sm-5 pull-right">
                     <div class="input-prepend input-group pull-right">
                        <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
-                       <input readonly type="text" style="width: 365px" id="daterange" ng-model="dateRange" ng-change="search()"/>
+                       <input readonly type="text" style="width: 315px" id="daterange" ng-model="dateRange" ng-change="search()"/>
                        <span class="input-group-addon" data-rel="tooltip" data-placement="top" title="自动刷新" style="cursor: pointer" ng-click="toggleAutoRefresh()">
                           <i class="fa fa-circle" ng-class="{red:!autoRefresh, green:autoRefresh}"></i>
                        </span>
@@ -155,7 +157,10 @@
                               .format('YYYY-MM-DDTHH:mm:ss')}}</td>
                           <td>{{hit._source.host}}</td>
                           <td>{{hit._source.path}}</td>
-                          <td>{{hit._source.message}}</td>
+                          <td>
+                            <span ng-if="hit.highlightMsg" ng-bind-html="hit.highlightMsg"></span>
+                            <span ng-if="!hit.highlightMsg">{{hit._source.message}}</span>
+                          </td>
                       </tr>
                   </tbody>
                 </table>

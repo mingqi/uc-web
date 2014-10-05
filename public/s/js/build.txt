@@ -24,4 +24,5 @@ lib/jquery.scrollTo.js
 console/log_pattern.js
 lib/highstock.js
 lib/daterangepicker.js
+lib/angular-sanitize.js
 console/search.js

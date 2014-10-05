@@ -7,6 +7,7 @@ var require = {
 		bootstrap: 'lib/bootstrap',
 		angular: 'lib/angular',
 		'angular-tablesort': 'lib/angular-tablesort',
+		'angular-sanitize': 'lib/angular-sanitize',
 		scrollTo: 'lib/jquery.scrollTo',
 		ace: 'lib/ace',
 		highstock: 'lib/highstock',
@@ -27,6 +28,7 @@ var require = {
 			exports: 'angular'
 		},
 		'angular-tablesort': ['angular'],
+		'angular-sanitize': ['angular'],
 		ace: ['jquery', 'bootstrap'],
 		con: ['bootstrap', 'angular-tablesort', 'ace']
 	}

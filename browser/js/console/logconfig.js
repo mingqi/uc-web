@@ -72,6 +72,7 @@ angular.module('consoleApp', ['tableSort'])
   };
 
   $scope.refreshHosts = function() {
+    $("#modalAddHost").modal('hide');
     con.wait();
     $http.get('/console/ajax/getHosts').success(function(hosts) {
         var oldHostMap = _.indexBy($scope.hosts, '_id');
@@ -112,6 +113,10 @@ angular.module('consoleApp', ['tableSort'])
         selectedWhenAddFile: false
       });
     });
+  };
+
+  $scope.addHost = function() {
+    $('#modalAddHost').modal();
   };
 }]);
 

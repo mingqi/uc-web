@@ -1,9 +1,9 @@
 require(['jquery', 'underscore', 'con', 'moment', 'scrollTo', 'pattern',
-         'highstock', 'daterangepicker', 'pattern'],
+         'highstock', 'daterangepicker', 'pattern', 'angular-sanitize'],
 function($, _, con, moment, $scrollTo, pattern) {
 
 var chosenLabel = '过去1小时';
-var dateFormat = 'YYYY-MM-DDTHH:mm:ss.SSS';
+var dateFormat = 'YYYY-MM-DD HH:mm:ss';
 
 var drawChart = function(chart, series) {
     if (chart.highChart) {
@@ -15,11 +15,11 @@ var drawChart = function(chart, series) {
             zoomType : 'x',
             events: {
                 selection: function(event) {
-                    var format = '%Y-%m-%dT%H:%M:%S.%L';
+                    var format = '%Y-%m-%d %H:%M:%S';
                     var begin = Highcharts.dateFormat(format, event.xAxis[0].min);
                     var end = Highcharts.dateFormat(format, event.xAxis[0].max);
                     chosenLabel = '自定义范围';
-                    $('#daterange').val(begin + ' - ' + end);
+                    $('#daterange').val(begin + ' 到 ' + end);
                     $('#daterange').trigger('change');
                 }
             }
@@ -118,6 +118,7 @@ var getDatePickerOpts = function() {
         minDate: moment().subtract(15, 'day'),
         minDate: moment().subtract(60, 'day'),
         maxDate: moment(),
+        separator: " 到 ",
         locale: {
             applyLabel: '应用',
             cancelLabel: '取消',
@@ -149,7 +150,7 @@ var getDatePickerOpts = function() {
 var datePickerOpts = getDatePickerOpts();
 
 var setDateRange = function() {
-    $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " - "
+    $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " 到 "
             + moment(datePickerOpts.endDate).format(dateFormat));
     $('#daterange').trigger('apply.daterangepicker', $('#daterange').data('daterangepicker'));
 };
@@ -170,6 +171,36 @@ var setAutoRefresh = function() {
     }, 1000 * 60);
 };
 
+var handleSearchResult = function($scope, esResponse) {
+  $scope.page.searchResult = esResponse;
+
+  _.each(esResponse.hits.hits || [], function(hit) {
+    if (hit.highlight) {
+      hit.highlightMsg = hit.highlight.message
+        && hit.highlight.message.length
+        && hit.highlight.message[0].replace('>', '&gt;').replace('<', '&lt;')
+          .replace('*%pre%*', '<em>').replace('*%post%*', '</em>');
+    }
+  });
+};
+
+var getESBody = function($scope) {
+  return {
+    query: $scope.page.query,
+    size: 100,
+    sort: ['timestamp'],
+    "highlight": {
+      "pre_tags" : ["*%pre%*"],
+      "post_tags" : ["*%post%*"],
+      "fields": {
+        "message": {
+          "fragment_size": 1000
+        }
+      }
+    }
+  }
+};
+
 $(function() {
   $('#daterange').daterangepicker(datePickerOpts);
   $('[data-rel=tooltip]').tooltip({container: 'body'});
@@ -185,7 +216,7 @@ $(function() {
   setDateRange();
 });
 
-angular.module('consoleApp', ['tableSort'])
+angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
         var bar;
         return function (obj) {
@@ -250,8 +281,8 @@ angular.module('consoleApp', ['tableSort'])
         if (isCustomerRange()) {
           $scope.autoRefresh = false;
         }
-        if (!$scope.dateRange.match(/^(\S+) - (\S+)$/)) {
-            alert("时间格式错误")
+        if (!$scope.dateRange.match(/^(.+) 到 (.+)$/)) {
+            return alert("时间格式错误")
         }
         var strBegin = RegExp.$1;
         var strEnd = RegExp.$2;
@@ -296,23 +327,21 @@ angular.module('consoleApp', ['tableSort'])
         }
 
         $http.post("/console/ajax/search", {
-          esBody: {
-            query: $scope.page.query,
-            size: 100,
-            sort: ['timestamp'],
+          esBody: _.extend(getESBody($scope), {
             aggs: {
-              "event_over_time": {
-                "date_histogram": {
-                  "field": "timestamp",
-                  "interval": interval + "ms"
+              event_over_time: {
+                date_histogram: {
+                  field: "timestamp",
+                  interval: interval + "ms"
                 }
               }
             }
-          },
+          }),
           begin: begin,
           end: end
         }).success(function(json) {
-          $scope.page.searchResult = json;
+          handleSearchResult($scope, json);
+          
           var buckets = json.aggregations ? json.aggregations.event_over_time.buckets : [];
           var data = [];
           if (buckets.length == 0) {
@@ -414,16 +443,13 @@ angular.module('consoleApp', ['tableSort'])
         return;
       }
       $http.post("/console/ajax/search", {
-          esBody: {
-            sort: ['timestamp'],
-            query: $scope.page.query,
-            size: 100,
+          esBody: _.extend(getESBody($scope), {
             from: (page - 1) * 100
-          },
+          }),
           begin: $scope.begin,
           end: $scope.end
       }).success(function(json) {
-          $scope.page.searchResult = json;
+          handleSearchResult($scope, json);
           $scope.currentPage = page;
           $scrollTo('#resultList', 500);
       })
