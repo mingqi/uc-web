@@ -157,7 +157,7 @@ em {color: red}
                               .format('YYYY-MM-DD HH:mm:ss')}}</td>
                           <td>{{hit._source.host}}</td>
                           <td>{{hit._source.path}}</td>
-                          <td>
+                          <td style="word-break:break-word">
                             <span ng-if="hit.highlightMsg" ng-bind-html="hit.highlightMsg"></span>
                             <span ng-if="!hit.highlightMsg">{{hit._source.message}}</span>
                           </td>
