@@ -299,6 +299,7 @@ angular.module('consoleApp', ['tableSort'])
           esBody: {
             query: $scope.page.query,
             size: 100,
+            sort: ['timestamp'],
             aggs: {
               "event_over_time": {
                 "date_histogram": {
@@ -414,6 +415,7 @@ angular.module('consoleApp', ['tableSort'])
       }
       $http.post("/console/ajax/search", {
           esBody: {
+            sort: ['timestamp'],
             query: $scope.page.query,
             size: 100,
             from: (page - 1) * 100

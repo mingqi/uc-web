@@ -36,6 +36,9 @@ var config = {
           port: 25
         }
     },
+    register: {
+        needInviteCode: true
+    }
 };
 
 var env = process.env.NODE_ENV || 'development';

@@ -12,6 +12,7 @@
   "author": "yanxi",
   "readmeFilename": "README.md",
   "dependencies": {
+      "coffee-script": "~1.8.0",
       "express": "4.3.1",
       "morgan": "~1.2.3",
       "body-parser" : "~1.6.5",

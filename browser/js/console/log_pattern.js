@@ -85,7 +85,7 @@
               _results.push({
                 'multi_match': {
                   'query': term,
-                  'fields': ['_all']
+                  'fields': ['message']
                 }
               });
             }

@@ -4,6 +4,7 @@ var http = require('http');
 var path = require('path');
 var ejs = require('ejs');
 
+require("coffee-script/register");
 require("date-format-lite");
 
 var config = require('./config');

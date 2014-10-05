@@ -31,6 +31,7 @@ router.use(cookieParser(config.pwdSecret));
 router.use(routes.account.loadUser);
 
 router.use('/console', require('./console'));
+router.use('/manage', require('./manage'));
 
 router.get('/', routes.home);
 router.get('/help/:page', routes.help);
