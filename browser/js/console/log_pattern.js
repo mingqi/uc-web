@@ -1,5 +1,5 @@
 
-/* jshint eqnull: true, boss: true */
+/* jshint ignore:start */
 
 (function() {
   var ESCAPE, escape, parse, pattern;

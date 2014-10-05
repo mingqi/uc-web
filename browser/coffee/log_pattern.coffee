@@ -1,4 +1,4 @@
-### jshint eqnull: true, boss: true ###
+### jshint ignore:start ###
 
 ESCAPE = ['\\','[',']','.', '^','$', '|', '?', '*', '+', '(', ')', '{', '}']
 

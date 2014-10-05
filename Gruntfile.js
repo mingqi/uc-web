@@ -133,7 +133,7 @@ module.exports = function(grunt) {
           node: true,
           predef: [ "require", "module", "exports"]
         },
-        src: ['Gruntfile.js', 'lib/**/*.js', 'routers/**/*.js', 'routes/**/*.js']
+        src: ['*.js', 'lib/**/*.js', 'routers/**/*.js', 'routes/**/*.js']
       }
     },
 
