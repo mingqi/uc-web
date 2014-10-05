@@ -1,11 +1,13 @@
-(function() {
+define(['jquery'], function($) {
   var $modal = $('#pleaseWaitDialog');
   
-  $modal
-    .on('shown.bs.modal', function () { $modal.addClass('fade') })
-    .on('hidden.bs.modal', function () { $modal.removeClass('fade') })
+  $modal.on('shown.bs.modal', function () {
+    $modal.addClass('fade');
+  }).on('hidden.bs.modal', function () {
+    $modal.removeClass('fade');
+  });
 
-  var con = {
+  return {
     wait: function() {
       $modal.modal();
     },
@@ -13,6 +15,4 @@
       $modal.modal('hide');
     }
   };
-
-  define(con);
-})();
+});

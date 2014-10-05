@@ -112,6 +112,33 @@ module.exports = function(grunt) {
       }
     },
 
+    jshint: {
+      browser: {
+        options: {
+          undef: true,
+          unused: true,
+          asi: true,  // 忽略缺少分号
+          browser: true,
+          predef: ["require", "define", "angular", "confirm", "alert", "Highcharts"],
+          globals: {
+            require: true
+          }
+        },
+        src: ['browser/js/console/*.js', 'browser/js/manage/*.js', 'browser/js/*.js',
+          //   'public/s/js/manage/*.js', 'public/s/js/*.js'
+        ]
+      },
+      node: {
+        options: {
+          undef: true,
+          unused: true,
+          node: true,
+          predef: [ "require", "module", "exports"]
+        },
+        src: ['Gruntfile.js', 'lib/**/*.js', 'routers/**/*.js', 'routes/**/*.js']
+      }
+    },
+
     'string-replace': {
       jsVersion: {
         files: {
@@ -136,6 +163,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-contrib-requirejs');
+  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-string-replace');
 
   grunt.registerTask('css', ['sass', 'less']);

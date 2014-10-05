@@ -115,7 +115,7 @@ var getDatePickerOpts = function() {
         timePickerIncrement: 15,
         ranges: ranges,
         format: dateFormat,
-        minDate: moment().subtract(15, 'day'),
+        // minDate: moment().subtract(15, 'day'),
         minDate: moment().subtract(60, 'day'),
         maxDate: moment(),
         separator: " 到 ",
@@ -150,8 +150,8 @@ var getDatePickerOpts = function() {
 var datePickerOpts = getDatePickerOpts();
 
 var setDateRange = function() {
-    $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " 到 "
-            + moment(datePickerOpts.endDate).format(dateFormat));
+    $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " 到 " +
+            moment(datePickerOpts.endDate).format(dateFormat));
     $('#daterange').trigger('apply.daterangepicker', $('#daterange').data('daterangepicker'));
 };
 
@@ -176,9 +176,8 @@ var handleSearchResult = function($scope, esResponse) {
 
   _.each(esResponse.hits.hits || [], function(hit) {
     if (hit.highlight) {
-      hit.highlightMsg = hit.highlight.message
-        && hit.highlight.message.length
-        && hit.highlight.message[0].replace(/>/g, '&gt;').replace(/</g, '&lt;')
+      hit.highlightMsg = hit.highlight.message && hit.highlight.message.length &&
+          hit.highlight.message[0].replace(/>/g, '&gt;').replace(/</g, '&lt;')
           .replace(/\*%pre%\*/g, '<em>').replace(/\*%post%\*/g, '</em>');
     }
   });
@@ -218,9 +217,8 @@ $(function() {
 
 angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
-        var bar;
         return function (obj) {
-            for (bar in obj) {
+            for (var bar in obj) {
                 if (obj.hasOwnProperty(bar)) {
                     return false;
                 }
@@ -241,7 +239,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         });
     };
 })
-.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http) {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $scope.dateRange = $('#daterange').val();
     _.extend($scope, {
@@ -344,7 +342,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           
           var buckets = json.aggregations ? json.aggregations.event_over_time.buckets : [];
           var data = [];
-          if (buckets.length == 0) {
+          if (buckets.length === 0) {
             for (var date = begin; date <= end; date += interval) {
               data.push([date, 0]);
             }
@@ -410,9 +408,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           end: $scope.end
         }).success(function(json) {
           field.loading = false;
-          field.buckets = json.aggregations
-            ? json.aggregations.unique_number_for_attributes.buckets
-            : [];
+          field.buckets = json.aggregations ?
+            json.aggregations.unique_number_for_attributes.buckets :
+            [];
         });
       }
       field.show = !field.show;

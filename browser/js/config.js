@@ -1,6 +1,6 @@
 var require = {
 	baseUrl: '/b/js',
-	urlArgs: 'v=' + +new Date,
+	urlArgs: 'v=' + (new Date() * 1),
 	paths: {
 		jquery: 'lib/jquery',
 		underscore: 'lib/underscore',

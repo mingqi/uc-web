@@ -13,15 +13,15 @@ var setObject = function(list, object) {
       list.push(object);
   }
 };
-var removeObject = function(list, object) {
-  list = list || [];
-  _.some(list, function(old, i) {
-    if (old._id === object._id) {
-      list.splice(i, 1);
-      return true;
-    }
-  })
-}
+// var removeObject = function(list, object) {
+//   list = list || [];
+//   _.some(list, function(old, i) {
+//     if (old._id === object._id) {
+//       list.splice(i, 1);
+//       return true;
+//     }
+//   })
+// };
 
 angular.module('consoleApp', ['tableSort'])
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {

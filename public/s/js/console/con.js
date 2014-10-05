@@ -1,1 +1,1 @@
-(function(){var e=$("#pleaseWaitDialog");e.on("shown.bs.modal",function(){e.addClass("fade")}).on("hidden.bs.modal",function(){e.removeClass("fade")});var t={wait:function(){e.modal()},done:function(){e.modal("hide")}};define(t)})();
+define(["jquery"],function(e){var t=e("#pleaseWaitDialog");return t.on("shown.bs.modal",function(){t.addClass("fade")}).on("hidden.bs.modal",function(){t.removeClass("fade")}),{wait:function(){t.modal()},done:function(){t.modal("hide")}}});
