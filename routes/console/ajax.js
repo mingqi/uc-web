@@ -24,8 +24,8 @@ module.exports = exports = function(req, res, next) {
 
 exports.search = function(req, res, next) {
     var visitor = req.visitor;
-    var begin = moment(req.body.begin).startOf('day');
-    var end = moment(req.body.end);
+    var begin = moment(req.body.begin).zone("+08:00").startOf('day');
+    var end = moment(req.body.end).zone("+08:00");
     var esBody = req.body.esBody;
 
     var index = [];
