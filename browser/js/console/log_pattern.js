@@ -1,3 +1,6 @@
+
+/* jshint eqnull: true, boss: true */
+
 (function() {
   var ESCAPE, escape, parse, pattern;
 

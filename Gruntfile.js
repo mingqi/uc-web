@@ -124,14 +124,12 @@ module.exports = function(grunt) {
             require: true
           }
         },
-        src: ['browser/js/console/*.js', 'browser/js/manage/*.js', 'browser/js/*.js',
-          //   'public/s/js/manage/*.js', 'public/s/js/*.js'
-        ]
+        src: ['browser/js/console/*.js', 'browser/js/manage/*.js']
       },
       node: {
         options: {
           undef: true,
-          unused: true,
+          unused: false,
           node: true,
           predef: [ "require", "module", "exports"]
         },

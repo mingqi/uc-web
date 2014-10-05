@@ -197,7 +197,11 @@ exports.postRegister = function(req, res, next) {
         }
 
         setLoginCookie(res, results.newUser);
-        req.xhr ? res.json({}) : res.redirect(rd);
+        if (req.xhr) {
+            res.json({});
+        } else {
+            res.redirect(rd);
+        }
     });
 };
 

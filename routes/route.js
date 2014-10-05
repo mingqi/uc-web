@@ -3,6 +3,8 @@ var async = require('async');
 var fs = require('fs');
 var path = require('path');
 
+var QiriError = require('../lib/qiri-err');
+
 exports.account = require('./account');
 exports.console = require('./console/console');
 

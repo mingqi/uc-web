@@ -1,3 +1,5 @@
+### jshint eqnull: true, boss: true ###
+
 ESCAPE = ['\\','[',']','.', '^','$', '|', '?', '*', '+', '(', ')', '{', '}']
 
 escape = (str) ->
