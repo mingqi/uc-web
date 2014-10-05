@@ -154,7 +154,7 @@ em {color: red}
                       <tr ng-repeat="hit in page.searchResult.hits.hits">
                           <td style="white-space: nowrap;">
                             {{moment(moment.utc(hit._source.timestamp).toDate())
-                              .format('YYYY-MM-DDTHH:mm:ss')}}</td>
+                              .format('YYYY-MM-DD HH:mm:ss')}}</td>
                           <td>{{hit._source.host}}</td>
                           <td>{{hit._source.path}}</td>
                           <td>
@@ -167,7 +167,7 @@ em {color: red}
 
                 <ul class="pagination">
                   <li ng-class="{active: currentPage==p+1}"
-                    ng-repeat="p in _.range(Math.min(5, Math.ceil(page.searchResult.hits.total/100)))">
+                    ng-repeat="p in _.range(Math.min(10, Math.ceil(page.searchResult.hits.total/100)))">
                     <a ng-click="toPage(p+1)">{{p+1}}</a>
                   </li>
                 </ul>
