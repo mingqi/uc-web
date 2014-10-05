@@ -178,8 +178,8 @@ var handleSearchResult = function($scope, esResponse) {
     if (hit.highlight) {
       hit.highlightMsg = hit.highlight.message
         && hit.highlight.message.length
-        && hit.highlight.message[0].replace('>', '&gt;').replace('<', '&lt;')
-          .replace('*%pre%*', '<em>').replace('*%post%*', '</em>');
+        && hit.highlight.message[0].replace(/>/g, '&gt;').replace(/</g, '&lt;')
+          .replace(/\*%pre%\*/g, '<em>').replace(/\*%post%\*/g, '</em>');
     }
   });
 };
