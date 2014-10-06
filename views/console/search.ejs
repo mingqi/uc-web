@@ -94,12 +94,12 @@ em {color: red}
               <div class="clearfix"></div>
               <hr/>
 
-              <div ng-include="'pageConent'">
-                {% include include/spinner/rect %}
+              <div ng-include="'pageContent'">
+                {% include include/spinner/rectangle-bounce %}
               </div>
 
             </div><!-- /.page-content -->
-            <script type="text/ng-template" id="pageConent">
+            <script type="text/ng-template" id="pageContent">
               <div ng-if="!(page.filter.field | isEmpty) || !(page.filter.attribute | isEmpty)">字段过滤：
                 <span ng-repeat="(key, value) in page.filter.field">
                   <div class="label label-xlg label-gray">
