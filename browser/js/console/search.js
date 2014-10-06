@@ -96,7 +96,7 @@ var drawChart = function(chart, series) {
 
 var isCustomerRange = function(label) {
     label = label || chosenLabel;
-    return label.indexOf('过去') === -1;
+    return !_.include(['过去1小时', '过去6小时'], label);
 };
 
 var getDatePickerOpts = function() {
