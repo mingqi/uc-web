@@ -94,7 +94,9 @@ em {color: red}
               <div class="clearfix"></div>
               <hr/>
 
-              <div ng-include="'pageConent'"></div>
+              <div ng-include="'pageConent'">
+                {% include include/spinner/rect %}
+              </div>
 
             </div><!-- /.page-content -->
             <script type="text/ng-template" id="pageConent">
