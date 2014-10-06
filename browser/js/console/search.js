@@ -440,13 +440,13 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 }]); // end angular
 
 $(function() {
-  $('#daterange').daterangepicker(datePickerOpts);
   $('[data-rel=tooltip]').tooltip({container: 'body'});
-  
   datePickerOpts = getDatePickerOpts();
   setDateRange();
+
   angular.bootstrap(document, ['consoleApp']);
-  
+
+  $('#daterange').daterangepicker(datePickerOpts);
   $('#daterange').on('apply.daterangepicker', function(ev, picker) {
       if (isCustomerRange() && !isCustomerRange(picker.chosenLabel)) {
           // customer -> (not customer)
