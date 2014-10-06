@@ -4,6 +4,18 @@ function($, _, con, moment, $scrollTo, pattern) {
 
 var chosenLabel = '过去1小时';
 var dateFormat = 'YYYY-MM-DD HH:mm:ss';
+var datePickerOpts;
+
+Highcharts.setOptions({
+    global : {
+        timezoneOffset : new Date().getTimezoneOffset()
+    },
+    lang: {
+      weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
+      //shortMonths: _.map(_.range(12), function(i) {return (i+1)+"月"})
+      //shortMonths: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+    }
+});
 
 var drawChart = function(chart, series) {
     if (chart.highChart) {
@@ -82,17 +94,6 @@ var drawChart = function(chart, series) {
     chart.highChart = new Highcharts.StockChart(opts);
 };
 
-Highcharts.setOptions({
-    global : {
-        timezoneOffset : new Date().getTimezoneOffset()
-    },
-    lang: {
-      weekdays: ['周日', '周一', '周二', '周三', '周四', '周五', '周六'],
-      //shortMonths: _.map(_.range(12), function(i) {return (i+1)+"月"})
-      //shortMonths: ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
-    }
-});
-
 var isCustomerRange = function(label) {
     label = label || chosenLabel;
     return label.indexOf('过去') === -1;
@@ -143,11 +144,9 @@ var getDatePickerOpts = function() {
     
     return _.extend(result, {
         startDate: ranges[chosenLabel][0],
-        endDate: ranges[chosenLabel][1],
+        endDate: ranges[chosenLabel][1]
     });
 };
-
-var datePickerOpts = getDatePickerOpts();
 
 var setDateRange = function() {
     $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " 到 " +
@@ -199,21 +198,6 @@ var getESBody = function($scope) {
     }
   }
 };
-
-$(function() {
-  $('#daterange').daterangepicker(datePickerOpts);
-  $('[data-rel=tooltip]').tooltip({container: 'body'});
-  $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-      if (isCustomerRange() && !isCustomerRange(picker.chosenLabel)) {
-          // customer -> (not customer)
-          var $scope = angular.element($("body")).scope();
-          $scope.autoRefresh = true;
-      }
-      chosenLabel = picker.chosenLabel;
-      $('#daterange').trigger('change');
-  });
-  setDateRange();
-});
 
 angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
@@ -453,7 +437,25 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       })
 
     }
-}]);
-angular.bootstrap(document, ['consoleApp']);
+}]); // end angular
+
+$(function() {
+  $('#daterange').daterangepicker(datePickerOpts);
+  $('[data-rel=tooltip]').tooltip({container: 'body'});
+  
+  datePickerOpts = getDatePickerOpts();
+  setDateRange();
+  angular.bootstrap(document, ['consoleApp']);
+  
+  $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+      if (isCustomerRange() && !isCustomerRange(picker.chosenLabel)) {
+          // customer -> (not customer)
+          var $scope = angular.element($("body")).scope();
+          $scope.autoRefresh = true;
+      }
+      chosenLabel = picker.chosenLabel;
+      $('#daterange').trigger('change');
+  });
+});
 
 }); // end require ['jquery', ...]
