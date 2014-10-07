@@ -27,9 +27,15 @@ var drawChart = function(chart, series) {
             zoomType : 'x',
             events: {
                 selection: function(event) {
+                    if (!event.xAxis) {
+                      return;
+                    }
                     var format = '%Y-%m-%d %H:%M:%S';
                     var begin = Highcharts.dateFormat(format, event.xAxis[0].min);
                     var end = Highcharts.dateFormat(format, event.xAxis[0].max);
+                    if (begin === end) {
+                      end = Highcharts.dateFormat(format, event.xAxis[0].min + 1000);
+                    }
                     chosenLabel = '自定义范围';
                     $('#daterange').val(begin + ' 到 ' + end);
                     $('#daterange').trigger('change');
@@ -106,7 +112,7 @@ var getDatePickerOpts = function() {
        '昨天': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
        '过去1天': [moment().subtract(1, 'day'), moment()],
        '过去1周': [moment().subtract(1, 'week'), moment()],
-       '过去15天': [moment().subtract(1, 'month'), moment()],
+       '过去15天': [moment().subtract(15, 'day'), moment()],
        '过去2月': [moment().subtract(2, 'month'), moment()]
     };
     var result = {
