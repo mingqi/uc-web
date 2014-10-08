@@ -7,3 +7,13 @@
 .sidebar:before {
     width: 260px;
 }
+
+em {color: red}
+
+.input-icon>input:focus+[class*=icon-] {
+  color: #909090;
+}
+
+.input-icon .fa:hover {
+  color: black;
+}

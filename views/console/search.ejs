@@ -5,13 +5,10 @@
 
 {% include include/inhead %}
 
-<link rel="stylesheet" href="/s/css/search.css" />
+<link rel="stylesheet" href="/s/css/search.css?1" />
 
 {% include include/requirejs %}
 <script data-main="console/search" src="/s/js/lib/require.js"></script>
-<style>
-em {color: red}
-</style>
 </head>
 
 <body ng-controller="Ctrl">
@@ -73,7 +70,10 @@ em {color: red}
             <div class="page-content">
               <div class="col-sm-5">
                   <div class="input-group">
-                      <input class="form-control input-mask-date" type="text" ng-model="page.keywords" ng-enter="search()">
+                      <div class="input-icon input-icon-right">
+                        <input class="form-control input-mask-date" type="text" ng-model="page.keywords" ng-enter="search()">
+                        <i ng-if="page.keywords" class="icon-none fa fa-times" style="top:3px; right:5px; cursor:pointer" ng-click="page.keywords=''"></i>
+                      </div>
                       <span class="input-group-btn">
                           <button class="btn btn-sm btn-primary" type="button" ng-click="search()">
                               <i class="fa fa-search bigger-110"></i>
