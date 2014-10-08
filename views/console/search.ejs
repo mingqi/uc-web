@@ -168,9 +168,18 @@ em {color: red}
                 </table>
 
                 <ul class="pagination">
-                  <li ng-class="{active: currentPage==p+1}"
-                    ng-repeat="p in _.range(Math.min(10, Math.ceil(page.searchResult.hits.total/100)))">
-                    <a ng-click="toPage(p+1)">{{p+1}}</a>
+                  <li ng-if="currentPage>4">
+                    <a ng-click="toPage(1)">第一页</a>
+                  </li>
+                  <li ng-if="currentPage>1">
+                    <a ng-click="toPage(currentPage-1)">上一页</a>
+                  </li>
+                  <li ng-class="{active: currentPage==p}"
+                    ng-repeat="p in _.range(Math.max(1, currentPage-3), Math.min(currentPage+3, pageCount) + 1)">
+                    <a ng-click="toPage(p)">{{p}}</a>
+                  </li>
+                  <li ng-if="pageCount>currentPage">
+                    <a ng-click="toPage(currentPage+1)">下一页</a>
                   </li>
                 </ul>
               </div>

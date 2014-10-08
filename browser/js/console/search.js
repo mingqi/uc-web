@@ -112,8 +112,8 @@ var getDatePickerOpts = function() {
        '昨天': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
        '过去1天': [moment().subtract(1, 'day'), moment()],
        '过去1周': [moment().subtract(1, 'week'), moment()],
-       '过去15天': [moment().subtract(15, 'day'), moment()],
-       '过去2月': [moment().subtract(2, 'month'), moment()]
+       '过去15天': [moment().subtract(15, 'day'), moment()]
+       //'过去2月': [moment().subtract(2, 'month'), moment()]
     };
     var result = {
         opens: 'left',
@@ -122,8 +122,8 @@ var getDatePickerOpts = function() {
         timePickerIncrement: 15,
         ranges: ranges,
         format: dateFormat,
-        // minDate: moment().subtract(15, 'day'),
-        minDate: moment().subtract(60, 'day'),
+        minDate: moment().subtract(15, 'day'),
+        // minDate: moment().subtract(60, 'day'),
         maxDate: moment(),
         separator: " 到 ",
         locale: {
@@ -157,7 +157,6 @@ var getDatePickerOpts = function() {
 var setDateRange = function() {
     $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " 到 " +
             moment(datePickerOpts.endDate).format(dateFormat));
-    $('#daterange').trigger('apply.daterangepicker', $('#daterange').data('daterangepicker'));
 };
 
 var setAutoRefresh = function() {
@@ -173,11 +172,13 @@ var setAutoRefresh = function() {
         datePickerOpts = getDatePickerOpts();
         $('#daterange').data('daterangepicker').setOptions(datePickerOpts);
         setDateRange();
+        $('#daterange').trigger('apply.daterangepicker', $('#daterange').data('daterangepicker'));
     }, 1000 * 60);
 };
 
 var handleSearchResult = function($scope, esResponse) {
   $scope.page.searchResult = esResponse;
+  $scope.pageCount = Math.ceil(esResponse.hits.total/100);
 
   _.each(esResponse.hits.hits || [], function(hit) {
     if (hit.highlight) {
@@ -229,7 +230,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         });
     };
 })
-.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http) {
+.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
     $scope.dateRange = $('#daterange').val();
     _.extend($scope, {
@@ -262,10 +263,28 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     }
 
     $scope.search = function(opts) {
-        // opts: reserve
+        // opts: reserve, init
         opts = opts || {};
 
-        $scope.currentPage = 1;
+        
+        if (opts.init) {
+          var locationSearch = $location.search();
+          $scope.currentPage = locationSearch.p || 1;
+          $scope.page.keywords = locationSearch.k || '';
+          if (locationSearch.b && locationSearch.e) {
+            var b = moment(parseFloat(locationSearch.b));
+            var e = moment(parseFloat(locationSearch.e));
+            if (b.isValid() && e.isValid() && 
+                b.isBefore(e) &&
+                moment().subtract(20, 'day').isBefore(b) &&
+                moment().add(1, 'day').isAfter(e)) {
+              $scope.dateRange = (b.format(dateFormat) + " 到 " + e.format(dateFormat));
+            }
+          }
+        } else {
+          $scope.currentPage = 1;          
+        }
+
         if (isCustomerRange()) {
           $scope.autoRefresh = false;
         }
@@ -276,10 +295,16 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         var strEnd = RegExp.$2;
         var begin = $scope.begin = +moment(strBegin, dateFormat);
         var end = $scope.end = +moment(strEnd, dateFormat);
+
+
         _.extend($scope.chartCount, {
             begin: begin,
             end: end
         });
+
+        $location.search('k', $scope.page.keywords || '');
+        $location.search('b', begin);
+        $location.search('e', end);
 
         $scope.page.pattern = pattern($scope.page.keywords);
 
@@ -424,12 +449,16 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       $('#modalAllFieldKeys').modal();
     }
 
-    $scope.search();
+    $scope.search({
+      init: 1
+    });
 
     $scope.toPage = function(page) {
       if ($scope.currentPage == page) {
         return;
       }
+      $location.search('p', page);
+
       $http.post("/console/ajax/search", {
           esBody: _.extend(getESBody($scope), {
             from: (page - 1) * 100
