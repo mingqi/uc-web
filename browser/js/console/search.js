@@ -295,6 +295,11 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         // opts: reserve, init
         opts = opts || {};
 
+        if (opts.init) {
+          // 不是第一次搜索(根据url显示页码)，显示第一页
+          $scope.currentPage = 1;
+        }
+
         updateDateRangePicker($scope);
 
         if (isCustomerRange()) {

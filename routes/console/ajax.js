@@ -69,7 +69,7 @@ exports.getHosts = function(req, res, next) {
         }
         var hosts = _.map(results.hosts, function(host) {
             return _.extend(host.toObject(), {
-                isActive: host.lastPushDate && (new Date() - host.lastPushDate < 1000*60*5)
+                isActive: host.isActive
             });
         });
         res.json(hosts);
@@ -95,7 +95,11 @@ exports.deleteFile = function(req, res, next) {
         if (err) {
             return next(err);
         }
-        res.json(results.host);
+
+        var host = results.host;
+        res.json(_.extend(host.toObject(), {
+            isActive: host.isActive
+        }));
     });
 };
 
@@ -123,6 +127,11 @@ exports.addFiles = function(req, res, next) {
         if (err) {
             return next(err);
         }
+        var hosts = _.map(hosts, function(host) {
+            return _.extend(host.toObject(), {
+                isActive: host.isActive
+            });
+        });
         res.json(hosts);
     });
 };
