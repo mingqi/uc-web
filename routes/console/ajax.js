@@ -28,6 +28,13 @@ exports.search = function(req, res, next) {
     var end = moment(req.body.end).zone("+08:00");
     var esBody = req.body.esBody;
 
+    var filters = esBody.query.filtered.filter.and;
+    filters.push({
+        term: {
+            userId: visitor.id
+        }
+    });
+
     var index = [];
     while (begin.isBefore(end)) {
         index.push('uclogs-' + begin.format('YYYYMMDD'));
