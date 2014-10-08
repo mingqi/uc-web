@@ -127,7 +127,7 @@ exports.addFiles = function(req, res, next) {
         if (err) {
             return next(err);
         }
-        var hosts = _.map(hosts, function(host) {
+        hosts = _.map(hosts, function(host) {
             return _.extend(host.toObject(), {
                 isActive: host.isActive
             });

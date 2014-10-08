@@ -43,7 +43,8 @@ module.exports = function(grunt) {
             'public/ace/assets/css/uncompressed/bootstrap.css',
             'public/ace/assets/css/uncompressed/ace.css',
             'public/s/font-awesome-4.1.0/css/font-awesome.css',
-            'public/s/tablesort.css',
+            'browser/css/lib/tablesort.css',
+            'browser/css/console/console.css'
           ],
           'public/s/css/search.css': [
             'public/ace/assets/css/daterangepicker.css',
