@@ -266,7 +266,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         // opts: reserve, init
         opts = opts || {};
 
-        
         if (opts.init) {
           var locationSearch = $location.search();
           $scope.currentPage = locationSearch.p || 1;
