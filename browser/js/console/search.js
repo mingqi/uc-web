@@ -2,10 +2,6 @@ require(['jquery', 'underscore', 'con', 'moment', 'scrollTo', 'pattern',
          'highstock', 'daterangepicker', 'pattern', 'angular-sanitize'],
 function($, _, con, moment, $scrollTo, pattern) {
 
-var chosenLabel = '过去1小时';
-var dateFormat = 'YYYY-MM-DD HH:mm:ss';
-var datePickerOpts;
-
 Highcharts.setOptions({
     global : {
         timezoneOffset : new Date().getTimezoneOffset()
@@ -17,7 +13,101 @@ Highcharts.setOptions({
     }
 });
 
-var drawChart = function(chart, series) {
+var dateFormat = 'YYYY-MM-DD HH:mm:ss';
+var chosenLabel = '过去1小时';
+var startDate, endDate, autoRefreshTimer;
+var getRanges = function() {
+  var ranges = {
+     '过去1小时': [moment().subtract(1, 'hour'), moment()],
+     '过去6小时': [moment().subtract(6, 'hour'), moment()],
+     '昨天': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
+     '过去1天': [moment().subtract(1, 'day'), moment()],
+     '过去1周': [moment().subtract(1, 'week'), moment()],
+     '过去15天': [moment().subtract(15, 'day'), moment()]
+  };
+
+  var range = ranges[chosenLabel];
+  if (range) {
+    startDate = range[0];
+    endDate = range[1];
+  }
+  return ranges;
+};
+var isCustomerRange = function() {
+    // return chosenLabel.indexOf('过去') === -1;
+    return !_.include(['过去1小时', '过去6小时'], chosenLabel);
+};
+var ranges = getRanges();
+
+var dateRangePickerOptions = {
+    opens: 'left',
+    timePicker: true,
+    timePicker12Hour: false,
+    timePickerIncrement: 15,
+    ranges: ranges,
+    format: dateFormat,
+    minDate: moment().subtract(15, 'day'),
+    maxDate: moment(),
+    separator: " 到 ",
+    locale: {
+        applyLabel: '应用',
+        cancelLabel: '取消',
+        fromLabel: '从',
+        toLabel: '到',
+        weekLabel: 'W',
+        customRangeLabel: '自定义范围',
+        daysOfWeek: moment.weekdaysMin(),
+        monthNames: moment.monthsShort(),
+        firstDay: moment.localeData()._week.dow
+    },
+    startDate: startDate,
+    endDate: endDate
+};
+
+var initDateRangePicker = function($scope, locationSearch) {
+  if (locationSearch.b && locationSearch.e) {
+    var b = moment(parseFloat(locationSearch.b));
+    var e = moment(parseFloat(locationSearch.e));
+    if (b.isValid() && e.isValid() && b.isBefore(e) &&
+        moment().subtract(20, 'day').isBefore(b) &&
+        moment().add(1, 'day').isAfter(e)) {
+      startDate = b;
+      endDate = e;
+      chosenLabel = "自定义范围";
+    }
+  }
+
+  $('#daterange').daterangepicker(dateRangePickerOptions);
+  $('#daterange').on('apply.daterangepicker', function(ev, picker) {
+      var isCustRangeBefore = isCustomerRange();
+      chosenLabel = picker.chosenLabel;
+      if (isCustRangeBefore && !isCustomerRange()) {
+          // customer -> (not customer)
+          $scope.autoRefresh = true;
+      }
+
+      startDate = picker.startDate;
+      endDate = picker.endDate;
+      $scope.search();
+  });
+};
+
+var updateDateRangePicker = function($scope) {
+  var ranges = getRanges();
+  $scope.dateRange = startDate.format(dateFormat) + " 到 " + endDate.format(dateFormat);
+
+  var opts = _.extend(dateRangePickerOptions, {
+    ranges: ranges,
+    startDate: startDate,
+    endDate: endDate,
+    minDate: moment().subtract(15, 'day'),
+    maxDate: moment(),
+  });
+  // $('#daterange').daterangepicker(opts);
+  $('#daterange').data('daterangepicker').setOptions(opts);
+};
+
+var drawChart = function(chart, series, $scope) {
     if (chart.highChart) {
         chart.highChart.destroy();
     }
@@ -30,15 +120,10 @@ var drawChart = function(chart, series) {
                     if (!event.xAxis) {
                       return;
                     }
-                    var format = '%Y-%m-%d %H:%M:%S';
-                    var begin = Highcharts.dateFormat(format, event.xAxis[0].min);
-                    var end = Highcharts.dateFormat(format, event.xAxis[0].max);
-                    if (begin === end) {
-                      end = Highcharts.dateFormat(format, event.xAxis[0].min + 1000);
-                    }
                     chosenLabel = '自定义范围';
-                    $('#daterange').val(begin + ' 到 ' + end);
-                    $('#daterange').trigger('change');
+                    startDate = moment(event.xAxis[0].min);
+                    endDate = moment(event.xAxis[0].max);
+                    $scope.search();
                 }
             }
         },
@@ -100,82 +185,16 @@ var drawChart = function(chart, series) {
     chart.highChart = new Highcharts.StockChart(opts);
 };
 
-var isCustomerRange = function() {
-    return !_.include(['过去1小时', '过去6小时'], chosenLabel);
-};
-
-var getDatePickerOpts = function() {
-    var ranges = {
-       '过去1小时': [moment().subtract(1, 'hour'), moment()],
-       '过去6小时': [moment().subtract(6, 'hour'), moment()],
-       '昨天': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
-       '过去1天': [moment().subtract(1, 'day'), moment()],
-       '过去1周': [moment().subtract(1, 'week'), moment()],
-       '过去15天': [moment().subtract(15, 'day'), moment()]
-       //'过去2月': [moment().subtract(2, 'month'), moment()]
-    };
-    var result = {
-        opens: 'left',
-        timePicker: true,
-        timePicker12Hour: false,
-        timePickerIncrement: 15,
-        ranges: ranges,
-        format: dateFormat,
-        minDate: moment().subtract(15, 'day'),
-        // minDate: moment().subtract(60, 'day'),
-        maxDate: moment(),
-        separator: " 到 ",
-        locale: {
-            applyLabel: '应用',
-            cancelLabel: '取消',
-            fromLabel: '从',
-            toLabel: '到',
-            weekLabel: 'W',
-            customRangeLabel: '自定义范围',
-            daysOfWeek: moment.weekdaysMin(),
-            monthNames: moment.monthsShort(),
-            firstDay: moment.localeData()._week.dow
-        }
-    };
-
-    if (isCustomerRange()) {
-        // start & end isn't change
-        var picker = $('#daterange').data('daterangepicker');
-        return _.extend(result, {
-            startDate: picker.startDate,
-            endDate: picker.endDate
-        });
+var setAutoRefresh = function($scope) {
+    if (autoRefreshTimer) {
+        clearInterval(autoRefreshTimer);
     }
-    
-    return _.extend(result, {
-        startDate: ranges[chosenLabel][0],
-        endDate: ranges[chosenLabel][1]
-    });
-};
-
-var setDateRange = function() {
-    $('#daterange').val(moment(datePickerOpts.startDate).format(dateFormat) + " 到 " +
-            moment(datePickerOpts.endDate).format(dateFormat));
-};
-
-var refreshDataRangePicker = function() {
-    datePickerOpts = getDatePickerOpts();
-    $('#daterange').data('daterangepicker').setOptions(datePickerOpts);
-    setDateRange();
-};
-
-var setAutoRefresh = function() {
-    if (window.refreshTimer) {
-        clearInterval(window.refreshTimer);
-    }
-    window.refreshTimer = setInterval(function() {
-        var $scope = angular.element($("body")).scope();
+    autoRefreshTimer = setInterval(function() {
         if (!$scope.autoRefresh) {
             return;
         }
 
-        refreshDataRangePicker();
-        $('#daterange').trigger('apply.daterangepicker', $('#daterange').data('daterangepicker'));
+        $scope.search();
     }, 1000 * 60);
 };
 
@@ -235,93 +254,75 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 })
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-    $scope.dateRange = $('#daterange').val();
+
+    var locationSearch = $location.search();
+    initDateRangePicker($scope, locationSearch)
+
+    var currentPage = (function() {
+      var p = parseInt(locationSearch.p) || 1;
+      if (p > 10 || p < 0) {
+        p = 1;
+      }
+      return p;
+    } ());
+
     _.extend($scope, {
       _: _,
       moment: moment,
       parseInt: parseInt,
-      Math: Math
-    })
-    $scope.page = {
-      filter: {
-        field: {}
+      currentPage: currentPage,
+      Math: Math,
+      autoRefresh: true,
+      page: {
+        filter: {
+          field: {}
+        },
+        attributeAggs: 'avg',
+        keywords: locationSearch.k || ''
       },
-      attributeAggs: 'avg',
-      keywords: ''
-    };
-    $scope.fields = [{
-      key: 'host',
-      name: '主机名称'
-    }, {
-      key: 'path',
-      name: '路径'
-    }];
-    $scope.autoRefresh = true;
-    $scope.chartCount = {
-      id: 'chartCount'
-    };
-    $scope.chartStat = {
-      id: 'chartStat'
-    }
+      fields: [{
+        key: 'host',
+        name: '主机名称'
+      }, {
+        key: 'path',
+        name: '路径'
+      }],
+      chartCount: {
+        id: 'chartCount'
+      }
+    });
 
     $scope.search = function(opts) {
         // opts: reserve, init
         opts = opts || {};
 
-        if (opts.init) {
-          var locationSearch = $location.search();
-          $scope.currentPage = parseInt(locationSearch.p) || 1;
-          if ($scope.currentPage > 10 || $scope.currentPage < 0) {
-            $scope.currentPage = 1;
-          }
-          $scope.page.keywords = locationSearch.k || '';
-          if (locationSearch.b && locationSearch.e) {
-            var b = moment(parseFloat(locationSearch.b));
-            var e = moment(parseFloat(locationSearch.e));
-            if (b.isValid() && e.isValid() && 
-                b.isBefore(e) &&
-                moment().subtract(20, 'day').isBefore(b) &&
-                moment().add(1, 'day').isAfter(e)) {
-              $scope.dateRange = (b.format(dateFormat) + " 到 " + e.format(dateFormat));
-            }
-          }
-        } else {
-          $scope.currentPage = 1;          
-        }
+        updateDateRangePicker($scope);
 
         if (isCustomerRange()) {
           $scope.autoRefresh = false;
         }
-        if (!$scope.dateRange.match(/^(.+) 到 (.+)$/)) {
-            return alert("时间格式错误")
-        }
-        var strBegin = RegExp.$1;
-        var strEnd = RegExp.$2;
-        var begin = $scope.begin = +moment(strBegin, dateFormat);
-        var end = $scope.end = +moment(strEnd, dateFormat);
-
 
         _.extend($scope.chartCount, {
-            begin: begin,
-            end: end
+            begin: startDate,
+            end: endDate
         });
 
         $location.search('k', $scope.page.keywords || '');
-        $location.search('b', begin);
-        $location.search('e', end);
+        $location.search('b', +startDate);
+        $location.search('e', +endDate);
 
         $scope.page.pattern = pattern($scope.page.keywords);
 
         var points = 30;
-        var interval = $scope.interval = parseInt((end-begin)/points);
+        var interval = $scope.interval = parseInt((endDate - startDate)/points);
         $scope.page.filter.timerange = {
           range: {
-                timestamp: {
-                  from: moment(begin).toISOString(),
-                  to:  moment(end).toISOString()
-                }
+              timestamp: {
+                from: startDate.toISOString(),
+                to:  endDate.toISOString()
+              }
           }
-        }
+        };
         $scope.page.query = {
           filtered: {
             query: $scope.page.pattern.query,
@@ -354,22 +355,21 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
               }
             }
           }),
-          begin: begin,
-          end: end
+          begin: +startDate,
+          end: +endDate
         }).success(function(json) {
           handleSearchResult($scope, json);
-          
           var buckets = json.aggregations ? json.aggregations.event_over_time.buckets : [];
           var data = [];
           if (buckets.length === 0) {
-            for (var date = begin; date <= end; date += interval) {
+            for (var date = +startDate; date <= +endDate; date += interval) {
               data.push([date, 0]);
             }
           } else {
-            var add = (buckets[0].key - begin) % interval;
-            var minus = (end - buckets[0].key) % interval;
-            var from = begin + add;
-            var to = end - minus;
+            var add = (buckets[0].key - startDate) % interval;
+            var minus = (endDate - buckets[0].key) % interval;
+            var from = startDate + add;
+            var to = endDate - minus;
 
             if (from < buckets[0].key) {
               data.push([from, 0]);
@@ -387,8 +387,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             type: 'column',
             data: data
           }];
-          drawChart($scope.chartCount, series);
-          setAutoRefresh();
+          drawChart($scope.chartCount, series, $scope);
+
+          setAutoRefresh($scope);
           
           if (!opts.reserve) {
               _.map($scope.fields, function(field) {
@@ -423,8 +424,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
               }
             }
           },
-          begin: $scope.begin,
-          end: $scope.end
+          begin: +startDate,
+          end: +endDate
         }).success(function(json) {
           field.loading = false;
           field.buckets = json.aggregations ?
@@ -467,8 +468,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           esBody: _.extend(getESBody($scope), {
             from: (page - 1) * 100
           }),
-          begin: $scope.begin,
-          end: $scope.end
+          begin: startDate,
+          end: endDate
       }).success(function(json) {
           handleSearchResult($scope, json);
           $scope.currentPage = page;
@@ -480,26 +481,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
 $(function() {
   $('[data-rel=tooltip]').tooltip({container: 'body'});
-  datePickerOpts = getDatePickerOpts();
-  setDateRange();
-
   angular.bootstrap(document, ['consoleApp']);
-
-  $('#daterange').daterangepicker(datePickerOpts);
-  $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-      var isCustRangeBefore = isCustomerRange();
-      chosenLabel = picker.chosenLabel;
-      if (isCustRangeBefore && !isCustomerRange()) {
-          // customer -> (not customer)
-          var $scope = angular.element($("body")).scope();
-          $scope.autoRefresh = true;
-      }
-      if (isCustomerRange()) {
-          refreshDataRangePicker();
-      } else {
-          $('#daterange').trigger('change');
-      }
-  });
 });
 
 }); // end require ['jquery', ...]
