@@ -100,9 +100,8 @@ var drawChart = function(chart, series) {
     chart.highChart = new Highcharts.StockChart(opts);
 };
 
-var isCustomerRange = function(label) {
-    label = label || chosenLabel;
-    return !_.include(['过去1小时', '过去6小时'], label);
+var isCustomerRange = function() {
+    return !_.include(['过去1小时', '过去6小时'], chosenLabel);
 };
 
 var getDatePickerOpts = function() {
@@ -159,6 +158,12 @@ var setDateRange = function() {
             moment(datePickerOpts.endDate).format(dateFormat));
 };
 
+var refreshDataRangePicker = function() {
+    datePickerOpts = getDatePickerOpts();
+    $('#daterange').data('daterangepicker').setOptions(datePickerOpts);
+    setDateRange();
+};
+
 var setAutoRefresh = function() {
     if (window.refreshTimer) {
         clearInterval(window.refreshTimer);
@@ -169,9 +174,7 @@ var setAutoRefresh = function() {
             return;
         }
 
-        datePickerOpts = getDatePickerOpts();
-        $('#daterange').data('daterangepicker').setOptions(datePickerOpts);
-        setDateRange();
+        refreshDataRangePicker();
         $('#daterange').trigger('apply.daterangepicker', $('#daterange').data('daterangepicker'));
     }, 1000 * 60);
 };
@@ -237,8 +240,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       _: _,
       moment: moment,
       parseInt: parseInt,
-      Math: Math,
-      currentPage: 1
+      Math: Math
     })
     $scope.page = {
       filter: {
@@ -268,7 +270,10 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
         if (opts.init) {
           var locationSearch = $location.search();
-          $scope.currentPage = locationSearch.p || 1;
+          $scope.currentPage = parseInt(locationSearch.p) || 1;
+          if ($scope.currentPage > 10 || $scope.currentPage < 0) {
+            $scope.currentPage = 1;
+          }
           $scope.page.keywords = locationSearch.k || '';
           if (locationSearch.b && locationSearch.e) {
             var b = moment(parseFloat(locationSearch.b));
@@ -482,13 +487,18 @@ $(function() {
 
   $('#daterange').daterangepicker(datePickerOpts);
   $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-      if (isCustomerRange() && !isCustomerRange(picker.chosenLabel)) {
+      var isCustRangeBefore = isCustomerRange();
+      chosenLabel = picker.chosenLabel;
+      if (isCustRangeBefore && !isCustomerRange()) {
           // customer -> (not customer)
           var $scope = angular.element($("body")).scope();
           $scope.autoRefresh = true;
       }
-      chosenLabel = picker.chosenLabel;
-      $('#daterange').trigger('change');
+      if (isCustomerRange()) {
+          refreshDataRangePicker();
+      } else {
+          $('#daterange').trigger('change');
+      }
   });
 });
 
