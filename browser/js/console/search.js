@@ -37,14 +37,13 @@ var isCustomerRange = function() {
     // return chosenLabel.indexOf('过去') === -1;
     return !_.include(['过去1小时', '过去6小时'], chosenLabel);
 };
-var ranges = getRanges();
 
 var dateRangePickerOptions = {
     opens: 'left',
     timePicker: true,
     timePicker12Hour: false,
     timePickerIncrement: 15,
-    ranges: ranges,
+    ranges: getRanges(),
     format: dateFormat,
     minDate: moment().subtract(15, 'day'),
     maxDate: moment(),
