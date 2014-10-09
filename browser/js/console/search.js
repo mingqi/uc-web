@@ -102,7 +102,6 @@ var updateDateRangePicker = function($scope) {
     minDate: moment().subtract(15, 'day'),
     maxDate: moment(),
   });
-  // $('#daterange').daterangepicker(opts);
   $('#daterange').data('daterangepicker').setOptions(opts);
 };
 
@@ -311,10 +310,13 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             end: endDate
         });
 
-        $location.search('k', $scope.page.keywords || '');
-        $location.search('b', +startDate);
-        $location.search('e', +endDate);
-
+        $location.search({
+          k: $scope.page.keywords || '',
+          b: +startDate,
+          e: +endDate,
+          p: $scope.currentPage,
+        });
+        
         $scope.page.pattern = pattern($scope.page.keywords);
 
         var points = 30;
