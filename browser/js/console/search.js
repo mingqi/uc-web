@@ -214,6 +214,7 @@ var getESBody = function($scope) {
   return {
     query: $scope.page.query,
     size: 100,
+    from: ($scope.currentPage - 1) * 100,
     sort: [{
       timestamp: {
         order: $scope.orderBy > 0 ? "asc" : "desc"
@@ -471,28 +472,39 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       init: 1
     });
 
+    var refreshResult = function(callback) {
+      $http.post("/console/ajax/search", {
+          esBody: getESBody($scope),
+          begin: startDate,
+          end: endDate
+      }).success(function(json) {
+        handleSearchResult($scope, json);
+        callback();
+      })
+    };
+
     $scope.toPage = function(page) {
       if ($scope.currentPage == page) {
         return;
       }
+      $scrollTo('#resultList', 500);
+      $scope.currentPage = page;
       $location.search('p', page);
-
-      $http.post("/console/ajax/search", {
-          esBody: _.extend(getESBody($scope), {
-            from: (page - 1) * 100
-          }),
-          begin: startDate,
-          end: endDate
-      }).success(function(json) {
-          handleSearchResult($scope, json);
-          $scope.currentPage = page;
-          $scrollTo('#resultList', 500);
-      })
+      
+      con.wait();
+      refreshResult(function() {
+        con.done();
+      });
     };
 
     $scope.toggleOrderBy = function() {
       $scope.orderBy = - $scope.orderBy;
-      $scope.search();
+      $location.search('o', $scope.orderBy);
+
+      con.wait();
+      refreshResult(function() {
+        con.done();
+      });
     }
 }]); // end angular
 
