@@ -498,7 +498,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     };
 
     $scope.toggleOrderBy = function() {
-      $scope.orderBy = - $scope.orderBy;
+      $scope.orderBy = -$scope.orderBy;
+      $scope.currentPage = 1;
+      $location.search('p', 1);
       $location.search('o', $scope.orderBy);
 
       con.wait();
