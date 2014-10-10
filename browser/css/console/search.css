@@ -9,3 +9,7 @@
 }
 
 em {color: red}
+
+.input-icon>input:focus+[class*=icon-] {
+  color: #909090;
+}
