@@ -158,7 +158,8 @@ var drawChart = function(chart, series, $scope) {
           ordinal: false,
           minRange: 1000,
           dateTimeLabelFormats: {
-            millisecond: '%H:%M:%S.%L',
+            //millisecond: '%H:%M:%S.%L',
+            millisecond: '%H:%M:%S',
             second: '%H:%M:%S',
             minute: '%H:%M',
             hour: '%H:%M',
