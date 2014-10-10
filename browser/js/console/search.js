@@ -214,7 +214,11 @@ var getESBody = function($scope) {
   return {
     query: $scope.page.query,
     size: 100,
-    sort: ['timestamp'],
+    sort: [{
+      timestamp: {
+        order: $scope.orderBy > 0 ? "asc" : "desc"
+      }
+    }],
     "highlight": {
       "pre_tags" : ["*%pre%*"],
       "post_tags" : ["*%post%*"],
@@ -272,6 +276,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       currentPage: currentPage,
       Math: Math,
       autoRefresh: true,
+      orderBy: parseInt(locationSearch.o) || 1,
       page: {
         filter: {
           field: {}
@@ -316,6 +321,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           b: +startDate,
           e: +endDate,
           p: $scope.currentPage,
+          o: $scope.orderBy
         });
         
         $scope.page.pattern = pattern($scope.page.keywords);
@@ -482,7 +488,11 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           $scope.currentPage = page;
           $scrollTo('#resultList', 500);
       })
+    };
 
+    $scope.toggleOrderBy = function() {
+      $scope.orderBy = - $scope.orderBy;
+      $scope.search();
     }
 }]); // end angular
 
