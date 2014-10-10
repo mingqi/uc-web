@@ -320,7 +320,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         
         $scope.page.pattern = pattern($scope.page.keywords);
 
-        var points = 30;
+        var points = Math.min(30, parseInt((endDate - startDate) / 1000) + 1);
         var interval = $scope.interval = parseInt((endDate - startDate)/points);
         $scope.page.filter.timerange = {
           range: {
