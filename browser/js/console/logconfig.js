@@ -120,6 +120,8 @@ angular.module('consoleApp', ['tableSort'])
   };
 }]);
 
-angular.bootstrap(document, ['consoleApp']);
+$(function() {
+  angular.bootstrap(document, ['consoleApp']);  
+});
 
 }); // end require ['jquery', ...]
