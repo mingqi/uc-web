@@ -15,7 +15,7 @@ Highcharts.setOptions({
 
 var dateFormat = 'YYYY-MM-DD HH:mm:ss';
 var chosenLabel = '过去1小时';
-var startDate, endDate, autoRefreshTimer;
+var startDate, endDate;
 var getRanges = function() {
   var ranges = {
      '过去1小时': [moment().subtract(1, 'hour'), moment()],
@@ -80,10 +80,6 @@ var initDateRangePicker = function($scope, locationSearch) {
   $('#daterange').on('apply.daterangepicker', function(ev, picker) {
       var isCustRangeBefore = isCustomerRange();
       chosenLabel = picker.chosenLabel;
-      if (isCustRangeBefore && !isCustomerRange()) {
-          // customer -> (not customer)
-          $scope.autoRefresh = true;
-      }
 
       startDate = picker.startDate;
       endDate = picker.endDate;
@@ -184,19 +180,6 @@ var drawChart = function(chart, series, $scope) {
     chart.highChart = new Highcharts.StockChart(opts);
 };
 
-var setAutoRefresh = function($scope) {
-    if (autoRefreshTimer) {
-        clearInterval(autoRefreshTimer);
-    }
-    autoRefreshTimer = setInterval(function() {
-        if (!$scope.autoRefresh) {
-            return;
-        }
-
-        $scope.search();
-    }, 1000 * 60);
-};
-
 var handleSearchResult = function($scope, esResponse) {
   $scope.page.searchResult = esResponse;
   $scope.pageCount = Math.ceil(esResponse.hits.total/100);
@@ -276,7 +259,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       parseInt: parseInt,
       currentPage: currentPage,
       Math: Math,
-      autoRefresh: true,
       orderBy: parseInt(locationSearch.o) || 1,
       page: {
         filter: {
@@ -307,10 +289,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         }
 
         updateDateRangePicker($scope);
-
-        if (isCustomerRange()) {
-          $scope.autoRefresh = false;
-        }
 
         _.extend($scope.chartCount, {
             begin: startDate,
@@ -403,8 +381,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           }];
           drawChart($scope.chartCount, series, $scope);
 
-          setAutoRefresh($scope);
-          
           if (!opts.reserve) {
               _.map($scope.fields, function(field) {
                 _.extend(field, {
@@ -415,12 +391,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           }
         })
     }
-
-    $scope.toggleAutoRefresh = function() {
-        if (!isCustomerRange()) {
-            $scope.autoRefresh = !$scope.autoRefresh    
-        }
-    };
 
     $scope.toggleField = function(field) {
       if (!field.buckets) {

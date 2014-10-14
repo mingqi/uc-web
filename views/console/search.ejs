@@ -5,7 +5,7 @@
 
 {% include include/inhead %}
 
-<link rel="stylesheet" href="/s/css/search.css?2" />
+<link rel="stylesheet" href="/s/css/search.css?3" />
 
 {% include include/requirejs %}
 <script data-main="console/search" src="/s/js/lib/require.js"></script>
@@ -67,7 +67,7 @@
 
         <div class="main-content">
 
-            <div class="page-content">
+            <div class="page-content" style="padding-top:15px">
               <div class="col-sm-5">
                   <div class="input-group">
                       <div class="input-icon input-icon-right">
@@ -84,11 +84,8 @@
               </div>
               <div class="col-sm-5 pull-right">
                     <div class="input-prepend input-group pull-right">
-                       <span class="add-on input-group-addon"><i class="glyphicon glyphicon-calendar fa fa-calendar"></i></span>
+                       <span class="add-on input-group-addon"><i class="icon-none bigger-110 fa fa-calendar"></i></span>
                        <input readonly type="text" style="width: 315px" id="daterange" ng-model="dateRange"/>
-                       <span class="input-group-addon" data-rel="tooltip" data-placement="top" title="绿色自动刷新" style="cursor: pointer" ng-click="toggleAutoRefresh()">
-                          <i class="fa fa-circle" ng-class="{red:!autoRefresh, green:autoRefresh}"></i>
-                       </span>
                     </div>
               </div>
               <div class="clearfix"></div>
@@ -162,14 +159,21 @@
                           <th>内容</th>
                       </tr>
                   </thead>
-
                   <tbody>
                       <tr ng-repeat="hit in page.searchResult.hits.hits">
                           <td style="white-space: nowrap;">
                             {{moment(moment.utc(hit._source.timestamp).toDate())
                               .format('YYYY-MM-DD HH:mm:ss')}}</td>
                           <td style="word-break:break-word">
-                            <span style="color:#707070">{{hit._source.host}}:{{hit._source.path}}</span><br/>
+                            <span class="event-facet" style="margin-right:20px">
+                              <span style="color:#707070">主机:</span>
+                              {{hit._source.host}}
+                            </span>
+                            <span class="event-facet">
+                              <span style="color:#707070">路径:</span>
+                              {{hit._source.path}}
+                            </span>
+                            <br/>
                             <span ng-if="hit.highlightMsg" ng-bind-html="hit.highlightMsg"></span>
                             <span ng-if="!hit.highlightMsg">{{hit._source.message}}</span>
                           </td>
