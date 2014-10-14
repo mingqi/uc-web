@@ -33,10 +33,6 @@ var getRanges = function() {
   }
   return ranges;
 };
-var isCustomerRange = function() {
-    // return chosenLabel.indexOf('过去') === -1;
-    return !_.include(['过去1小时', '过去6小时'], chosenLabel);
-};
 
 var dateRangePickerOptions = {
     opens: 'left',
@@ -78,9 +74,7 @@ var initDateRangePicker = function($scope, locationSearch) {
 
   $('#daterange').daterangepicker(dateRangePickerOptions);
   $('#daterange').on('apply.daterangepicker', function(ev, picker) {
-      var isCustRangeBefore = isCustomerRange();
       chosenLabel = picker.chosenLabel;
-
       startDate = picker.startDate;
       endDate = picker.endDate;
       $scope.search();
