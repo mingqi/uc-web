@@ -108,7 +108,7 @@ angular.module('consoleApp', ['tableSort'])
         setObject($scope.hosts, host);
       });
 
-      $scope.newFiles = [];
+      $scope.newFiles = [{path: ''}];
       _.extend($scope.hosts, {
         selectedWhenAddFile: false
       });
