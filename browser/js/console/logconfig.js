@@ -29,7 +29,7 @@ angular.module('consoleApp', ['tableSort'])
       _.extend($scope, {
         page: {},
         hosts: hosts,
-        newFiles: [],
+        newFiles: [{path: ''}],
         platforms: [{
             key: 'redhat',
             name: 'Red Hat or CentOS'
@@ -117,6 +117,13 @@ angular.module('consoleApp', ['tableSort'])
 
   $scope.addHost = function() {
     $('#modalAddHost').modal();
+  };
+
+  $scope.addHostFile = function(host) {
+    _.each($scope.hosts, function(h) {
+      h.selectedWhenAddFile = h._id === host._id;
+    });
+    $scope.changeTab('addFile');
   };
 }]);
 
