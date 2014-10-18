@@ -97,26 +97,16 @@
 
             </div><!-- /.page-content -->
             <script type="text/ng-template" id="pageContent">
-              <div ng-if="!(page.filter.field | isEmpty) || !(page.filter.attribute | isEmpty)">字段过滤：
+              <div ng-if="!(page.filter.field | isEmpty)">字段过滤：
                 <span ng-repeat="(key, value) in page.filter.field">
                   <div class="label label-xlg label-gray">
                     <button type="button" class="close" ng-click="removeFieldFilter(key)">
                       <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
                     </button>
-                    {{key}}:{{value}}
+                    {{key}} : {{value}}
                   </div>
                   &nbsp;
                 </span>
-                <span ng-repeat="(key, value) in page.filter.attribute">
-                  <div class="label label-xlg label-gray">
-                    <button type="button" class="close" ng-click="removeAttributeFilter(key)">
-                      <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
-                    </button>
-                    {{key}}:{{value}}
-                  </div>
-                  &nbsp;
-                </span>
-
                 <hr>
               </div>
               

@@ -256,14 +256,20 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       orderBy: parseInt(locationSearch.o) || 1,
       page: {
         filter: {
-          field: {}
+          field: (function() {
+            try {
+              return JSON.parse(locationSearch.f);
+            } catch (e) {
+              return {};
+            }
+          }).call(this)
         },
         attributeAggs: 'avg',
         keywords: locationSearch.k || ''
       },
       fields: [{
         key: 'host',
-        name: '主机名称'
+        name: '主机'
       }, {
         key: 'path',
         name: '路径'
@@ -294,7 +300,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           b: +startDate,
           e: +endDate,
           p: $scope.currentPage,
-          o: $scope.orderBy
+          o: $scope.orderBy,
+          f: JSON.stringify($scope.page.filter.field)
         });
         
         $scope.page.pattern = pattern($scope.page.keywords);

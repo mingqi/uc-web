@@ -28,7 +28,7 @@ app.locals = {
     headTitle : "",
     page : '',
     error : null,
-    debug: config.env === 'development' && 0,
+    debug: config.env === 'development',
 };
 
 var server = http.createServer(app);
