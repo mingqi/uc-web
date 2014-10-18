@@ -29,7 +29,7 @@ var stageConfig = {
 var config = {
     pwdSecret : "12NtRoQfVjhuDaIue1kxKtTNYq3",
     sendMail : {
-        from : "MetricsAt <service@uclogs.com>",
+        from : "UCLogs <service@uclogs.com>",
         smtp: {
           host : "es2",
           secureConnection : false,
