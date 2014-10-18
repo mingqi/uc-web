@@ -20,7 +20,21 @@ exports.config = function(req, res, next) {
 };
 
 exports.search = function(req, res, next) {
-    res.render("console/search", {
-        page: 'search'
+    var visitor = req.visitor;
+
+    m.Host.count({
+        userId: visitor.id
+    }, function(err, count) {
+        if (err) {
+            return next(err);
+        }
+
+        if (count === 0) {
+            return res.redirect('/console/config');
+        }
+
+        res.render("console/search", {
+            page: 'search'
+        });
     });
 };

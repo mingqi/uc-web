@@ -46,8 +46,14 @@ angular.module('consoleApp', ['tableSort'])
   });
 
   var venderPage = function() {
-      var locationSearch = $location.search();
-      $scope.mainContent = locationSearch.tab || 'seeConfigs';
+      $scope.mainContent = $location.search().tab;
+      if (!$scope.mainContent) {
+        $scope.mainContent = $scope.hosts.length === 0 ? 'addFile' : 'seeConfigs';
+      }
+
+      if ($scope.mainContent === 'addFile' && $scope.hosts.length === 0) {
+        $scope.addHost();
+      }
   };
 
   $scope.changeTab = function(tab) {

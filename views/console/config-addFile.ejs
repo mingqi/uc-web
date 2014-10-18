@@ -19,7 +19,7 @@
             </div>
         </div>
         <div class="panel-body">
-            <div class="checkbox" ng-if="!hosts.length">
+            <div ng-if="!hosts.length">
                 没有任何主机
             </div>
             <div ng-repeat="host in hosts | filter:{hostname:page.searchHostWhenAddFile}">
