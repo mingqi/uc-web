@@ -31,7 +31,7 @@ var config = {
     sendMail : {
         from : "MetricsAt <service@uclogs.com>",
         smtp: {
-          host : "smtp.uclogs.com",
+          host : "es2",
           secureConnection : false,
           port: 25
         }
