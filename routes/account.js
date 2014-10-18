@@ -220,7 +220,7 @@ exports.postFindPwd = function(req, res, next) {
             email : email,
             key : key
         });
-        return 'http://' + config.domain + '/' + res.locals.locale + '/account/resetPwd?' + query;
+        return 'http://' + config.domain + '/account/resetPwd?' + query;
     };
 
     async.auto({
