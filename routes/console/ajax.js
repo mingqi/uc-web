@@ -58,7 +58,10 @@ exports.getHosts = function(req, res, next) {
     async.auto({
         hosts: function(callback) {
             m.Host.find({
-                userId: visitor.id
+                userId: visitor.id,
+                lastPushDate: {
+                    $gt: new Date(new Date() - 1000*3600*24*2)
+                }
             }, null, {
                 sort: 'hostname'
             }, callback);
