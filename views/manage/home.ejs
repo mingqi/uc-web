@@ -6,6 +6,11 @@
 {% include include/inhead %}
 
 <script src="/s/js/config.js"></script>
+
+{% if (!debug) { %}
+<script> require.baseUrl = '/s/js'; </script>
+{% } %}
+
 <script data-main="manage/home" src="/s/js/lib/require.js"></script>
 </head>
 
