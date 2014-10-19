@@ -65,14 +65,14 @@
     </h4>
     <p>64位操作系统：</p>
     <div class="well well-sm">
-        wget {{agentUrl.base}}{{agentUrl.folder}}-{{agentUrl.bit64}}<br>
-        tar -xzvf {{agentUrl.folder}}-{{agentUrl.bit64}}
+        wget {{agentUrl.base}}uc-agent-{%= agentVersion %}-{{agentUrl.bit64}}<br>
+        tar -xzvf uc-agent-{%= agentVersion %}-{{agentUrl.bit64}}
     </div>
 
     <p>32位操作系统：</p>
     <div class="well well-sm">
-        wget {{agentUrl.base}}{{agentUrl.folder}}-{{agentUrl.bit32}}<br>
-        tar -xzvf {{agentUrl.folder}}-{{agentUrl.bit32}}
+        wget {{agentUrl.base}}uc-agent-{%= agentVersion %}-{{agentUrl.bit32}}<br>
+        tar -xzvf uc-agent-{%= agentVersion %}-{{agentUrl.bit32}}
     </div>
 
     <h4>
@@ -81,7 +81,7 @@
     </h4>
     <div class="well well-sm">
         sudo mkdir -p /opt/uc-agent<br>
-        sudo cp -r {{agentUrl.folder}}/* /opt/uc-agent/
+        sudo cp -r uc-agent-{%= agentVersion %}/* /opt/uc-agent/
     </div>
 
     <h4>

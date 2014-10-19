@@ -38,7 +38,7 @@ angular.module('consoleApp', ['tableSort'])
             name: 'Ubuntu 或者 Debian'
         }, {
             key: 'linux',
-            name: '其他 linux'
+            name: '其他 Linux'
         }],
         agentUrl: {
           base: "http://download.uclogs.com/uc-agent/release/",
@@ -127,14 +127,7 @@ angular.module('consoleApp', ['tableSort'])
   };
 
   $scope.addHost = function() {
-    if ($scope.agentUrl.folder) {
-      return $('#modalAddHost').modal();
-    }
-    $http.get('http://download.uclogs.com/uc-agent/release/latestVersion.txt?' + new Date() * 1)
-    .success(function(version) {
-      $scope.agentUrl.folder = "uc-agent-" + version.replace(/\s+$/g, '');
-      $scope.addHost();
-    });
+    $('#modalAddHost').modal();
   };
 
   $scope.addHostFile = function(host) {

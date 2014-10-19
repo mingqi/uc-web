@@ -41,7 +41,8 @@ var config = {
     },
     register: {
         needInviteCode: true
-    }
+    },
+    agentVersion: '1.0.1'
 };
 
 var env = process.env.NODE_ENV || 'development';

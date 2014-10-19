@@ -1,6 +1,7 @@
 var async = require('async');
 
 var m = require('../../lib/models');
+var config = require('../../config');
 var QiriError = require('../../lib/qiri-err');
 
 module.exports = exports = function(req, res, next) {
@@ -15,7 +16,8 @@ exports.ajax = require('./ajax');
 
 exports.config = function(req, res, next) {
     res.render("console/config", {
-        page : 'config'
+        page : 'config',
+        agentVersion: config.agentVersion
     });
 };
 
