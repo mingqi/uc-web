@@ -71,13 +71,18 @@
         </a>
     </span>
 </h4>
+
+<p style="margin-left:40px">
+    请填写你的log路径，比如 <code>/your/log/path/name.log</code>
+    支持通配符，比如 <code>/your/log/path/*.log</code>
+</p>
 <hr>
 
-<div class="col-sm-12">
+<div class="col-sm-12 col-xs-12">
     
     <div class="form-group" ng-repeat="file in newFiles">
         <input type="text" class="col-xs-10 col-sm-8" ng-model="file.path"/>
-        <div class="col-xs-2 col-sm-4 ng-scope" style="padding-top:5px">
+        <div class="col-xs-2 col-sm-4" style="padding-top:5px">
             <a ng-click="newFiles.splice($index, 1)">
               <i class="fa fa-times" style="font-size:14px"></i>
             </a>
