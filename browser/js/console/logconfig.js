@@ -42,7 +42,6 @@ angular.module('consoleApp', ['tableSort'])
         }],
         agentUrl: {
           base: "http://download.uclogs.com/uc-agent/release/",
-          folder: "uc-agent-1.0.0",
           bit32: "linux-i386.tar.gz",
           bit64: "linux-x86_64.tar.gz"
         }
@@ -128,7 +127,14 @@ angular.module('consoleApp', ['tableSort'])
   };
 
   $scope.addHost = function() {
-    $('#modalAddHost').modal();
+    if ($scope.agentUrl.folder) {
+      return $('#modalAddHost').modal();
+    }
+    $http.get('http://download.uclogs.com/uc-agent/release/latestVersion.txt?' + new Date() * 1)
+    .success(function(version) {
+      $scope.agentUrl.folder = "uc-agent-" + version.replace(/\s+$/g, '');
+      $scope.addHost();
+    });
   };
 
   $scope.addHostFile = function(host) {
