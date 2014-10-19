@@ -152,6 +152,19 @@ module.exports = function(grunt) {
             }
           }]
         }
+      },
+      cssVersion: {
+        files: {
+          'views/console/include/css.ejs': 'views/console/include/css.ejs'
+        },
+        options: {
+          replacements: [{
+            pattern: /\.css\?(\d+)/,
+            replacement: function (p0, p1) {
+              return '.css?' + (parseInt(p1) + 1);
+            }
+          }]
+        }
       }
     }
   });
@@ -166,7 +179,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-string-replace');
 
-  grunt.registerTask('css', ['sass', 'less']);
+  grunt.registerTask('css', ['sass', 'less', 'cssmin']);
   grunt.registerTask('js', ['coffee', 'uglify']);
   grunt.registerTask('rjs', ['requirejs', 'string-replace']);
   grunt.registerTask('default', ['css', 'js', 'watch']);
