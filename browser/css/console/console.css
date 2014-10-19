@@ -19,7 +19,7 @@ a {cursor: pointer;}
 }
 
 .ace-nav>li:first-child {
-  margin-left:30px;
+  margin-left:15px;
 }
 .pull-right .ace-nav>li:last-child>a{
   padding-right:0;

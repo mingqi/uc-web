@@ -179,8 +179,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-string-replace');
 
-  grunt.registerTask('css', ['sass', 'less', 'cssmin']);
+  grunt.registerTask('css', ['sass', 'less', 'cssmin', 'string-replace:cssVersion']);
   grunt.registerTask('js', ['coffee', 'uglify']);
-  grunt.registerTask('rjs', ['requirejs', 'string-replace']);
+  grunt.registerTask('rjs', ['requirejs', 'string-replace:jsVersion']);
   grunt.registerTask('default', ['css', 'js', 'watch']);
 };
