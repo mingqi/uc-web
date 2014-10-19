@@ -32,14 +32,20 @@ angular.module('consoleApp', ['tableSort'])
         newFiles: [{path: ''}],
         platforms: [{
             key: 'redhat',
-            name: 'Red Hat or CentOS'
+            name: 'Red Hat 或者 CentOS'
         }, {
             key: 'debian',
-            name: 'Ubuntu or Debian'
+            name: 'Ubuntu 或者 Debian'
         }, {
             key: 'linux',
-            name: 'Others linux'
-        }]
+            name: '其他 linux'
+        }],
+        agentUrl: {
+          base: "http://download.uclogs.com/uc-agent/release/",
+          folder: "uc-agent-1.0.0",
+          bit32: "linux-i386.tar.gz",
+          bit64: "linux-x86_64.tar.gz"
+        }
       });
       venderPage();
       $scope.$on('$locationChangeSuccess', venderPage);

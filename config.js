@@ -3,7 +3,6 @@ var path = require('path');
 
 var stageConfig = {
     development : {
-        //mongodb: "mongodb://182.92.3.45/monitorat?poolSize=10&bufferMaxEntries=0",
         mongodb: "mongodb://127.0.0.1/uclogs?poolSize=10&bufferMaxEntries=0",
         domain: 'dev.uclogs.com',
         port : 5001,
