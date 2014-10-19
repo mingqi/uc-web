@@ -28,11 +28,15 @@ var stageConfig = {
 var config = {
     pwdSecret : "12NtRoQfVjhuDaIue1kxKtTNYq3",
     sendMail : {
-        from : "UCLogs <service@uclogs.com>",
+        from : "UCLogs 云日志 <no-reply@uclogs.com>",
         smtp: {
-          host : "es2",
-          secureConnection : false,
-          port: 25
+            host: "smtp.exmail.qq.com",
+            secure: true,
+            port: 465,
+            auth: {
+                user : "no-reply@uclogs.com",
+                pass : "uclogs2014noReply"
+            }
         }
     },
     register: {
