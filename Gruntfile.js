@@ -38,6 +38,7 @@ module.exports = function(grunt) {
             'public/cc/css/bootstrap/bootstrap.css',
             'public/cc/css/compiled/bootstrap-overrides.css',
             'public/cc/css/compiled/theme.css',
+            'public/s/font-awesome-4.1.0/css/font-awesome.css',
           ],
           'public/s/css/console.css': [
             'public/ace/assets/css/uncompressed/bootstrap.css',
