@@ -114,7 +114,7 @@ exports.register = function(req, res, next) {
 
 exports.postRegister = function(req, res, next) {
     var rd = req.body.rd || "/";
-    var inviteCode = req.body.inviteCode || '';
+    var inviteCode = (req.body.inviteCode || '').toUpperCase();
     var user = {
         email : (_s.trim(req.body.email) || "").toLowerCase(),
         password : _s.trim(req.body.password) || "",
