@@ -86,7 +86,7 @@
             for (_j = 0, _len1 = terms.length; _j < _len1; _j++) {
               term = terms[_j];
               _results.push({
-                'multi_match': {
+                'match_phrase': {
                   'message': term
                 }
               });

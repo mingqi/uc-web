@@ -62,7 +62,7 @@ pattern = ( pattern_str, end_flag ) ->
     query = 
       'bool' :
         'must' : for term in terms 
-          'multi_match' : 
+          'match_phrase' : 
             'message' : term
 
   attributes = [] 
