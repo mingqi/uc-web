@@ -87,8 +87,7 @@
               term = terms[_j];
               _results.push({
                 'multi_match': {
-                  'query': term,
-                  'fields': ['message']
+                  'message': term
                 }
               });
             }
