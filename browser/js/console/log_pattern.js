@@ -64,8 +64,8 @@
       };
     }
     tempSpace = '<s-p-a-c-e>';
-    terms = pattern_str.replace(/(^|\s)"([^"]+)"($|\s)/g, function(match, p1) {
-      return p1.replace(/\s+/g, tempSpace);
+    terms = pattern_str.replace(/(^|\s)"([^"]+?)"($|\s)/g, function(match, p1, p2) {
+      return p2.replace(/\s+/g, tempSpace);
     }).split(/\s+/);
     parses = [];
     if (terms.length === 0) {
