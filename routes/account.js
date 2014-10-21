@@ -21,15 +21,6 @@ var getPwdMd5 = function(password) {
     return crypto.createHash('md5').update(pwd).digest('hex');
 };
 
-var setLoginCookie = function(res, user) {
-    var opt = {
-        maxAge : 30 * 24 * 3600 * 1000,
-        signed : true,
-    };
-    res.cookie('maUid', user.id, opt);
-    res.cookie('userEmail', user.email, opt);
-};
-
 var validateResetPwdKey = function(params) {
     if (params.key !== getPwdMd5(params.date + params.email)) {
         return false;
@@ -47,6 +38,15 @@ module.exports = exports = function(req, res, next) {
         return next(new QiriError(404));
     }
     exports[page](req, res, next);
+};
+
+var setLoginCookie = exports.setLoginCookie = function(res, user) {
+    var opt = {
+        maxAge : 3 * 24 * 3600 * 1000,
+        signed : true,
+    };
+    res.cookie('maUid', user.id, opt);
+    res.cookie('userEmail', user.email, opt);
 };
 
 exports.login = function(req, res, next) {

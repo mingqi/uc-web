@@ -20,6 +20,7 @@ var getRanges = function() {
   var ranges = {
      '过去1小时': [moment().subtract(1, 'hour'), moment()],
      '过去6小时': [moment().subtract(6, 'hour'), moment()],
+     '今天': [moment().startOf('day'), moment()],
      '昨天': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
      '过去1天': [moment().subtract(1, 'day'), moment()],
      '过去1周': [moment().subtract(1, 'week'), moment()],

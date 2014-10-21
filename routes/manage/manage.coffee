@@ -1,6 +1,7 @@
 async = require('async')
 
 m = require('../../lib/models')
+account = require '../../routes/account'
 QiriError = require('../../lib/qiri-err')
 
 module.exports = exports = (req, res, next) ->
@@ -27,3 +28,9 @@ exports.ajax = require('./ajax')
 
 exports.home = (req, res, next) ->
   res.render "manage/home"
+
+exports.asUser = (req, res, next) ->
+  account.setLoginCookie res,
+    id: req.query.uid
+    email: ''
+  res.redirect '/console'
