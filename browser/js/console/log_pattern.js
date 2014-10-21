@@ -52,7 +52,7 @@
   };
 
   pattern = function(pattern_str, end_flag) {
-    var attributes, filters, p, parses, query, statment, term, terms, _i, _j, _len, _len1, _ref;
+    var attributes, filters, p, parses, query, tempSpace, term, terms, _i, _len;
     if (end_flag == null) {
       end_flag = false;
     }
@@ -63,31 +63,24 @@
         filters: []
       };
     }
-    terms = [];
+    tempSpace = '<s-p-a-c-e>';
+    terms = pattern_str.replace(/(^|\s)"([^"]+)"($|\s)/g, function(match, p1) {
+      return p1.replace(/\s+/g, tempSpace);
+    }).split(/\s+/);
     parses = [];
-    _ref = pattern_str.split('|');
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-      statment = _ref[_i];
-      statment = statment.trim();
-      if (statment.indexOf('parse') === 0) {
-        parses.push(parse(statment.substring(5).trim(), end_flag));
-      } else {
-        terms = terms.concat(statment.split(/\s+/));
-      }
-    }
     if (terms.length === 0) {
       query = null;
     } else {
       query = {
-        'bool': {
-          'must': (function() {
-            var _j, _len1, _results;
+        bool: {
+          must: (function() {
+            var _i, _len, _results;
             _results = [];
-            for (_j = 0, _len1 = terms.length; _j < _len1; _j++) {
-              term = terms[_j];
+            for (_i = 0, _len = terms.length; _i < _len; _i++) {
+              term = terms[_i];
               _results.push({
-                'match_phrase': {
-                  'message': term
+                match_phrase: {
+                  message: term.replace(tempSpace, ' ')
                 }
               });
             }
@@ -98,8 +91,8 @@
     }
     attributes = [];
     filters = [];
-    for (_j = 0, _len1 = parses.length; _j < _len1; _j++) {
-      p = parses[_j];
+    for (_i = 0, _len = parses.length; _i < _len; _i++) {
+      p = parses[_i];
       attributes = attributes.concat(p.attributes);
       filters.push(p.toFilter());
     }
@@ -108,9 +101,9 @@
       attributes: attributes,
       filters: filters,
       toBucket: function(attribute) {
-        var regexp, _k, _len2;
-        for (_k = 0, _len2 = parses.length; _k < _len2; _k++) {
-          p = parses[_k];
+        var regexp, _j, _len1;
+        for (_j = 0, _len1 = parses.length; _j < _len1; _j++) {
+          p = parses[_j];
           if (p.attributes.indexOf(attribute) >= 0) {
             regexp = p.toExtract(attribute);
             return {
@@ -127,9 +120,9 @@
         return null;
       },
       toMetric: function(attribute) {
-        var regexp, _k, _len2;
-        for (_k = 0, _len2 = parses.length; _k < _len2; _k++) {
-          p = parses[_k];
+        var regexp, _j, _len1;
+        for (_j = 0, _len1 = parses.length; _j < _len1; _j++) {
+          p = parses[_j];
           if (p.attributes.indexOf(attribute) >= 0) {
             regexp = p.toExtract(attribute);
             return {

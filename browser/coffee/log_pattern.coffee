@@ -46,24 +46,28 @@ pattern = ( pattern_str, end_flag ) ->
       filters: []
     }
 
-  terms = []
+  tempSpace = '<s-p-a-c-e>'
+  terms = pattern_str.replace /(^|\s)"([^"]+)"($|\s)/g, (match, p1) ->
+    return p1.replace /\s+/g, tempSpace
+  .split(/\s+/)
+
   parses = []
-  for statment in pattern_str.split('|')
-    statment = statment.trim()
-    if statment.indexOf('parse') == 0
-      # this is attribute parse
-      parses.push parse(statment.substring(5).trim(), end_flag)
-    else
-      terms = terms.concat statment.split(/\s+/)
+  # for statment in pattern_str.split('|')
+  #   statment = statment.trim()
+  #   if statment.indexOf('parse') == 0
+  #     # this is attribute parse
+  #     parses.push parse(statment.substring(5).trim(), end_flag)
+  #   else
+  #     terms = terms.concat statment.split(/\s+/)
 
   if terms.length == 0
     query = null
   else
     query = 
-      'bool' :
-        'must' : for term in terms 
-          'match_phrase' : 
-            'message' : term
+      bool:
+        must: for term in terms 
+          match_phrase: 
+            message: term.replace tempSpace, ' '
 
   attributes = [] 
   filters = []
