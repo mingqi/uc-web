@@ -80,7 +80,7 @@
               term = terms[_i];
               _results.push({
                 match_phrase: {
-                  message: term.replace(tempSpace, ' ')
+                  message: term.replace(new RegExp(tempSpace, 'g'), ' ')
                 }
               });
             }

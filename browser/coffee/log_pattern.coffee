@@ -67,7 +67,7 @@ pattern = ( pattern_str, end_flag ) ->
       bool:
         must: for term in terms 
           match_phrase: 
-            message: term.replace tempSpace, ' '
+            message: term.replace new RegExp(tempSpace, 'g'), ' '
 
   attributes = [] 
   filters = []
