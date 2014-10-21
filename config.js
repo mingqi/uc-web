@@ -21,7 +21,8 @@ var stageConfig = {
               type: 'stdio',
               levels: ['error', 'warning']
             }]
-        }
+        },
+        logDir: '/data/uc-web/logs'
     },
 };
 

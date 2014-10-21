@@ -18,7 +18,7 @@ exports.getUsers = (req, res, next) ->
     res.json(users)
 
 exports.getInviteCodes = (req, res, next) ->
-  m.InviteCode.find {}, (err, codes) ->
+  m.InviteCode.find {}, null, {sort: '_id'}, (err, codes) ->
     return next() if err
     res.json(codes)
 
