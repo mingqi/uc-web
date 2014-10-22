@@ -46,7 +46,7 @@
                         </a>
                       </li>
                       <li ng-repeat="bucket in field.buckets | limitTo:5" style="word-break: break-all">
-                          <a ng-click="filterField(field, bucket)">
+                          <a ng-click="filterField(field, bucket);">
                               <i class="fa fa-angle-double-right"></i>
                               {{bucket.key}} ({{bucket.doc_count | number:0}})
                           </a>
@@ -225,7 +225,7 @@
 
           <tbody>
               <tr ng-repeat="bucket in modalFieldData.buckets | filter:modalFieldData.filter">
-                  <td style="word-break: break-all"><a ng-click="filterField(modalFieldData.field, bucket)">{{bucket.key}}</a></td>
+                  <td style="word-break: break-all"><a ng-click="hideFieldKeys();filterField(modalFieldData.field, bucket)">{{bucket.key}}</a></td>
                   <td>{{bucket.doc_count}}</td>
               </tr>
           </tbody>
