@@ -47,8 +47,8 @@ pattern = ( pattern_str, end_flag ) ->
     }
 
   tempSpace = '<s-p-a-c-e>'
-  terms = pattern_str.replace /(^|\s)"([^"]+?)"($|\s)/g, (match, p1, p2) ->
-    p2.replace /\s+/g, tempSpace
+  terms = pattern_str.replace /"([^"]+?)"/g, (match, p1) ->
+    p1.replace /\s+/g, tempSpace
   .split(/\s+/)
 
   parses = []
