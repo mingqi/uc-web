@@ -84,7 +84,12 @@ var initDateRangePicker = function($scope, locationSearch) {
 
 var updateDateRangePicker = function($scope) {
   var ranges = getRanges();
-  $scope.dateRange = startDate.format(dateFormat) + " 到 " + endDate.format(dateFormat);
+  if (chosenLabel === "自定义范围") {
+    $scope.dateRange = startDate.format(dateFormat) + " 到 " + endDate.format(dateFormat);
+  } else {
+    $scope.dateRange = chosenLabel;
+  }
+
 
   var opts = _.extend(dateRangePickerOptions, {
     ranges: ranges,
