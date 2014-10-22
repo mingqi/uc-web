@@ -261,6 +261,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       Math: Math,
       orderBy: parseInt(locationSearch.o) || 1,
       page: {
+        showHostAndPath: 1,
         filter: {
           field: (function() {
             try {
