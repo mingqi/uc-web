@@ -3,6 +3,7 @@ var express = require('express');
 var http = require('http');
 var path = require('path');
 var ejs = require('ejs');
+var compress = require('compression');
 
 require("coffee-script/register");
 require("date-format-lite");
@@ -21,6 +22,7 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
 app.use(middleware.logger());
+app.use(compress());
 app.use(router);
 
 app.locals = {

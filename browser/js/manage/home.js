@@ -71,6 +71,9 @@ angular.module('ngApp', [])
     });
   }
 }]);
-angular.bootstrap(document, ['ngApp']);
+
+$(function() {
+  angular.bootstrap(document, ['ngApp']);  
+});
 
 }); // end require ['jquery', ...]
