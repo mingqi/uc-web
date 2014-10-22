@@ -1,6 +1,8 @@
 var _ = require('underscore');
 var path = require('path');
 
+var secretConfig = require('./secret-config');
+
 var stageConfig = {
     development : {
         mongodb: "mongodb://127.0.0.1/uclogs?poolSize=10&bufferMaxEntries=0",
@@ -8,7 +10,11 @@ var stageConfig = {
         port : 5001,
         es: {
             hosts: ['es-dev-1.uclogs.com:9200'],
-            log: 'trace'
+            // log: 'trace'
+            log: [{
+              type: 'stdio',
+              levels: ['error', 'warning']
+            }]
         }
     },
     production : {
@@ -27,7 +33,7 @@ var stageConfig = {
 };
 
 var config = {
-    pwdSecret : "12NtRoQfVjhuDaIue1kxKtTNYq3",
+    pwdSecret : secretConfig.pwdSecret,
     sendMail : {
         from : "UCLogs 云日志 <no-reply@uclogs.com>",
         smtp: {

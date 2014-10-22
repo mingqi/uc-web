@@ -20,3 +20,4 @@ node_modules
 *.md.html
 .DS_Store
 .sass-cache
+secret-config.js
