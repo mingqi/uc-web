@@ -8,14 +8,30 @@
     <meta name="keywords" content="云日志, log, logs, 日志, 分析, debug" />
     <meta name="description" content="实时日志收集、搜索、分析"/>
 </head>
-<body class="pull_top" style="background-color:#e6e6e6">
+<body style="background-color:#e6e6e6">
     <div class="navbar navbar-inverse navbar-static-top" role="navigation" style="margin-bottom:0">
     {% include include/navbar %}
     </div>
 
+    
     <section id="feature_slider" class="lol">
-        
-        <article class="slide" id="ideas" style="background: url('/img/backgrounds/aqua.jpg') repeat-x top center;">
+        <article class="slide" id="showcasing" style="background: url('/img/backgrounds/aqua.jpg') repeat-x top center;">
+            <img src="/s/img/home-1.png" />
+            <div class="info">
+                <h2>实时日志<br>收集、搜索、分析</h2>
+
+                <div style="margin:30px 0 30px">
+                    {% if (visitor) { %}
+                        <a class="btn btn-warning btn-lg" href="/console/" style="font-family: verdana; font-weight: bold;">免费试用</a>
+                    {% } else { %}
+                        <a class="btn btn-warning btn-lg" href="/account/register" style="font-family: verdana; font-weight: bold;">免费试用</a>
+                    {% } %}
+                  
+                </div>
+                <span style="color:white">无需硬件投入，无需授权费用，按需收费</span>
+            </div>
+        </article>
+        <!-- <article class="slide" id="ideas" style="background: url('/img/backgrounds/aqua.jpg') repeat-x top center;">
             <div class="info">
                 <h2>实时日志收集、搜索、分析</h2>
                 <span style="color:white">无需硬件投入，无需授权费用，按需收费</span>
@@ -29,7 +45,7 @@
                   
                 </div>
             </div>
-        </article>      
+        </article>       -->
     </section>
 
     <div id="showcase">
