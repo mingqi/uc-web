@@ -18,7 +18,6 @@ var utils = require('../lib/utils');
 
 var getPwdMd5 = function(password) {
     var pwd = password + "undefined"; 
-    console.log(pwd);
     return crypto.createHash('md5').update(pwd).digest('hex');
 };
 

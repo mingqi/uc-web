@@ -8,12 +8,12 @@ UserVoice=window.UserVoice||[];(function(){var uv=document.createElement('script
 UserVoice.push(['set', {
   accent_color: '#448dd6',
   trigger_color: 'white',
-  trigger_background_color: '#448dd6'
+  trigger_background_color: '#448dd6',
+  locale: 'cn'
 }]);
 UserVoice.push(['identify', {
     email: "{%= visitor && visitor.email %}"
 }]);
 UserVoice.push(['addTrigger', { mode: 'contact', trigger_position: 'bottom-left' }]);
 UserVoice.push(['autoprompt', {}]);
-UserVoice.push(["set", "locale", "cn"]);
 </script>
