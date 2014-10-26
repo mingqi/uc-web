@@ -6,9 +6,11 @@
 
 {% include ../../console/include/css %}
 
-<!--[if lte IE 8]>
-  <link rel="stylesheet" href="/assets/css/ace-ie.min.css" />
-<![endif]-->
+<script src="/s/js/config.js"></script>
+
+{% if (!isDebug) { %}
+<script> require.baseUrl = '/s/js'; </script>
+{% } %}
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
 

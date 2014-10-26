@@ -286,6 +286,11 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }
     });
 
+    var fieldMap = _.indexBy($scope.fields, 'key');
+    $scope.getFieldName = function(key) {
+      return fieldMap[key] && fieldMap[key].name;
+    }
+
     $scope.search = function(opts) {
         // opts: reserve, init
         opts = opts || {};
@@ -331,9 +336,14 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             }
           }
         };
-        _.each($scope.page.filter.field, function(value, field) {
+        _.each($scope.page.filter.field, function(fieldValues, fieldName) {
           $scope.page.query.filtered.filter.and.push({
-            term: _.object([[field, value]])
+            or: _.map(fieldValues, function(fieldValue) {
+              return {
+                term: _.object([[fieldName, fieldValue]])
+              }
+            })
+            // term: _.object([[field, value]])
           });
         });
         _.each($scope.page.pattern.filters, function(filter) {
@@ -390,7 +400,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           drawChart($scope.chartCount, series, $scope);
 
           if (!opts.reserve) {
-              _.map($scope.fields, function(field) {
+              _.each($scope.fields, function(field) {
                 _.extend(field, {
                   show: false,
                   buckets: null
@@ -430,9 +440,21 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
     $scope.filterField = function(field, bucket) {
       // field.key, bucket.key
-      $scope.page.filter.field[field.key] = bucket.key;
+      var fields = $scope.page.filter.field[field.key] || [];
+      if (_.contains(fields, bucket.key)) {
+        fields = _.without(fields, bucket.key);
+        if (fields.length) {
+          $scope.page.filter.field[field.key] = fields;
+        } else {
+          delete $scope.page.filter.field[field.key]
+        }
+      } else {
+        fields.push(bucket.key);
+        $scope.page.filter.field[field.key] = fields;
+      }
       $scope.search({reserve:true});
     }
+
     $scope.removeFieldFilter = function(key) {
       // field.key, bucket.key
       delete $scope.page.filter.field[key]

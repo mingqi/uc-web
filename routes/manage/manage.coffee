@@ -27,7 +27,12 @@ exports.checkRole = (req, res, next) ->
 exports.ajax = require('./ajax')
 
 exports.home = (req, res, next) ->
-  res.render "manage/home"
+  res.render "manage/home",
+    page: 'home'
+
+exports.user = (req, res, next) ->
+  res.render "manage/user",
+    page: 'user'
 
 exports.asUser = (req, res, next) ->
   account.setLoginCookie res,

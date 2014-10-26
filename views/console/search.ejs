@@ -5,7 +5,7 @@
 
 {% include include/inhead %}
 
-<link rel="stylesheet" href="/s/css/search.css?3" />
+<link rel="stylesheet" href="/s/css/search.css?4" />
 
 {% include include/requirejs %}
 <script data-main="console/search" src="/s/js/lib/require.js"></script>
@@ -45,7 +45,8 @@
                           没有结果
                         </a>
                       </li>
-                      <li ng-repeat="bucket in field.buckets | limitTo:5" style="word-break: break-all">
+                      <li ng-repeat="bucket in field.buckets | limitTo:5" style="word-break: break-all"
+                        ng-class="{active: _.contains(page.filter.field[field.key], bucket.key)}">
                           <a ng-click="filterField(field, bucket);">
                               <i class="fa fa-angle-double-right"></i>
                               {{bucket.key}} ({{bucket.doc_count | number:0}})
@@ -98,12 +99,12 @@
             </div><!-- /.page-content -->
             <script type="text/ng-template" id="pageContent">
               <div ng-if="!(page.filter.field | isEmpty)">字段过滤：
-                <span ng-repeat="(key, value) in page.filter.field">
+                <span ng-repeat="(fieldKey, fieldValues) in page.filter.field">
                   <div class="label label-xlg label-gray">
-                    <button type="button" class="close" ng-click="removeFieldFilter(key)">
+                    <button type="button" class="close" ng-click="removeFieldFilter(fieldKey)">
                       <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
                     </button>
-                    {{key}} : {{value}}
+                    {{getFieldName(fieldKey)}} : 已选中{{fieldValues.length}}个
                   </div>
                   &nbsp;
                 </span>

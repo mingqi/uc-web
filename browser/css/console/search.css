@@ -27,3 +27,7 @@ em {color: red}
   border-radius: 2px;
   margin-bottom: 8px;
 }
+
+.nav-list li.active>a:after {
+  display: none;
+}
