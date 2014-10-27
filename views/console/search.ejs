@@ -48,7 +48,11 @@
                       <li ng-repeat="bucket in field.buckets | limitTo:5" style="word-break: break-all"
                         ng-class="{active: _.contains(page.filter.field[field.key], bucket.key)}">
                           <a ng-click="filterField(field, bucket);">
-                              <i class="fa fa-angle-double-right"></i>
+                              <i class="fa" ng-class="{
+                                'fa-square-o': !_.contains(page.filter.field[field.key], bucket.key),
+                                'fa-check-square-o': _.contains(page.filter.field[field.key], bucket.key)
+                              }">
+                              </i>
                               {{bucket.key}} ({{bucket.doc_count | number:0}})
                           </a>
                       </li>
@@ -104,7 +108,12 @@
                     <button type="button" class="close" ng-click="removeFieldFilter(fieldKey)">
                       <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
                     </button>
-                    {{getFieldName(fieldKey)}} : 已选中{{fieldValues.length}}个
+                    <span ng-if="fieldValues.length>1">
+                      {{getFieldName(fieldKey)}} : 已选择{{fieldValues.length}}个
+                    </span>
+                    <span ng-if="fieldValues.length==1">
+                      {{getFieldName(fieldKey)}} : {{fieldValues[0]}}
+                    </span>
                   </div>
                   &nbsp;
                 </span>
