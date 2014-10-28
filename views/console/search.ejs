@@ -5,7 +5,7 @@
 
 {% include include/inhead %}
 
-<link rel="stylesheet" href="/s/css/search.css?4" />
+<link rel="stylesheet" href="/s/css/search.css?5" />
 
 {% include include/requirejs %}
 <script data-main="console/search" src="/s/js/lib/require.js"></script>
@@ -41,13 +41,13 @@
                     
                   <ul class="submenu" ng-class="{block: field.show}">
                       <li ng-if="field.buckets.length==0">
-                        <a style="cursor: default;display: block;padding: 7px 0 9px 22px;">
+                        <a style="cursor: default; display: block; padding: 7px 0 9px 22px; text-decoration:none">
                           没有结果
                         </a>
                       </li>
                       <li ng-repeat="bucket in field.buckets | limitTo:5" style="word-break: break-all"
                         ng-class="{active: _.contains(page.filter.field[field.key], bucket.key)}">
-                          <a ng-click="filterField(field, bucket);">
+                          <a ng-click="filterField(field, bucket);" style="text-decoration:none">
                               <i class="fa" ng-class="{
                                 'fa-square-o': !_.contains(page.filter.field[field.key], bucket.key),
                                 'fa-check-square-o': _.contains(page.filter.field[field.key], bucket.key)
