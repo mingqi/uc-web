@@ -493,10 +493,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }
       $('#modalAllFieldKeys').modal();
     }
-    $scope.hideFieldKeys = function() {
-      $('#modalAllFieldKeys').modal('hide');
-    }
-
     $scope.search({
       init: 1
     });
