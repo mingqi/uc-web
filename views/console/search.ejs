@@ -252,12 +252,14 @@
           <tbody>
               <tr ng-repeat="bucket in modalFieldData.buckets | filter:modalFieldData.filter">
                   <td style="word-break: break-all">
-                    <i class="fa" ng-class="{
-                      'fa-square-o': !_.contains(page.filter.field[modalFieldData.field.key], bucket.key),
-                      'fa-check-square-o': _.contains(page.filter.field[modalFieldData.field.key], bucket.key)
-                    }">
-                    </i>
-                    <a ng-click="filterField(modalFieldData.field, bucket)">{{bucket.key}}</a>
+                    <a ng-click="filterField(modalFieldData.field, bucket)">
+                      <i class="fa" ng-class="{
+                        'fa-square-o': !_.contains(page.filter.field[modalFieldData.field.key], bucket.key),
+                        'fa-check-square-o': _.contains(page.filter.field[modalFieldData.field.key], bucket.key)
+                      }">
+                      </i>
+                        {{bucket.key}}
+                      </a>
                   </td>
                   <td>{{bucket.doc_count}}</td>
               </tr>
