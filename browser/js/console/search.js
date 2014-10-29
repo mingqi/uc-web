@@ -292,7 +292,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     }
 
     $scope.search = function(opts) {
-        // opts: reserve, init
+        // opts: init
         opts = opts || {};
 
         if (!opts.init) {
@@ -336,11 +336,11 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             }
           }
         };
-        _.each($scope.page.filter.field, function(fieldValues, fieldName) {
+        _.each($scope.page.filter.field, function(fieldValues, fieldKey) {
           $scope.page.query.filtered.filter.and.push({
             or: _.map(fieldValues, function(fieldValue) {
               return {
-                term: _.object([[fieldName, fieldValue]])
+                term: _.object([[fieldKey, fieldValue]])
               }
             })
             // term: _.object([[field, value]])
@@ -399,43 +399,84 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           }];
           drawChart($scope.chartCount, series, $scope);
 
-          if (!opts.reserve) {
-              _.each($scope.fields, function(field) {
-                _.extend(field, {
-                  show: false,
-                  buckets: null
-                });
-              });
-          }
-        })
+        }); // end success
+
+        _.each($scope.fields, refreshFieldInfo);
     }
 
-    $scope.toggleField = function(field) {
-      if (!field.buckets) {
-        field.loading = true;
-        $http.post("/console/ajax/search", {
-          esBody: {
-            query: $scope.page.query,
-            size: 0,
-            aggs: {
-              unique_number_for_attributes: {
-                terms: {
-                  field: field.key,
-                  size: 300
-                }
+    var refreshFieldInfo = function(field) {
+      if (!field.show) {
+        field.buckets = null;
+        return;
+      }
+
+      field.loading = true;
+      var query = {
+        filtered: {
+          query: $scope.page.pattern.query,
+          filter: {
+            and: [$scope.page.filter.timerange]
+          }
+        }
+      };
+      _.each($scope.page.pattern.filters, function(filter) {
+        query.filtered.filter.and.push(filter);
+      });
+      
+      _.each($scope.page.filter.field, function(fieldValues, fieldKey) {
+        if (fieldKey === field.key) {
+          return;
+        }
+        query.filtered.filter.and.push({
+          or: _.map(fieldValues, function(fieldValue) {
+            return {
+              term: _.object([[fieldKey, fieldValue]])
+            }
+          })
+        });
+      });
+
+      $http.post("/console/ajax/search", {
+        esBody: {
+          query: query,
+          size: 0,
+          aggs: {
+            unique_number_for_attributes: {
+              terms: {
+                field: field.key,
+                size: 300
               }
             }
-          },
-          begin: +startDate,
-          end: +endDate
-        }).success(function(json) {
-          field.loading = false;
-          field.buckets = json.aggregations ?
-            json.aggregations.unique_number_for_attributes.buckets :
-            [];
-        });
-      }
+          }
+        },
+        begin: +startDate,
+        end: +endDate
+      }).success(function(json) {
+        field.loading = false;
+        field.buckets = json.aggregations ?
+          json.aggregations.unique_number_for_attributes.buckets :
+          [];
+        // add 0 number
+        var fieldValues = $scope.page.filter.field[field.key];
+        if (fieldValues) {
+          var fieldBucketKeys = _.map(field.buckets, function(bucket) {
+            return bucket.key;
+          });
+          _.each(fieldValues, function(fieldValue) {
+            if (!_.contains(fieldBucketKeys, fieldValue)) {
+              field.buckets.push({
+                key: fieldValue,
+                doc_count: 0
+              });
+            }
+          });
+        }
+      });
+    };
+
+    $scope.toggleField = function(field) {
       field.show = !field.show;
+      refreshFieldInfo(field);
     };
 
     $scope.filterField = function(field, bucket) {
@@ -452,13 +493,13 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         fields.push(bucket.key);
         $scope.page.filter.field[field.key] = fields;
       }
-      $scope.search({reserve:true});
-    }
+      $scope.search();
+    };
 
     $scope.removeFieldFilter = function(key) {
       // field.key, bucket.key
-      delete $scope.page.filter.field[key]
-      $scope.search({reserve:true});
+      delete $scope.page.filter.field[key];
+      $scope.search();
     }
     $scope.showFieldKeys = function(field) {
       $scope.modalFieldData = {
@@ -467,10 +508,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }
       $('#modalAllFieldKeys').modal();
     }
-    $scope.hideFieldKeys = function() {
-      $('#modalAllFieldKeys').modal('hide');
-    }
-
     $scope.search({
       init: 1
     });

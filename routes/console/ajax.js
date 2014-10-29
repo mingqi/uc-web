@@ -43,6 +43,7 @@ exports.search = function(req, res, next) {
 
     esClient.search({
         index: index.join(','),
+        type: 'event',
         ignoreUnavailable: true,
         body: esBody
     }, function(error, response) {
