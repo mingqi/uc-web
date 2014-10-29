@@ -40,7 +40,7 @@
                   </a>
                     
                   <ul class="submenu" ng-class="{block: field.show}">
-                      <li ng-if="field.buckets.length==0">
+                      <li ng-if="field.buckets.length==0 && !page.filter.field[field.key]">
                         <a style="cursor: default; display: block; padding: 7px 0 9px 22px; text-decoration:none">
                           没有结果
                         </a>
@@ -56,7 +56,8 @@
                               {{bucket.key}} ({{bucket.doc_count | number:0}})
                           </a>
                       </li>
-                      <li ng-if="field.buckets.length>1">
+
+                      <li ng-if="field.buckets.length>5">
                         <a class="text-right" style="padding-right:5px;" ng-click="showFieldKeys(field)">
                           
                           查看所有({{field.buckets.length}})

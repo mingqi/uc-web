@@ -456,8 +456,23 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         field.buckets = json.aggregations ?
           json.aggregations.unique_number_for_attributes.buckets :
           [];
+        // add 0 number
+        var fieldValues = $scope.page.filter.field[field.key];
+        if (fieldValues) {
+          var fieldBucketKeys = _.map(field.buckets, function(bucket) {
+            return bucket.key;
+          });
+          _.each(fieldValues, function(fieldValue) {
+            if (!_.contains(fieldBucketKeys, fieldValue)) {
+              field.buckets.push({
+                key: fieldValue,
+                doc_count: 0
+              });
+            }
+          });
+        }
       });
-    };   
+    };
 
     $scope.toggleField = function(field) {
       field.show = !field.show;
