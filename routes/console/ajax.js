@@ -27,6 +27,7 @@ exports.search = function(req, res, next) {
     var begin = moment(req.body.begin).zone("+08:00").startOf('day');
     var end = moment(req.body.end).zone("+08:00");
     var esBody = req.body.esBody;
+    var type = req.body.type || 'event';
 
     var filters = esBody.query.filtered.filter.and;
     filters.push({
@@ -43,7 +44,7 @@ exports.search = function(req, res, next) {
 
     esClient.search({
         index: index.join(','),
-        type: 'event',
+        type: type,
         ignoreUnavailable: true,
         body: esBody
     }, function(error, response) {

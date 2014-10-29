@@ -215,6 +215,14 @@ var getESBody = function($scope) {
   }
 };
 
+var baseFields = [{
+  key: 'host',
+  name: '主机'
+}, {
+  key: 'path',
+  name: '路径'
+}];
+
 angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
         return function (obj) {
@@ -274,22 +282,62 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         attributeAggs: 'avg',
         keywords: locationSearch.k || ''
       },
-      fields: [{
-        key: 'host',
-        name: '主机'
-      }, {
-        key: 'path',
-        name: '路径'
-      }],
       chartCount: {
         id: 'chartCount'
       }
     });
 
-    var fieldMap = _.indexBy($scope.fields, 'key');
     $scope.getFieldName = function(key) {
+      var fieldMap = _.indexBy($scope.fields, 'key');
       return fieldMap[key] && fieldMap[key].name;
     }
+
+    var parepareDynamicFields = function(callback) {
+      $http.post("/console/ajax/search", {
+        type: 'attributes',
+        esBody: {
+          query: {
+            filtered: {
+              query: null,
+              filter: {
+                and: [$scope.page.filter.timerange]
+              }
+            }
+          },
+          aggs: {
+            field_aggs: {
+              terms: {
+                field: "attribute"
+              }
+            }
+          },
+          size: 0
+        },
+        begin: +startDate,
+        end: +endDate
+      }).success(function(json) {
+        var fields = _.map(json.aggregations.field_aggs.buckets, function(bucket) {
+          if (bucket.key.indexOf('_') == 0) {
+            return null;
+          }
+          return {
+            key: bucket.key,
+            name: bucket.key
+          }
+        });
+
+        if (!$scope.fields) {
+          $scope.fields = baseFields;
+        }
+        var fieldMapByKey = _.indexBy($scope.fields, 'key');
+        _.each(fields, function(field) {
+          if (field && !fieldMapByKey[field.key]) {
+            $scope.fields.push(field);
+          }
+        });
+        callback(null);
+      });
+    };
 
     $scope.search = function(opts) {
         // opts: init
@@ -354,6 +402,11 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             $scope.chartCount.highChart.showLoading();
         }
 
+        parepareDynamicFields(function(err) {
+
+        });
+
+        // 主要搜索
         $http.post("/console/ajax/search", {
           esBody: _.extend(getESBody($scope), {
             aggs: {

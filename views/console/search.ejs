@@ -103,8 +103,10 @@
 
             </div><!-- /.page-content -->
             <script type="text/ng-template" id="pageContent">
-              <div ng-if="!(page.filter.field | isEmpty)">字段过滤：
-                <span ng-repeat="(fieldKey, fieldValues) in page.filter.field">
+              <div ng-if="!(page.filter.field | isEmpty)">
+                <span style="display: block; float:left; padding:4px 10px 0 0">字段过滤：</span>
+                <span ng-repeat="(fieldKey, fieldValues) in page.filter.field"
+                    style="display: block; float: left; margin-bottom:5px">
                   <div class="label label-xlg label-gray">
                     <button type="button" class="close" ng-click="removeFieldFilter(fieldKey)">
                       <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
@@ -118,7 +120,8 @@
                   </div>
                   &nbsp;
                 </span>
-                <hr>
+                <div class="clearfix"></div>
+                <hr style="margin-top:15px">
               </div>
               
 
