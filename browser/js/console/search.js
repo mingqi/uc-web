@@ -294,6 +294,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
     var parepareDynamicFields = function(callback) {
       $http.post("/console/ajax/search", {
+        keywords: $scope.page.keywords || '',
         type: 'attributes',
         esBody: {
           query: {
@@ -408,6 +409,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
         // 主要搜索
         $http.post("/console/ajax/search", {
+          keywords: $scope.page.keywords || '',
           esBody: _.extend(getESBody($scope), {
             aggs: {
               event_over_time: {
@@ -490,6 +492,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       });
 
       $http.post("/console/ajax/search", {
+        keywords: $scope.page.keywords || '',
         esBody: {
           query: query,
           size: 0,
@@ -567,6 +570,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
     var refreshResult = function(callback) {
       $http.post("/console/ajax/search", {
+          keywords: $scope.page.keywords || '',
           esBody: getESBody($scope),
           begin: startDate,
           end: endDate

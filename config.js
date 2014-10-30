@@ -15,7 +15,8 @@ var stageConfig = {
               type: 'stdio',
               levels: ['error', 'warning']
             }]
-        }
+        },
+        logDir: path.join(process.cwd(), '/var/logs')
     },
     production : {
         mongodb : "mongodb://es1/uclogs?poolSize=10&bufferMaxEntries=0",

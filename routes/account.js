@@ -15,6 +15,7 @@ var config = require('../config');
 var m = require('../lib/models');
 var QiriError = require('../lib/qiri-err');
 var utils = require('../lib/utils');
+var logger = require('../lib/logger')(__filename);
 
 var getPwdMd5 = function(password) {
     var pwd = password + "undefined"; 
@@ -319,7 +320,11 @@ exports.loadUser = function(req, res, next) {
         if (err) {
             return next(err);
         }
-        res.locals.visitor = req.visitor = results.user;
+        var user = results.user;
+        if (user) {
+            logger.info("loadUser ip:" + req.ip + " id:" + user.id + " email:" + user.email + " url:" + req.url);
+        }
+        res.locals.visitor = req.visitor = user;
         next();
     });
 };
