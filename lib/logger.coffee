@@ -6,12 +6,11 @@ config = require('../config')
 logConfig =
   appenders: []
 
-if config.env == 'production'
-  logConfig.appenders.push
-    type: "file"
-    filename: path.join(config.logDir, "app.log")
-    maxLogSize: 1024*1024*5
-    backups: 10
+logConfig.appenders.push
+  type: "file"
+  filename: path.join(config.logDir, "app.log")
+  maxLogSize: 1024*1024*5
+  backups: 10
 
 if config.env == 'development'
   logConfig.appenders.push
