@@ -292,19 +292,35 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       return fieldMap[key] && fieldMap[key].name;
     }
 
-    var parepareDynamicFields = function(callback) {
+    var parepareDynamicFields = function() {
+      var query = {
+        filtered: {
+          query: null,
+          filter: {
+            and: [$scope.page.filter.timerange]
+          }
+        }
+      };
+
+      _.each($scope.page.filter.field, function(fieldValues, fieldKey) {
+        if (!_.contains(['path', 'host'], fieldKey)) {
+          return;
+        }
+        query.filtered.filter.and.push({
+          or: _.map(fieldValues, function(fieldValue) {
+            return {
+              term: _.object([[fieldKey, fieldValue]])
+            }
+          })
+          // term: _.object([[field, value]])
+        });
+      });
+
       $http.post("/console/ajax/search", {
         keywords: $scope.page.keywords || '',
         type: 'attributes',
         esBody: {
-          query: {
-            filtered: {
-              query: null,
-              filter: {
-                and: [$scope.page.filter.timerange]
-              }
-            }
-          },
+          query: query,
           aggs: {
             field_aggs: {
               terms: {
@@ -317,26 +333,25 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         begin: +startDate,
         end: +endDate
       }).success(function(json) {
-        var fields = _.map(json.aggregations.field_aggs.buckets, function(bucket) {
-          if (bucket.key.indexOf('_') == 0) {
+        var fields = _.chain(json.aggregations.field_aggs.buckets).map(function(bucket) {
+          if (bucket.key.indexOf('_') === 0) {
             return null;
           }
           return {
             key: bucket.key,
             name: bucket.key
           }
+        }).filter().value();
+
+        var oldFieldMap = _.indexBy($scope.fields || [], 'key');
+
+        $scope.fields = _.clone(baseFields);
+        _.each(fields, function(field) {
+          var oldField = oldFieldMap[field.key];
+
+          $scope.fields.push(oldField || field);
         });
 
-        if (!$scope.fields) {
-          $scope.fields = baseFields;
-        }
-        var fieldMapByKey = _.indexBy($scope.fields, 'key');
-        _.each(fields, function(field) {
-          if (field && !fieldMapByKey[field.key]) {
-            $scope.fields.push(field);
-          }
-        });
-        callback(null);
       });
     };
 
@@ -385,6 +400,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             }
           }
         };
+
         _.each($scope.page.filter.field, function(fieldValues, fieldKey) {
           $scope.page.query.filtered.filter.and.push({
             or: _.map(fieldValues, function(fieldValue) {
@@ -403,9 +419,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             $scope.chartCount.highChart.showLoading();
         }
 
-        parepareDynamicFields(function(err) {
-
-        });
+        parepareDynamicFields();
 
         // 主要搜索
         $http.post("/console/ajax/search", {
@@ -512,7 +526,32 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         field.buckets = json.aggregations ?
           json.aggregations.unique_number_for_attributes.buckets :
           [];
-        // add 0 number
+        field.total = field.buckets.length;
+
+        // 查看 attributes 总数
+        if (field.total >= 300) {
+          field.total = 'loading';
+          $http.post("/console/ajax/search", {
+            keywords: $scope.page.keywords || '',
+            esBody: {
+              query: query,
+              size: 0,
+              aggs: {
+                unique_attributes_count: {
+                  cardinality: {
+                    field: field.key
+                  }
+                }
+              }
+            },
+            begin: +startDate,
+            end: +endDate
+          }).success(function(json) {
+            field.total = json.aggregations.unique_attributes_count.value;
+          });
+        }
+
+        // 如果已经选中，虽然没有数据，也会显示数量位0
         var fieldValues = $scope.page.filter.field[field.key];
         if (fieldValues) {
           var fieldBucketKeys = _.map(field.buckets, function(bucket) {
@@ -535,10 +574,16 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       refreshFieldInfo(field);
     };
 
+    /*
+    * 设置某个 filter field，包含增加 field 和移除 field
+    * field: {key, name}
+    * bucket: {key, doc_count}
+    */
     $scope.filterField = function(field, bucket) {
-      // field.key, bucket.key
+      // fields: [value1, value2, value3]
       var fields = $scope.page.filter.field[field.key] || [];
       if (_.contains(fields, bucket.key)) {
+        // 移除 field
         fields = _.without(fields, bucket.key);
         if (fields.length) {
           $scope.page.filter.field[field.key] = fields;
@@ -546,12 +591,14 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           delete $scope.page.filter.field[field.key]
         }
       } else {
+        // 增加 field
         fields.push(bucket.key);
         $scope.page.filter.field[field.key] = fields;
       }
       $scope.search();
     };
 
+    // 删除某个 field 的全部
     $scope.removeFieldFilter = function(key) {
       // field.key, bucket.key
       delete $scope.page.filter.field[key];
