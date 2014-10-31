@@ -23,14 +23,14 @@
         <div class="sidebar" id="sidebar" style="height:0">
             <ul class="nav nav-list" ng-include="'navList'"></ul>
             <script type="text/ng-template" id="navList">
-            <li>
+            <li ng-repeat="fieldGroup in fieldGroups">
               <a>
                   <i class="icon-none fa fa-search"></i>
-                  <span class="menu-text">按条件过滤</span>
+                  <span class="menu-text">{{fieldGroup.title}}</span>
               </a>
 
               <ul class="submenu" style="display:block">
-                <li ng-repeat="field in fields">
+                <li ng-repeat="field in fieldGroup.fields">
                   <a ng-click="toggleField(field)">
                       <i class="icon-none fa fa-angle-double-right"></i>
                       

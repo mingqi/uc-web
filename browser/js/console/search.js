@@ -90,7 +90,6 @@ var updateDateRangePicker = function($scope) {
     $scope.dateRange = chosenLabel;
   }
 
-
   var opts = _.extend(dateRangePickerOptions, {
     ranges: ranges,
     startDate: startDate,
@@ -217,11 +216,29 @@ var getESBody = function($scope) {
 
 var baseFields = [{
   key: 'host',
-  name: '主机'
+  name: '主机',
+  group: 'base'
 }, {
   key: 'path',
-  name: '路径'
+  name: '路径',
+  group: 'base'
 }];
+
+var nginxKeyNameMap = {
+  'nginx.http_method': '请求方法',
+  'nginx.referer': '来源',
+  'nginx.remote_address': 'IP',
+  'nginx.request_uri': '网址',
+  'nginx.response_size': '响应大小',
+  'nginx.response_status': '响应状态码',
+  'nginx.user_agent': 'User Agent',
+  'nginx.spider': '蜘蛛(Spider)'
+};
+
+var nginxFieldKeys = _.map(('remote_address,http_method,request_uri,response_status,response_size,' +
+    'user_agent,spider').split(','), function(name) {
+  return 'nginx.' + name;
+});
 
 angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
@@ -341,12 +358,15 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         end: +endDate
       }).success(function(json) {
         var fields = _.chain(json.aggregations.field_aggs.buckets).map(function(bucket) {
-          if (bucket.key.indexOf('_') === 0) {
+          var key = bucket.key;
+          if (key.indexOf('_') === 0) {
             return null;
           }
+          var group = key.indexOf('.') > 0 ? key.substr(0, key.indexOf('.')) : 'unknow';
           return {
-            key: bucket.key,
-            name: bucket.key
+            key: key,
+            name: nginxKeyNameMap[key],
+            group: group
           }
         }).filter().value();
 
@@ -358,6 +378,24 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
           $scope.fields.push(oldField || field);
         });
+
+        $scope.fieldGroups = [{
+          group: 'base',
+          title: '按条件过滤',
+          fields: baseFields
+        }];
+
+        var groupMap = _.groupBy($scope.fields, 'group');
+        if (groupMap.nginx) {
+          var fieldMap = _.indexBy(groupMap.nginx, 'key');
+          $scope.fieldGroups.push({
+            group: 'nginx',
+            title: 'Nginx / Apache',
+            fields: _.map(nginxFieldKeys, function(fieldKey) {
+              return fieldMap[fieldKey];
+            })
+          });
+        }
 
       });
     };
