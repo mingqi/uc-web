@@ -115,7 +115,8 @@
                       {{getFieldName(fieldKey)}} : 已选择{{fieldValues.length}}个
                     </span>
                     <span ng-if="fieldValues.length==1">
-                      {{getFieldName(fieldKey)}} : {{fieldValues[0]}}
+                      {{getFieldName(fieldKey)}} :
+                      {{fieldValues[0].length > 30 ? fieldValues[0].substr(0, 30) + '...' : fieldValues[0]}}
                     </span>
                   </div>
                   &nbsp;
