@@ -234,6 +234,13 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             return true;
         };
 })
+.filter('maxStr', function() {
+  return function(str, len) {
+    return (str && str.length > len) ?
+      str.substr(0, len) + "..." :
+      str;
+  };
+})
 .directive('ngEnter', function () {
     return function (scope, element, attrs) {
         element.bind("keydown keypress", function (event) {
