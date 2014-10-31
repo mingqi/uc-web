@@ -381,7 +381,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
         $scope.fieldGroups = [{
           group: 'base',
-          title: '按条件过滤',
+          title: '按日志位置过滤',
           fields: baseFields
         }];
 
