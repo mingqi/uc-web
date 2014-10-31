@@ -236,7 +236,7 @@ var nginxKeyNameMap = {
 };
 
 var nginxFieldKeys = _.map(('remote_address,http_method,request_uri,response_status,response_size,' +
-    'user_agent,spider').split(','), function(name) {
+    'referer,user_agent,spider').split(','), function(name) {
   return 'nginx.' + name;
 });
 
