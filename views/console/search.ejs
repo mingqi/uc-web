@@ -9,6 +9,23 @@
 
 {% include include/requirejs %}
 <script data-main="console/search" src="/s/js/lib/require.js"></script>
+
+<style>
+.intervals span {
+  float: right;
+  display: block;
+  margin: 0 4px;
+  padding: 2px 4px;
+}
+.availableInterval {
+  display: block;
+  border: 1px solid #CCC;
+  cursor: pointer;
+}
+.availableInterval.active {
+  background-color: #DDD;
+}
+</style>
 </head>
 
 <body ng-controller="Ctrl">
@@ -126,9 +143,21 @@
               
 
               <div ng-if="page.searchResult">
-                  <div class="col-sm-12">
+                  <div class="col-xs-6">
                       <h4 style="margin-top:0">{{page.searchResult.hits.total | number:0}} 条记录，
                       用时 {{page.searchResult.took / 1000 | number}} 秒</h4>
+                  </div>
+                  <div class="col-xs-6 text-right intervals">
+                      <span ng-repeat="availableInterval in availableIntervals" class="availableInterval"
+                           ng-class="{active: availableInterval.ms == interval}"
+                           ng-click="changeInterval(availableInterval.ms)">
+                        {{availableInterval.title}}
+                      </span>
+                      <span class="availableInterval" ng-class="{active: autoInterval}"
+                            ng-click="changeInterval('auto')">
+                        自动
+                      </span>
+                      <span>分组间隔:</span>
                   </div>
                   
                   <div class="clearfix"></div>

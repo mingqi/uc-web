@@ -60,6 +60,12 @@ var dateRangePickerOptions = {
     endDate: endDate
 };
 
+var emitDateRangeChange = function($scope) {
+  setAutoInterval($scope);
+  $scope.availableIntervals = getAvailableIntervals();
+  $scope.search();
+};
+
 var initDateRangePicker = function($scope, locationSearch) {
   if (locationSearch.b && locationSearch.e) {
     var b = moment(parseFloat(locationSearch.b));
@@ -78,7 +84,7 @@ var initDateRangePicker = function($scope, locationSearch) {
       chosenLabel = picker.chosenLabel;
       startDate = picker.startDate;
       endDate = picker.endDate;
-      $scope.search();
+      emitDateRangeChange($scope);
   });
 };
 
@@ -116,7 +122,7 @@ var drawChart = function(chart, series, $scope) {
                     chosenLabel = '自定义范围';
                     startDate = moment(event.xAxis[0].min);
                     endDate = moment(event.xAxis[0].max);
-                    $scope.search();
+                    emitDateRangeChange($scope);
                 }
             }
         },
@@ -240,6 +246,43 @@ var nginxFieldKeys = _.map(('remote_address,http_method,request_uri,response_sta
   return 'nginx.' + name;
 });
 
+var intervals = [{
+  title: '1分钟',
+  ms: 1000 * 60
+}, {
+  title: '5分钟',
+  ms: 1000 * 60 * 5
+}, {
+  title: '20分钟',
+  ms: 1000 * 60 * 20
+}, {
+  title: '1小时',
+  ms: 1000 * 3600
+}, {
+  title: '4小时',
+  ms: 1000 * 3600 * 4
+}, {
+  title: '1天',
+  ms: 1000 * 3600 * 24
+}];
+
+var getAvailableIntervals = function() {
+  var result = _.chain(intervals).map(function(interval) {
+    var points = (endDate - startDate) / interval.ms;
+    if (points > 1 && points < 100) {
+      return interval;
+    }
+    return null;
+  }).filter().value().reverse();
+  return result;
+};
+
+var setAutoInterval = function($scope) {
+  var points = Math.min(30, parseInt((endDate - startDate) / 1000) + 1);
+  $scope.interval = parseInt((endDate - startDate)/points);
+  $scope.autoInterval = true;
+};
+
 angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
         return function (obj) {
@@ -284,6 +327,14 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }
       return p;
     } ());
+
+    // interval
+    var i = parseInt(locationSearch.i);
+    if (i) {
+      $scope.interval = i;
+    } else {
+      setAutoInterval($scope);
+    }
 
     _.extend($scope, {
       _: _,
@@ -401,15 +452,21 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     };
 
     $scope.search = function(opts) {
-        // opts: init
+        // opts: init, intervalOnly
         opts = opts || {};
 
-        if (!opts.init) {
+        if (opts.init) {
+          // 第一次搜索
+          $scope.availableIntervals = getAvailableIntervals();
+        } else {
           // 不是第一次搜索(第一次根据url显示页码)，显示第一页
           $scope.currentPage = 1;
         }
 
-        updateDateRangePicker($scope);
+        if (!opts.intervalOnly) {
+          // 只更新间隔时间，不刷新 date range picker
+          updateDateRangePicker($scope);
+        }
 
         _.extend($scope.chartCount, {
             begin: startDate,
@@ -422,13 +479,12 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           e: +endDate,
           p: $scope.currentPage,
           o: $scope.orderBy,
-          f: JSON.stringify($scope.page.filter.field)
+          f: JSON.stringify($scope.page.filter.field),
+          i: $scope.interval
         });
         
         $scope.page.pattern = pattern($scope.page.keywords);
-
-        var points = Math.min(30, parseInt((endDate - startDate) / 1000) + 1);
-        var interval = $scope.interval = parseInt((endDate - startDate)/points);
+        
         $scope.page.filter.timerange = {
           range: {
               timestamp: {
@@ -464,7 +520,11 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             $scope.chartCount.highChart.showLoading();
         }
 
-        parepareDynamicFields();
+        if (!opts.intervalOnly) {
+          //  不仅更新间隔时间
+          parepareDynamicFields();
+          _.each($scope.fields, refreshFieldInfo);
+        }
 
         // 主要搜索
         $http.post("/console/ajax/search", {
@@ -474,7 +534,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
               event_over_time: {
                 date_histogram: {
                   field: "timestamp",
-                  interval: interval + "ms"
+                  interval: $scope.interval + "ms"
                 }
               }
             }
@@ -486,12 +546,12 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           var buckets = json.aggregations ? json.aggregations.event_over_time.buckets : [];
           var data = [];
           if (buckets.length === 0) {
-            for (var date = +startDate; date <= +endDate; date += interval) {
+            for (var date = +startDate; date <= +endDate; date += $scope.interval) {
               data.push([date, 0]);
             }
           } else {
-            var add = (buckets[0].key - startDate) % interval;
-            var minus = (endDate - buckets[0].key) % interval;
+            var add = (buckets[0].key - startDate) % $scope.interval;
+            var minus = (endDate - buckets[0].key) % $scope.interval;
             var from = startDate + add;
             var to = endDate - minus;
 
@@ -515,7 +575,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
         }); // end success
 
-        _.each($scope.fields, refreshFieldInfo);
     }
 
     var refreshFieldInfo = function(field) {
@@ -697,6 +756,18 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         con.done();
       });
     }
+
+    $scope.changeInterval = function(interval) {
+      if (interval === 'auto') {
+        setAutoInterval($scope);
+      } else {
+        $scope.interval = interval;
+        $scope.autoInterval = false;
+      }
+      $scope.search({
+        intervalOnly: 1
+      });
+    };
 }]); // end angular
 
 $(function() {
