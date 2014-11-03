@@ -1,6 +1,6 @@
-require(['jquery', 'underscore', 'con', 'moment', 'scrollTo', 'pattern',
+require(['jquery', 'underscore', 'con', 'moment', 'scrollTo', 'pattern', 'searchStats',
          'highstock', 'daterangepicker', 'pattern', 'angular-sanitize'],
-function($, _, con, moment, $scrollTo, pattern) {
+function($, _, con, moment, $scrollTo, pattern, searchStats) {
 
 Highcharts.setOptions({
     global : {
@@ -230,6 +230,34 @@ var baseFields = [{
   group: 'base'
 }];
 
+var nginxKeyMap = {
+  'nginx.http_method': {
+    name: '请求方法'
+  },
+  'nginx.referer': {
+    name: '来源'
+  },
+  'nginx.remote_address': {
+    name: 'IP'
+  },
+  'nginx.request_uri': {
+    name: '网址'
+  },
+  'nginx.response_size': {
+    name: '响应大小',
+    isNumeric: true
+  },
+  'nginx.response_status': {
+    name: '响应状态码'
+  },
+  'nginx.user_agent': {
+    name: 'User Agent'
+  },
+  'nginx.spider': {
+    name: '蜘蛛(Spider)'
+  }
+};
+
 var nginxKeyNameMap = {
   'nginx.http_method': '请求方法',
   'nginx.referer': '来源',
@@ -408,7 +436,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         begin: +startDate,
         end: +endDate
       }).success(function(json) {
-        var fields = _.chain(json.aggregations.field_aggs.buckets).map(function(bucket) {
+        var fields = json.aggregations && _.chain(json.aggregations.field_aggs.buckets).map(function(bucket) {
           var key = bucket.key;
           if (key.indexOf('_') === 0) {
             return null;
@@ -416,7 +444,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           var group = key.indexOf('.') > 0 ? key.substr(0, key.indexOf('.')) : 'unknow';
           return {
             key: key,
-            name: nginxKeyNameMap[key],
+            name: nginxKeyMap[key].name,
+            isNumeric: nginxKeyMap[key].isNumeric,
             group: group
           }
         }).filter().value();
@@ -429,6 +458,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
           $scope.fields.push(oldField || field);
         });
+
+        searchStats($scope);
 
         $scope.fieldGroups = [{
           group: 'base',

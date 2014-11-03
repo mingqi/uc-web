@@ -170,6 +170,35 @@
               <div id="resultList" style="overflow-x:auto"
                   ng-if="page.searchResult && page.searchResult.hits.hits.length">
                 <h5>
+                  统计:
+                  <select ng-options="type.text for type in stats.chartTypes"
+                      ng-model="stats.selectedChartType"
+                      ng-change="stats.changeChartType()">
+                  </select>
+
+                  &nbsp; 选择字段:
+                  <select ng-options="field.name for field in stats.fields"
+                      ng-model="stats.selectedField"
+                      ng-change="stats.changeField()">
+                    <option value="">请选择</option>
+                  </select>
+
+                  &nbsp; 统计方法:
+                  <select ng-options="agg.title for agg in stats.aggs"
+                      ng-model="stats.selectedAgg"
+                      ng-change="stats.changeAgg()">
+                    <option value="">请选择</option>
+                  </select>
+
+                  &nbsp; 分组:
+                  <select ng-options="groupField.name for groupField in stats.groups"
+                      ng-model="stats.selectedGroup"
+                      ng-change="stats.changeGroup()">
+                    <option value="">请选择</option>
+                  </select>
+                </h5>
+                <hr>
+                <h5>
                   排序: 
                   <span class="dropdown">
                     <a data-toggle="dropdown" href="#" style="text-decoration:none">
