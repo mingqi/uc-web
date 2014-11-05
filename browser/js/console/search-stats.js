@@ -2,6 +2,37 @@
 /* jshint ignore:start */
 
 (function() {
+  var getTimeData;
+
+  getTimeData = function(timeAgg, $scope) {
+    var add, buckets, data, date, endDate, from, minus, startDate, to, _ref;
+    _ref = [$scope.startDate, $scope.endDate], startDate = _ref[0], endDate = _ref[1];
+    buckets = (timeAgg != null ? timeAgg.event_over_time.buckets : void 0) || [];
+    data = [];
+    if (buckets.length === 0) {
+      date = +startDate;
+      while (date <= +endDate) {
+        data.push([date, 0]);
+        date += $scope.interval;
+      }
+    } else {
+      add = (buckets[0].key - startDate) % $scope.interval;
+      minus = (endDate - buckets[0].key) % $scope.interval;
+      from = startDate + add;
+      to = endDate - minus;
+      if (from < buckets[0].key) {
+        data.push([from, 0]);
+      }
+      _.each(buckets, function(bucket) {
+        data.push([bucket.key, bucket.metric_value.value]);
+      });
+      if (buckets.length > 1 && to > buckets[buckets.length - 1].key) {
+        data.push([to, 0]);
+      }
+    }
+    return data;
+  };
+
   define(['underscore', 'scrollTo'], function(_, $scrollTo) {
     return function($scope, $http) {
       var $stats;
@@ -105,7 +136,23 @@
                   },
                   begin: +$scope.startDate,
                   end: +$scope.endDate
-                }).success(function(json) {});
+                }).success((function(_this) {
+                  return function(json) {
+                    var series;
+                    series = _.chain(json.aggregations.group_info.buckets).map(function(bucket) {
+                      var data;
+                      data = getTimeData(bucket, $scope);
+                      return {
+                        name: bucket.key + " " + _this.selectedField.name + " " + _this.selectedAgg.title,
+                        type: 'line',
+                        data: data
+                      };
+                    }).value().slice(0, 4);
+                    return $scope.drawChart({
+                      id: 'chartStats'
+                    }, series);
+                  };
+                })(this));
               } else {
                 return $http.post("/console/ajax/search", {
                   esBody: {
@@ -147,7 +194,22 @@
                   },
                   begin: +$scope.startDate,
                   end: +$scope.endDate
-                }).success(function(json) {});
+                }).success((function(_this) {
+                  return function(json) {
+                    var data, series;
+                    data = getTimeData(json.aggregations, $scope);
+                    series = [
+                      {
+                        name: _this.selectedField.name + " " + _this.selectedAgg.title,
+                        type: 'line',
+                        data: data
+                      }
+                    ];
+                    return $scope.drawChart({
+                      id: 'chartStats'
+                    }, series);
+                  };
+                })(this));
               } else {
                 return $http.post("/console/ajax/search", {
                   esBody: {

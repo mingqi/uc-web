@@ -1,5 +1,45 @@
 ### jshint ignore:start ###
 
+getTimeData = (timeAgg, $scope) ->
+  [startDate, endDate] = [$scope.startDate, $scope.endDate]
+  buckets = timeAgg?.event_over_time.buckets || []
+
+  data = []
+  if buckets.length is 0
+    date = +startDate
+
+    while date <= +endDate
+      data.push [
+        date
+        0
+      ]
+      date += $scope.interval
+  else
+    add = (buckets[0].key - startDate) % $scope.interval
+    minus = (endDate - buckets[0].key) % $scope.interval
+    from = startDate + add
+    to = endDate - minus
+    if from < buckets[0].key
+      data.push [
+        from
+        0
+      ]
+    _.each buckets, (bucket) ->
+      data.push [
+        bucket.key
+        bucket.metric_value.value
+      ]
+      return
+
+    if buckets.length > 1 and to > buckets[buckets.length - 1].key
+      data.push [
+        to
+        0
+      ]
+
+  return data
+
+
 
 define ['underscore', 'scrollTo'], (_, $scrollTo) ->
   ($scope, $http) ->
@@ -84,7 +124,19 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                             metric_value: metricValue
                 begin: +$scope.startDate
                 end: +$scope.endDate
-              .success (json) ->
+              .success (json) =>
+                # 分组、时间、统计
+
+                series = _.chain(json.aggregations.group_info.buckets).map (bucket) =>
+                  data = getTimeData(bucket, $scope)
+                  return {
+                    name: bucket.key + " " + @selectedField.name + " " + @selectedAgg.title,
+                    type: 'line'
+                    data: data
+                  }
+                .value()[0..3]
+
+                $scope.drawChart({id: 'chartStats'}, series)
 
             else
               $http.post "/console/ajax/search",
@@ -102,6 +154,7 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 begin: +$scope.startDate
                 end: +$scope.endDate
               .success (json) ->
+                # 分组、统计
 
           else
 
@@ -119,7 +172,15 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                         metric_value: metricValue
                 begin: +$scope.startDate
                 end: +$scope.endDate
-              .success (json) ->
+              .success (json) =>
+                # 时间、统计
+                data = getTimeData(json.aggregations, $scope)
+                series = [{
+                  name: @selectedField.name + " " + @selectedAgg.title
+                  type: 'line'
+                  data: data
+                }]
+                $scope.drawChart({id: 'chartStats'}, series)
 
             else
               $http.post "/console/ajax/search",
@@ -132,6 +193,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 begin: +$scope.startDate
                 end: +$scope.endDate
               .success (json) ->
+                # 统计
+                
 
     $stats.selectedChartType = $stats.chartTypes[0]
 

@@ -109,7 +109,8 @@ var updateDateRangePicker = function($scope) {
   $('#daterange').data('daterangepicker').setOptions(opts);
 };
 
-var drawChart = function(chart, series, $scope) {
+var drawChart = function(chart, series) {
+    $scope = this;
     if (chart.highChart) {
         chart.highChart.destroy();
     }
@@ -261,17 +262,6 @@ var nginxKeyMap = {
   }
 };
 
-var nginxKeyNameMap = {
-  'nginx.http_method': '请求方法',
-  'nginx.referer': '来源',
-  'nginx.remote_address': 'IP',
-  'nginx.request_uri': '网址',
-  'nginx.response_size': '响应大小',
-  'nginx.response_status': '响应状态码',
-  'nginx.user_agent': 'User Agent',
-  'nginx.spider': '蜘蛛(Spider)'
-};
-
 var nginxFieldKeys = _.map(('remote_address,http_method,request_uri,response_status,response_size,' +
     'referer,user_agent,spider').split(','), function(name) {
   return 'nginx.' + name;
@@ -347,6 +337,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 })
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+    $scope.drawChart = drawChart;
 
     var locationSearch = $location.search();
     initDateRangePicker($scope, locationSearch)
@@ -605,10 +597,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             type: 'column',
             data: data
           }];
-          drawChart($scope.chartCount, series, $scope);
+          $scope.drawChart($scope.chartCount, series);
 
         }); // end success
-
     }
 
     var refreshFieldInfo = function(field) {

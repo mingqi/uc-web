@@ -197,6 +197,12 @@
                     <option value="">不分组</option>
                   </select>
                 </h5>
+
+                <div id="chartStats" style="height:300px; padding:1px;"
+                  ng-if="stats.selectedField && stats.selectedAgg">
+                  <div style="font-size:20px; padding-top:20px" class="text-center">Loading...</div>
+                </div>
+
                 <hr>
                 <h5>
                   排序: 
