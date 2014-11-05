@@ -24,12 +24,8 @@
         changeField: function() {
           this.aggs = [];
           if (this.selectedField) {
-            this.aggs.push({
-              value: 'cardinality',
-              title: '唯一值数量'
-            });
             if (this.selectedField.isNumeric) {
-              this.aggs = this.aggs.concat([
+              this.aggs = [
                 {
                   value: 'avg',
                   title: '平均'
@@ -43,7 +39,14 @@
                   value: 'min',
                   title: '最小值'
                 }
-              ]);
+              ];
+            } else {
+              this.aggs = [
+                {
+                  value: 'cardinality',
+                  title: '唯一值数量'
+                }
+              ];
             }
           }
           return this.selectedAgg = null;
@@ -67,63 +70,97 @@
           return this.showStats();
         },
         showStats: function() {
+          var metricValue;
           if (this.selectedField && this.selectedAgg) {
+            metricValue = _.object([this.selectedAgg.value], [
+              {
+                field: this.selectedField.key
+              }
+            ]);
             if (this.selectedGroup) {
-              return $http.post("/console/ajax/search", {
-                esBody: {
-                  query: $scope.page.query,
-                  size: 0,
-                  aggs: {
-                    group_info: {
-                      terms: {
-                        field: this.selectedGroup.key,
-                        size: 10
-                      },
-                      aggs: {
-                        event_over_time: {
-                          date_histogram: {
-                            field: "timestamp",
-                            interval: $scope.interval + "ms"
-                          },
-                          aggs: {
-                            metric_value: _.object([this.selectedAgg.value], [
-                              {
-                                field: this.selectedField.key
-                              }
-                            ])
+              if (this.selectedChartType.value === 'line') {
+                return $http.post("/console/ajax/search", {
+                  esBody: {
+                    query: $scope.page.query,
+                    size: 0,
+                    aggs: {
+                      group_info: {
+                        terms: {
+                          field: this.selectedGroup.key,
+                          size: 10
+                        },
+                        aggs: {
+                          event_over_time: {
+                            date_histogram: {
+                              field: "timestamp",
+                              interval: $scope.interval + "ms"
+                            },
+                            aggs: {
+                              metric_value: metricValue
+                            }
                           }
                         }
                       }
                     }
-                  }
-                },
-                begin: +$scope.startDate,
-                end: +$scope.endDate
-              }).success(function(json) {});
-            } else {
-              return $http.post("/console/ajax/search", {
-                esBody: {
-                  query: $scope.page.query,
-                  size: 0,
-                  aggs: {
-                    event_over_time: {
-                      date_histogram: {
-                        field: "timestamp",
-                        interval: $scope.interval + "ms"
-                      },
-                      aggs: {
-                        metric_value: _.object([this.selectedAgg.value], [
-                          {
-                            field: this.selectedField.key
-                          }
-                        ])
+                  },
+                  begin: +$scope.startDate,
+                  end: +$scope.endDate
+                }).success(function(json) {});
+              } else {
+                return $http.post("/console/ajax/search", {
+                  esBody: {
+                    query: $scope.page.query,
+                    size: 0,
+                    aggs: {
+                      group_info: {
+                        terms: {
+                          field: this.selectedGroup.key,
+                          size: 10
+                        },
+                        aggs: {
+                          metric_value: metricValue
+                        }
                       }
                     }
-                  }
-                },
-                begin: +$scope.startDate,
-                end: +$scope.endDate
-              }).success(function(json) {});
+                  },
+                  begin: +$scope.startDate,
+                  end: +$scope.endDate
+                }).success(function(json) {});
+              }
+            } else {
+              if (this.selectedChartType.value === 'line') {
+                return $http.post("/console/ajax/search", {
+                  esBody: {
+                    query: $scope.page.query,
+                    size: 0,
+                    aggs: {
+                      event_over_time: {
+                        date_histogram: {
+                          field: "timestamp",
+                          interval: $scope.interval + "ms"
+                        },
+                        aggs: {
+                          metric_value: metricValue
+                        }
+                      }
+                    }
+                  },
+                  begin: +$scope.startDate,
+                  end: +$scope.endDate
+                }).success(function(json) {});
+              } else {
+                return $http.post("/console/ajax/search", {
+                  esBody: {
+                    query: $scope.page.query,
+                    size: 0,
+                    aggs: {
+                      metric_value: metricValue
+                    }
+                  },
+                  begin: +$scope.startDate,
+                  end: +$scope.endDate
+                }).success(function(json) {});
+              }
             }
           }
         }
