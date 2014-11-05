@@ -552,6 +552,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           _.each($scope.fields, refreshFieldInfo);
         }
 
+        // 更新统计
+        $scope.stats && $scope.stats.showStats();
+
         // 主要搜索
         $http.post("/console/ajax/search", {
           keywords: $scope.page.keywords || '',

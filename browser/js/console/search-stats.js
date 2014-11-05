@@ -2,7 +2,7 @@
 /* jshint ignore:start */
 
 (function() {
-  var getTimeData;
+  var chartStats, getTimeData;
 
   getTimeData = function(timeAgg, $scope) {
     var add, buckets, data, date, endDate, from, minus, startDate, to, _ref;
@@ -31,6 +31,10 @@
       }
     }
     return data;
+  };
+
+  chartStats = {
+    id: 'chartStats'
   };
 
   define(['underscore', 'scrollTo'], function(_, $scrollTo) {
@@ -103,6 +107,9 @@
         showStats: function() {
           var metricValue;
           if (this.selectedField && this.selectedAgg) {
+            if (chartStats.highChart) {
+              chartStats.highChart.showLoading();
+            }
             metricValue = _.object([this.selectedAgg.value], [
               {
                 field: this.selectedField.key
@@ -148,9 +155,7 @@
                         data: data
                       };
                     }).value().slice(0, 4);
-                    return $scope.drawChart({
-                      id: 'chartStats'
-                    }, series);
+                    return $scope.drawChart(chartStats, series);
                   };
                 })(this));
               } else {
@@ -205,9 +210,7 @@
                         data: data
                       }
                     ];
-                    return $scope.drawChart({
-                      id: 'chartStats'
-                    }, series);
+                    return $scope.drawChart(chartStats, series);
                   };
                 })(this));
               } else {

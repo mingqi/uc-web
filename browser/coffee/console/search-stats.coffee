@@ -40,6 +40,7 @@ getTimeData = (timeAgg, $scope) ->
   return data
 
 
+chartStats = {id: 'chartStats'}
 
 define ['underscore', 'scrollTo'], (_, $scrollTo) ->
   ($scope, $http) ->
@@ -102,6 +103,9 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
       showStats: () ->
         if @selectedField && @selectedAgg
 
+          if chartStats.highChart
+            chartStats.highChart.showLoading();
+
           metricValue = _.object [@selectedAgg.value], [{field: @selectedField.key}]
 
           if @selectedGroup
@@ -136,7 +140,7 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                   }
                 .value()[0..3]
 
-                $scope.drawChart({id: 'chartStats'}, series)
+                $scope.drawChart(chartStats, series)
 
             else
               $http.post "/console/ajax/search",
@@ -180,7 +184,7 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                   type: 'line'
                   data: data
                 }]
-                $scope.drawChart({id: 'chartStats'}, series)
+                $scope.drawChart(chartStats, series)
 
             else
               $http.post "/console/ajax/search",
