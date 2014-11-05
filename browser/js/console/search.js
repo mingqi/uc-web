@@ -73,15 +73,14 @@ var initDateRangePicker = function($scope, locationSearch) {
     if (b.isValid() && e.isValid() && b.isBefore(e) &&
         moment().subtract(20, 'day').isBefore(b) &&
         moment().add(1, 'day').isAfter(e)) {
-      $scope.startDate = startDate = b;
-      $scope.endDate = endDate = e;
+      startDate = b;
+      endDate = e;
       chosenLabel = "自定义范围";
-    } else {
-      // 直接赋值
-      $scope.startDate = startDate;
-      $scope.endDate = endDate;
     }
   }
+
+  $scope.startDate = startDate;
+  $scope.endDate = endDate;
 
   $('#daterange').daterangepicker(dateRangePickerOptions);
   $('#daterange').on('apply.daterangepicker', function(ev, picker) {
