@@ -141,7 +141,6 @@
                 <hr style="margin-top:15px">
               </div>
               
-
               <div ng-if="page.searchResult">
                   <div class="col-xs-6">
                       <h4 style="margin-top:0">{{page.searchResult.hits.total | number:0}} 条记录，
@@ -199,8 +198,25 @@
                 </h5>
 
                 <div id="chartStats" style="height:300px; padding:1px;"
-                  ng-if="stats.selectedField && stats.selectedAgg">
+                  ng-if="stats.selectedChartType.value==='line' && stats.selectedField && stats.selectedAgg">
                   <div style="font-size:20px; padding-top:20px" class="text-center">Loading...</div>
+                </div>
+
+                <div id="chartStats"
+                  ng-if="stats.selectedChartType.value==='bar' && stats.selectedField && stats.selectedAgg">
+                  <div style="font-size:20px; padding-top:20px" class="text-center" ng-if="stats.loading">
+                    Loading...
+                  </div>
+
+                  <div ng-if="!stats.loading">
+                    <div class="text-center"><h4>{{stats.title}}</h4></div>
+  
+                    <div ng-repeat="serie in stats.series" style="margin:10px 0; width:90%">
+                      <div style="background-color: rgb(124, 181, 236); white-space: nowrap; color:black; padding:2px;" ng-style="{width: serie.percent + '%'}">
+                        {{serie.title}} {{stats.selectedAgg.title}}: {{serie.value | number:0}}
+                      </div>
+                    </div>
+                  </div>
                 </div>
 
                 <hr>

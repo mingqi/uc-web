@@ -114,6 +114,7 @@
             if (chartStats.highChart) {
               chartStats.highChart.showLoading();
             }
+            this.loading = true;
             metricValue = _.object([this.selectedAgg.value], [
               {
                 field: this.selectedField.key
@@ -154,12 +155,12 @@
                       var data;
                       data = getTimeData(bucket, $scope);
                       return {
-                        name: bucket.key + " " + _this.selectedField.name + " " + _this.selectedAgg.title,
+                        name: bucket.key,
                         type: 'line',
                         data: data
                       };
                     }).value().slice(0, 4);
-                    return $scope.drawChart(chartStats, series);
+                    return $scope.drawChart(chartStats, series, _this.selectedField.name + " " + _this.selectedAgg.title);
                   };
                 })(this));
               } else {
@@ -181,7 +182,29 @@
                   },
                   begin: +$scope.startDate,
                   end: +$scope.endDate
-                }).success(function(json) {});
+                }).success((function(_this) {
+                  return function(json) {
+                    var maxValue, serie, _i, _len, _ref;
+                    _this.loading = false;
+                    _this.title = _this.selectedField.name + " " + _this.selectedAgg.title;
+                    _this.series = _.map(json.aggregations.group_info.buckets, function(bucket) {
+                      return {
+                        title: bucket.key,
+                        value: bucket.metric_value.value
+                      };
+                    });
+                    maxValue = _.reduce(_this.series, function(memo, serie) {
+                      return Math.max(memo, serie.value);
+                    }, 0);
+                    console.log(maxValue);
+                    _ref = _this.series;
+                    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+                      serie = _ref[_i];
+                      serie.percent = parseInt(serie.value * 100 / maxValue);
+                    }
+                    return console.log(serie.percent);
+                  };
+                })(this));
               }
             } else {
               if (this.selectedChartType.value === 'line') {
@@ -228,7 +251,19 @@
                   },
                   begin: +$scope.startDate,
                   end: +$scope.endDate
-                }).success(function(json) {});
+                }).success((function(_this) {
+                  return function(json) {
+                    _this.loading = false;
+                    _this.title = _this.selectedField.name + " " + _this.selectedAgg.title;
+                    return _this.series = [
+                      {
+                        title: '全部',
+                        value: json.aggregations.metric_value.value,
+                        percent: 60
+                      }
+                    ];
+                  };
+                })(this));
               }
             }
           }

@@ -109,7 +109,7 @@ var updateDateRangePicker = function($scope) {
   $('#daterange').data('daterangepicker').setOptions(opts);
 };
 
-var drawChart = function(chart, series) {
+var drawChart = function(chart, series, title) {
     $scope = this;
     if (chart.highChart) {
         chart.highChart.destroy();
@@ -186,6 +186,11 @@ var drawChart = function(chart, series) {
             }
         }
     };
+    if (title) {
+      opts.title = {
+        text: title
+      };  
+    }
     chart.highChart = new Highcharts.StockChart(opts);
 };
 
@@ -345,6 +350,10 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     var locationSearch = $location.search();
     initDateRangePicker($scope, locationSearch)
 
+    var chartCount = {
+      id: 'chartCount'
+    };
+
     var currentPage = (function() {
       var p = parseInt(locationSearch.p) || 1;
       if (p > 10 || p < 0) {
@@ -381,9 +390,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         },
         attributeAggs: 'avg',
         keywords: locationSearch.k || ''
-      },
-      chartCount: {
-        id: 'chartCount'
       }
     });
 
@@ -496,11 +502,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           updateDateRangePicker($scope);
         }
 
-        _.extend($scope.chartCount, {
-            begin: startDate,
-            end: endDate
-        });
-
         $location.search({
           k: $scope.page.keywords || '',
           b: +startDate,
@@ -544,8 +545,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           $scope.page.query.filtered.filter.and.push(filter);
         });
 
-        if ($scope.chartCount.highChart) {
-            $scope.chartCount.highChart.showLoading();
+        if (chartCount.highChart) {
+            chartCount.highChart.showLoading();
         }
 
         if (!opts.intervalOnly) {
@@ -602,7 +603,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             type: 'column',
             data: data
           }];
-          $scope.drawChart($scope.chartCount, series);
+          $scope.drawChart(chartCount, series);
 
         }); // end success
     }

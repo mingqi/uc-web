@@ -110,6 +110,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
           if chartStats.highChart
             chartStats.highChart.showLoading();
 
+          @loading = true;
+
           metricValue = _.object [@selectedAgg.value], [{field: @selectedField.key}]
 
           if @selectedGroup
@@ -135,16 +137,16 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
               .success (json) =>
                 # 分组、时间、统计
 
-                series = _.chain(json.aggregations.group_info.buckets).map (bucket) =>
+                series = _.chain(json.aggregations.group_info.buckets).map (bucket) ->
                   data = getTimeData(bucket, $scope)
                   return {
-                    name: bucket.key + " " + @selectedField.name + " " + @selectedAgg.title,
+                    name: bucket.key,
                     type: 'line'
                     data: data
                   }
                 .value()[0..3]
 
-                $scope.drawChart(chartStats, series)
+                $scope.drawChart(chartStats, series, @selectedField.name + " " + @selectedAgg.title)
 
             else
               $http.post "/console/ajax/search",
@@ -161,9 +163,27 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
 
                 begin: +$scope.startDate
                 end: +$scope.endDate
-              .success (json) ->
+              .success (json) =>
                 # 分组、统计
+                @loading = false;
+                @title = @selectedField.name + " " + @selectedAgg.title
+                
+                @series = _.map json.aggregations.group_info.buckets, (bucket) ->
+                  return {
+                    title: bucket.key
+                    value: bucket.metric_value.value
+                  }
 
+                maxValue = _.reduce @series, (memo, serie) ->
+                  return Math.max(memo, serie.value)
+                , 0
+
+                console.log maxValue
+
+                for serie in @series
+                  serie.percent = parseInt(serie.value * 100 / maxValue) 
+
+                console.log serie.percent
           else
 
             if @selectedChartType.value == 'line'
@@ -200,8 +220,14 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
 
                 begin: +$scope.startDate
                 end: +$scope.endDate
-              .success (json) ->
+              .success (json) =>
                 # 统计
-                
+                @loading = false;
+                @title = @selectedField.name + " " + @selectedAgg.title
+                @series = [{
+                  title: '全部'
+                  value: json.aggregations.metric_value.value
+                  percent: 60
+                }]
 
     
