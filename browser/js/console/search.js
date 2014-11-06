@@ -338,6 +338,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
+    searchStats($scope, $http).init();
+
     $scope.drawChart = drawChart;
 
     var locationSearch = $location.search();
@@ -454,7 +456,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           $scope.fields.push(oldField || field);
         });
 
-        searchStats($scope, $http);
+        $scope.stats.setFileds();
 
         $scope.fieldGroups = [{
           group: 'base',
@@ -553,7 +555,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         }
 
         // 更新统计
-        $scope.stats && $scope.stats.showStats();
+        $scope.stats.showStats();
 
         // 主要搜索
         $http.post("/console/ajax/search", {

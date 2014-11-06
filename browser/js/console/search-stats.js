@@ -39,20 +39,24 @@
 
   define(['underscore', 'scrollTo'], function(_, $scrollTo) {
     return function($scope, $http) {
-      var $stats;
-      $stats = $scope.stats = {
-        chartTypes: [
-          {
-            value: 'line',
-            text: '折线图'
-          }, {
-            value: 'bar',
-            text: '柱状图'
-          }
-        ],
-        fields: $scope.fields,
-        aggs: [],
-        groups: [],
+      return $scope.stats = {
+        init: function() {
+          this.chartTypes = [
+            {
+              value: 'line',
+              text: '折线图'
+            }, {
+              value: 'bar',
+              text: '柱状图'
+            }
+          ];
+          this.aggs = [];
+          this.groups = [];
+          return this.selectedChartType = this.chartTypes[0];
+        },
+        setFileds: function() {
+          return this.fields = $scope.fields;
+        },
         changeChartType: function() {
           return this.showStats();
         },
@@ -230,7 +234,6 @@
           }
         }
       };
-      return $stats.selectedChartType = $stats.chartTypes[0];
     };
   });
 

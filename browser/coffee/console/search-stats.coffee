@@ -44,17 +44,21 @@ chartStats = {id: 'chartStats'}
 
 define ['underscore', 'scrollTo'], (_, $scrollTo) ->
   ($scope, $http) ->
-    $stats = $scope.stats =
-      chartTypes: [{
-        value: 'line'
-        text: '折线图'
-      }, {
-        value: 'bar'
-        text: '柱状图'
-      }]
-      fields: $scope.fields
-      aggs: []
-      groups: []
+    $scope.stats =
+      init: () ->
+        @chartTypes = [{
+          value: 'line'
+          text: '折线图'
+        }, {
+          value: 'bar'
+          text: '柱状图'
+        }]
+        @aggs = []
+        @groups = []
+        @selectedChartType = @chartTypes[0]
+
+      setFileds: () ->
+        @fields = $scope.fields
 
       changeChartType: () ->
         # alert(@selectedChartType.value)
@@ -199,7 +203,5 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
               .success (json) ->
                 # 统计
                 
-
-    $stats.selectedChartType = $stats.chartTypes[0]
 
     
