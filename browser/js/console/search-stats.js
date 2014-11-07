@@ -114,7 +114,6 @@
             if (chartStats.highChart) {
               chartStats.highChart.showLoading();
             }
-            this.loading = true;
             metricValue = _.object([this.selectedAgg.value], [
               {
                 field: this.selectedField.key
@@ -160,7 +159,11 @@
                         data: data
                       };
                     }).value().slice(0, 4);
-                    return $scope.drawChart(chartStats, series, _this.selectedField.name + " " + _this.selectedAgg.title);
+                    return $scope.drawChart(chartStats, series, {
+                      title: {
+                        text: _this.selectedField.name + " " + _this.selectedAgg.title
+                      }
+                    });
                   };
                 })(this));
               } else {
@@ -184,25 +187,55 @@
                   end: +$scope.endDate
                 }).success((function(_this) {
                   return function(json) {
-                    var maxValue, serie, _i, _len, _ref;
-                    _this.loading = false;
-                    _this.title = _this.selectedField.name + " " + _this.selectedAgg.title;
-                    _this.series = _.map(json.aggregations.group_info.buckets, function(bucket) {
-                      return {
-                        title: bucket.key,
-                        value: bucket.metric_value.value
-                      };
+                    var bucket, buckets;
+                    buckets = json.aggregations.group_info.buckets;
+                    $('#chartStats').height(60 + buckets.length * 35);
+                    return $scope.drawChart(chartStats, [
+                      {
+                        name: _this.selectedField.name + " " + _this.selectedAgg.title,
+                        data: (function() {
+                          var _i, _len, _results;
+                          _results = [];
+                          for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                            bucket = buckets[_i];
+                            _results.push(bucket.metric_value.value);
+                          }
+                          return _results;
+                        })(),
+                        type: 'bar'
+                      }
+                    ], {
+                      plotOptions: {
+                        bar: {
+                          dataLabels: {
+                            enabled: true
+                          }
+                        }
+                      },
+                      title: {
+                        text: _this.selectedField.name + " " + _this.selectedAgg.title
+                      },
+                      xAxis: {
+                        categories: (function() {
+                          var _i, _len, _results;
+                          _results = [];
+                          for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                            bucket = buckets[_i];
+                            _results.push(bucket.key);
+                          }
+                          return _results;
+                        })(),
+                        title: {
+                          text: null
+                        }
+                      },
+                      yAxis: {
+                        min: 0,
+                        labels: {
+                          overflow: 'justify'
+                        }
+                      }
                     });
-                    maxValue = _.reduce(_this.series, function(memo, serie) {
-                      return Math.max(memo, serie.value);
-                    }, 0);
-                    console.log(maxValue);
-                    _ref = _this.series;
-                    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-                      serie = _ref[_i];
-                      serie.percent = parseInt(serie.value * 100 / maxValue);
-                    }
-                    return console.log(serie.percent);
                   };
                 })(this));
               }
@@ -253,15 +286,41 @@
                   end: +$scope.endDate
                 }).success((function(_this) {
                   return function(json) {
-                    _this.loading = false;
-                    _this.title = _this.selectedField.name + " " + _this.selectedAgg.title;
-                    return _this.series = [
+                    $('#chartStats').height(100);
+                    return $scope.drawChart(chartStats, [
                       {
-                        title: '全部',
-                        value: json.aggregations.metric_value.value,
-                        percent: 60
+                        name: _this.selectedAgg.title,
+                        data: [json.aggregations.metric_value.value],
+                        type: 'bar'
                       }
-                    ];
+                    ], {
+                      plotOptions: {
+                        bar: {
+                          dataLabels: {
+                            enabled: true
+                          }
+                        }
+                      },
+                      title: {
+                        text: _this.selectedField.name + " " + _this.selectedAgg.title
+                      },
+                      xAxis: {
+                        categories: ['全部'],
+                        title: {
+                          text: null
+                        }
+                      },
+                      yAxis: {
+                        title: {
+                          text: null
+                        },
+                        min: 0,
+                        labels: {
+                          overflow: 'justify',
+                          enabled: false
+                        }
+                      }
+                    });
                   };
                 })(this));
               }

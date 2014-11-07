@@ -110,8 +110,6 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
           if chartStats.highChart
             chartStats.highChart.showLoading();
 
-          @loading = true;
-
           metricValue = _.object [@selectedAgg.value], [{field: @selectedField.key}]
 
           if @selectedGroup
@@ -146,7 +144,9 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                   }
                 .value()[0..3]
 
-                $scope.drawChart(chartStats, series, @selectedField.name + " " + @selectedAgg.title)
+                $scope.drawChart chartStats, series,
+                  title:
+                    text: @selectedField.name + " " + @selectedAgg.title
 
             else
               $http.post "/console/ajax/search",
@@ -165,25 +165,28 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 end: +$scope.endDate
               .success (json) =>
                 # 分组、统计
-                @loading = false;
-                @title = @selectedField.name + " " + @selectedAgg.title
-                
-                @series = _.map json.aggregations.group_info.buckets, (bucket) ->
-                  return {
-                    title: bucket.key
-                    value: bucket.metric_value.value
-                  }
+                buckets = json.aggregations.group_info.buckets
+                $('#chartStats').height(60 + buckets.length * 35)
 
-                maxValue = _.reduce @series, (memo, serie) ->
-                  return Math.max(memo, serie.value)
-                , 0
-
-                console.log maxValue
-
-                for serie in @series
-                  serie.percent = parseInt(serie.value * 100 / maxValue) 
-
-                console.log serie.percent
+                $scope.drawChart chartStats, [{
+                  name: @selectedField.name + " " + @selectedAgg.title
+                  data: bucket.metric_value.value for bucket in buckets
+                  type: 'bar'
+                }],
+                  plotOptions:
+                    bar:
+                      dataLabels:
+                        enabled: true
+                  title:
+                    text: @selectedField.name + " " + @selectedAgg.title
+                  xAxis:
+                    categories: (bucket.key for bucket in buckets)
+                    title:
+                      text: null
+                  yAxis:
+                    min: 0
+                    labels:
+                      overflow: 'justify'
           else
 
             if @selectedChartType.value == 'line'
@@ -222,12 +225,28 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 end: +$scope.endDate
               .success (json) =>
                 # 统计
-                @loading = false;
-                @title = @selectedField.name + " " + @selectedAgg.title
-                @series = [{
-                  title: '全部'
-                  value: json.aggregations.metric_value.value
-                  percent: 60
-                }]
+                $('#chartStats').height(100);
+                $scope.drawChart chartStats, [{
+                  name: @selectedAgg.title
+                  data: [json.aggregations.metric_value.value]
+                  type: 'bar'
+                }],
+                  plotOptions:
+                    bar:
+                      dataLabels:
+                        enabled: true
+                  title:
+                    text: @selectedField.name + " " + @selectedAgg.title
+                  xAxis:
+                    categories: ['全部']
+                    title:
+                      text: null
+                  yAxis:
+                    title:
+                      text: null
+                    min: 0
+                    labels:
+                      overflow: 'justify'
+                      enabled: false
 
     

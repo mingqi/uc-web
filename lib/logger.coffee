@@ -15,6 +15,7 @@ logConfig.appenders.push
 if config.env == 'development'
   logConfig.appenders.push
     type: 'console'
+    level: 'DEBUG'
 
 log4js.configure logConfig
 

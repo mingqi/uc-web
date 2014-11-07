@@ -109,12 +109,12 @@ var updateDateRangePicker = function($scope) {
   $('#daterange').data('daterangepicker').setOptions(opts);
 };
 
-var drawChart = function(chart, series, title) {
+var drawChart = function(chart, series, opts) {
     $scope = this;
     if (chart.highChart) {
         chart.highChart.destroy();
     }
-    var opts = {
+    var defaultOpts = {
         chart : {
             renderTo : chart.id,
             zoomType : 'x',
@@ -186,12 +186,12 @@ var drawChart = function(chart, series, title) {
             }
         }
     };
-    if (title) {
-      opts.title = {
-        text: title
-      };  
+    if (opts) {
+      opts = _.extend(defaultOpts, opts);
+      chart.highChart = new Highcharts.Chart(opts);  
+    } else {
+      chart.highChart = new Highcharts.StockChart(defaultOpts);
     }
-    chart.highChart = new Highcharts.StockChart(opts);
 };
 
 var handleSearchResult = function($scope, esResponse) {
