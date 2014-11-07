@@ -184,6 +184,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                     title:
                       text: null
                   yAxis:
+                    title:
+                      text: null
                     min: 0
                     labels:
                       overflow: 'justify'
