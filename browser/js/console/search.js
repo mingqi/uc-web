@@ -250,13 +250,15 @@ var nginxKeyMap = {
     name: '请求方法'
   },
   'nginx.referer': {
-    name: '来源'
+    name: '来源',
+    customizable: true
   },
   'nginx.remote_address': {
     name: 'IP'
   },
   'nginx.request_uri': {
-    name: '网址'
+    name: '网址',
+    customizable: true
   },
   'nginx.response_size': {
     name: '响应大小',
@@ -451,12 +453,10 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             return null;
           }
           var group = key.indexOf('.') > 0 ? key.substr(0, key.indexOf('.')) : 'unknow';
-          return {
+          return _.extend({
             key: key,
-            name: nginxKeyMap[key].name,
-            isNumeric: nginxKeyMap[key].isNumeric,
             group: group
-          }
+          }, nginxKeyMap[key]);
         }).filter().value();
 
         var oldFieldMap = _.indexBy($scope.fields || [], 'key');
@@ -537,6 +537,28 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           }
         };
 
+        // 增加 $scope.page.query.filtered.query
+        _.each($scope.fields, function(field) {
+          if ($scope.page.query.filtered.query == null) {
+            $scope.page.query.filtered.query = {
+              bool: {
+                must: []
+              }
+            }
+          }
+
+          if (field.input) {
+            $scope.page.query.filtered.query.bool.must.push({
+              match_phrase: _.object(["_" + field.key], [field.input])
+            })
+          }
+        });
+
+        if ($scope.page.query.filtered.query && $scope.page.query.filtered.query.bool.must.length === 0) {
+          $scope.page.query.filtered.query = null;
+        }
+
+        // 增加 $scope.page.query.filtered.filter 
         _.each($scope.page.filter.field, function(fieldValues, fieldKey) {
           $scope.page.query.filtered.filter.and.push({
             or: _.map(fieldValues, function(fieldValue) {
@@ -721,21 +743,27 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     * bucket: {key, doc_count}
     */
     $scope.filterField = function(field, bucket) {
-      // fields: [value1, value2, value3]
-      var fields = $scope.page.filter.field[field.key] || [];
-      if (_.contains(fields, bucket.key)) {
+      // fieldValues: [value1, value2, value3]
+      var fieldValues = $scope.page.filter.field[field.key] || [];
+      if (_.contains(fieldValues, bucket.key)) {
         // 移除 field
-        fields = _.without(fields, bucket.key);
-        if (fields.length) {
-          $scope.page.filter.field[field.key] = fields;
+        fieldValues = _.without(fieldValues, bucket.key);
+        if (fieldValues.length) {
+          $scope.page.filter.field[field.key] = fieldValues;
         } else {
           delete $scope.page.filter.field[field.key]
         }
       } else {
         // 增加 field
-        fields.push(bucket.key);
-        $scope.page.filter.field[field.key] = fields;
+        fieldValues.push(bucket.key);
+        $scope.page.filter.field[field.key] = fieldValues;
       }
+      $scope.search();
+    };
+
+    // 自定义field: key, name, input
+    $scope.searchCustomField = function(field) {
+      // $scope.page.filter._field["_" + field.key] = [field.input]
       $scope.search();
     };
 

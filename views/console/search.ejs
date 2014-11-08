@@ -8,7 +8,7 @@
 <link rel="stylesheet" href="/s/css/search.css?5" />
 
 {% include include/requirejs %}
-<script data-main="console/search" src="/s/js/lib/require.js"></script>
+<script async data-main="console/search" src="/s/js/lib/require.js"></script>
 
 <style>
 .intervals span {
@@ -72,6 +72,15 @@
                               </i>
                               {{bucket.key}} ({{bucket.doc_count | number:0}})
                           </a>
+                      </li>
+
+                      <li ng-if="field.customizable">
+                        <div style="padding: 7px 10px 9px 37px;">
+                          <span class="input-icon input-icon-right" style="width: 100%">
+                            <input type="text" ng-model="field.input" style="width: 100%" placeholder="自定义{{field.name}}" ng-enter="searchCustomField(field)">
+                            <i class="icon-none green fa fa-search" ng-click="searchCustomField(field)"></i>
+                          </span>
+                        </div>
                       </li>
 
                       <li ng-if="field.buckets.length>5">
