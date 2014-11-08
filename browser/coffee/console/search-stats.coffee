@@ -141,6 +141,7 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 end: +$scope.endDate
               .success (json) =>
                 # 分组、时间、统计
+                $('#chartStats').height(350);
 
                 series = _.chain(json.aggregations.group_info.buckets).map (bucket) ->
                   data = getTimeData(bucket, $scope)
@@ -181,6 +182,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                   type: 'bar'
                 }],
                   basicChart: 1
+                  chart:
+                    renderTo : chartStats.id
                   plotOptions:
                     bar:
                       dataLabels:
@@ -215,6 +218,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 end: +$scope.endDate
               .success (json) =>
                 # 时间、统计
+                $('#chartStats').height(300);
+                
                 data = getTimeData(json.aggregations, $scope)
                 series = [{
                   name: @selectedField.name + " " + @selectedAgg.title
@@ -242,6 +247,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                   type: 'bar'
                 }],
                   basicChart: 1
+                  chart:
+                    renderTo : chartStats.id
                   plotOptions:
                     bar:
                       dataLabels:

@@ -157,6 +157,7 @@
                 }).success((function(_this) {
                   return function(json) {
                     var series;
+                    $('#chartStats').height(350);
                     series = _.chain(json.aggregations.group_info.buckets).map(function(bucket) {
                       var data;
                       data = getTimeData(bucket, $scope);
@@ -213,6 +214,9 @@
                       }
                     ], {
                       basicChart: 1,
+                      chart: {
+                        renderTo: chartStats.id
+                      },
                       plotOptions: {
                         bar: {
                           dataLabels: {
@@ -273,6 +277,7 @@
                 }).success((function(_this) {
                   return function(json) {
                     var data, series;
+                    $('#chartStats').height(300);
                     data = getTimeData(json.aggregations, $scope);
                     series = [
                       {
@@ -306,6 +311,9 @@
                       }
                     ], {
                       basicChart: 1,
+                      chart: {
+                        renderTo: chartStats.id
+                      },
                       plotOptions: {
                         bar: {
                           dataLabels: {
