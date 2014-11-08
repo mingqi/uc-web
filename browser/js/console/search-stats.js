@@ -61,10 +61,25 @@
           return this.showStats();
         },
         changeField: function() {
-          this.aggs = [];
+          var field, newAggs, oldAggValue, _i, _len, _ref, _ref1, _ref2, _ref3;
+          oldAggValue = (_ref = this.selectedAgg) != null ? _ref.value : void 0;
+          this.groups = [];
+          if (this.selectedField) {
+            _ref1 = this.fields;
+            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
+              field = _ref1[_i];
+              if (field.key !== this.selectedField.key && !field.isNumeric) {
+                this.groups.push(field);
+              }
+            }
+          }
+          if (((_ref2 = this.selectedGroup) != null ? _ref2.key : void 0) === ((_ref3 = this.selectedField) != null ? _ref3.key : void 0)) {
+            this.selectedGroup = '';
+          }
+          newAggs = [];
           if (this.selectedField) {
             if (this.selectedField.isNumeric) {
-              this.aggs = [
+              newAggs = [
                 {
                   value: 'avg',
                   title: '平均'
@@ -80,7 +95,7 @@
                 }
               ];
             } else {
-              this.aggs = [
+              newAggs = [
                 {
                   value: 'cardinality',
                   title: '唯一值数量'
@@ -88,21 +103,13 @@
               ];
             }
           }
-          return this.selectedAgg = null;
+          if (newAggs.length !== this.aggs.length) {
+            this.aggs = newAggs;
+            this.selectedAgg = '';
+          }
+          return this.showStats();
         },
         changeAgg: function() {
-          var field, _i, _len, _ref;
-          this.groups = [];
-          if (this.selectedAgg) {
-            _ref = this.fields;
-            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-              field = _ref[_i];
-              if (field.key !== this.selectedField.key && !field.isNumeric) {
-                this.groups.push(field);
-              }
-            }
-          }
-          this.selectedGroup = '';
           return this.showStats();
         },
         changeGroup: function() {
@@ -205,6 +212,7 @@
                         type: 'bar'
                       }
                     ], {
+                      basicChart: 1,
                       plotOptions: {
                         bar: {
                           dataLabels: {
@@ -297,6 +305,7 @@
                         type: 'bar'
                       }
                     ], {
+                      basicChart: 1,
                       plotOptions: {
                         bar: {
                           dataLabels: {

@@ -186,11 +186,17 @@ var drawChart = function(chart, series, opts) {
             }
         }
     };
+
     if (opts) {
       opts = _.extend(defaultOpts, opts);
-      chart.highChart = new Highcharts.Chart(opts);  
     } else {
-      chart.highChart = new Highcharts.StockChart(defaultOpts);
+      opts = defaultOpts;
+    }
+
+    if (opts.basicChart) {
+      chart.highChart = new Highcharts.Chart(opts);
+    } else {
+      chart.highChart = new Highcharts.StockChart(opts);
     }
 };
 

@@ -61,15 +61,25 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
         @fields = $scope.fields
 
       changeChartType: () ->
-        # alert(@selectedChartType.value)
         @showStats()
 
       changeField: () ->
-        @aggs = []
+        oldAggValue = @selectedAgg?.value
 
+        # groups 逻辑
+        @groups = []
+        if @selectedField
+          for field in @fields
+            if field.key != @selectedField.key and !field.isNumeric
+              @groups.push field
+        if @selectedGroup?.key == @selectedField?.key
+          @selectedGroup = ''
+
+        # aggs 逻辑
+        newAggs = []
         if @selectedField
           if @selectedField.isNumeric
-            @aggs = [{
+            newAggs = [{
               value: 'avg'
               title: '平均'
             }, {
@@ -83,25 +93,22 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
               title: '最小值'
             }]
           else
-            @aggs = [{
+            newAggs = [{
               value: 'cardinality'
               title: '唯一值数量'
             }]
 
-        @selectedAgg = null
+        if newAggs.length != @aggs.length
+          @aggs = newAggs
+          @selectedAgg = ''
+
+        # 显示图表
+        @showStats()
 
       changeAgg: () ->
-        # alert(@selectedAgg)
-        @groups = []
-        if @selectedAgg
-          for field in @fields
-            if field.key != @selectedField.key and !field.isNumeric
-              @groups.push field
-        @selectedGroup = ''
         @showStats()
 
       changeGroup: () ->
-        # alert(@selectedGroup)
         @showStats()
 
       showStats: () ->
@@ -173,6 +180,7 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                   data: bucket.metric_value.value for bucket in buckets
                   type: 'bar'
                 }],
+                  basicChart: 1
                   plotOptions:
                     bar:
                       dataLabels:
@@ -233,6 +241,7 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                   data: [json.aggregations.metric_value.value]
                   type: 'bar'
                 }],
+                  basicChart: 1
                   plotOptions:
                     bar:
                       dataLabels:
