@@ -191,10 +191,10 @@
 
                 <ul class="nav nav-tabs" id="recent-tab" style="margin-bottom: 15px;">
                     <li ng-class="{active : page.tab == 'detail'}">
-                        <a ng-click="page.tab = 'detail'">结果列表</a>
+                        <a ng-click="changeTab('detail')">结果列表</a>
                     </li>
                     <li ng-class="{active : page.tab == 'stats'}">
-                        <a ng-click="page.tab = 'stats'">统计分析</a>
+                        <a ng-click="changeTab('stats')">统计分析</a>
                     </li>
                 </ul>
 

@@ -378,6 +378,14 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       setAutoInterval($scope);
     }
 
+    var parseJsonStr = function(str) {
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        return {};
+      }
+    };
+
     _.extend($scope, {
       _: _,
       moment: moment,
@@ -387,16 +395,10 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       orderBy: parseInt(locationSearch.o) || 1,
       page: {
         showHostAndPath: 1,
-        tab: 'detail',
+        tab: locationSearch.t || 'detail',
         filter: {
-          field: (function() {
-            try {
-              return JSON.parse(locationSearch.f);
-            } catch (e) {
-              return {};
-            }
-          }).call(this),
-          _field: {},
+          field: parseJsonStr(locationSearch.f),
+          _field: parseJsonStr(locationSearch._f)
         },
         attributeAggs: 'avg',
         keywords: locationSearch.k || ''
@@ -517,7 +519,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           p: $scope.currentPage,
           o: $scope.orderBy,
           f: JSON.stringify($scope.page.filter.field),
-          i: $scope.interval
+          _f: JSON.stringify($scope.page.filter._field),
+          i: $scope.interval,
+          s: $scope.stats.serialization()
         });
         
         $scope.page.pattern = pattern($scope.page.keywords);
@@ -852,6 +856,11 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         intervalOnly: 1
       });
     };
+
+    $scope.changeTab = function(tab) {
+      $location.search('t', tab);
+      $scope.page.tab = tab;
+    }
 }]); // end angular
 
 $(function() {

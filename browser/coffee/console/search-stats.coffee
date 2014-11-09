@@ -63,6 +63,11 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
         @selectedChartType = @chartTypes[0]
         @selectedAgg = @aggs[0]
 
+      serialization: () ->
+        ""
+
+      deserialization: () ->
+
       setFileds: () ->
         @fields = $scope.fields
         @setGroups()

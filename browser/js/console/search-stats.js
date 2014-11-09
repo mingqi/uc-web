@@ -61,6 +61,10 @@
           this.selectedChartType = this.chartTypes[0];
           return this.selectedAgg = this.aggs[0];
         },
+        serialization: function() {
+          return "";
+        },
+        deserialization: function() {},
         setFileds: function() {
           this.fields = $scope.fields;
           return this.setGroups();
