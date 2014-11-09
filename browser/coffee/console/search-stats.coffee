@@ -27,7 +27,7 @@ getTimeData = (timeAgg, $scope) ->
     _.each buckets, (bucket) ->
       data.push [
         bucket.key
-        bucket.metric_value.value
+        bucket.metric_value?.value || bucket.doc_count  # 没有选取 field 时无 metric_value
       ]
       return
 
@@ -42,6 +42,11 @@ getTimeData = (timeAgg, $scope) ->
 
 chartStats = {id: 'chartStats'}
 
+defaultAgg = {
+  value: 'value_count'
+  title: '数量'
+}
+
 define ['underscore', 'scrollTo'], (_, $scrollTo) ->
   ($scope, $http) ->
     $scope.stats =
@@ -53,33 +58,23 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
           value: 'bar'
           text: '柱状图'
         }]
-        @aggs = []
+        @aggs = [defaultAgg]
         @groups = []
         @selectedChartType = @chartTypes[0]
+        @selectedAgg = @aggs[0]
 
       setFileds: () ->
         @fields = $scope.fields
+        @setGroups()
 
-      changeChartType: () ->
-        @showStats()
-
-      changeField: () ->
-        oldAggValue = @selectedAgg?.value
-
-        # groups 逻辑
-        @groups = []
-        if @selectedField
-          for field in @fields
-            if field.key != @selectedField.key and !field.isNumeric
-              @groups.push field
-        if @selectedGroup?.key == @selectedField?.key
-          @selectedGroup = ''
-
-        # aggs 逻辑
-        newAggs = []
+      setAggs: () ->
+        newAggs = [{
+          value: 'terms'
+          title: '数量'
+        }]
         if @selectedField
           if @selectedField.isNumeric
-            newAggs = [{
+            newAggs = [defaultAgg].concat [{
               value: 'avg'
               title: '平均'
             }, {
@@ -93,14 +88,33 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
               title: '最小值'
             }]
           else
-            newAggs = [{
+            newAggs = [defaultAgg].concat [{
               value: 'cardinality'
               title: '唯一值数量'
             }]
 
         if newAggs.length != @aggs.length
           @aggs = newAggs
-          @selectedAgg = ''
+          @selectedAgg = @aggs[0]
+
+      setGroups: () ->
+        @groups = []
+        # if @selectedField
+        for field in @fields
+          if field.key != @selectedField?.key and !field.isNumeric
+            @groups.push field
+        if @selectedGroup?.key == @selectedField?.key
+          @selectedGroup = ''
+
+      changeChartType: () ->
+        @showStats()
+
+      changeField: () ->
+        # groups 逻辑
+        @setGroups()
+
+        # aggs 逻辑
+        @setAggs()
 
         # 显示图表
         @showStats()
@@ -112,31 +126,39 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
         @showStats()
 
       showStats: () ->
-        if @selectedField && @selectedAgg
+        if @selectedField || @selectedGroup
 
           if chartStats.highChart
-            chartStats.highChart.showLoading();
+            chartStats.highChart.showLoading()
 
-          metricValue = _.object [@selectedAgg.value], [{field: @selectedField.key}]
+          metricValue = if @selectedField
+            _.object [@selectedAgg.value], [{field: @selectedField.key}]
+          else
+            null
+
+          title = (if @selectedField then @selectedField.name + " " else "") + @selectedAgg.title
 
           if @selectedGroup
             if @selectedChartType.value == 'line'
+              esBody = 
+                query: $scope.page.query
+                size: 0
+                aggs:
+                  group_info:
+                    terms:
+                      field: @selectedGroup.key
+                      size: 10
+                    aggs:
+                      event_over_time:
+                        date_histogram:
+                          field: "timestamp",
+                          interval: $scope.interval + "ms"
+                        aggs:
+                          metric_value: metricValue
+              if !esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value
+                delete esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value
               $http.post "/console/ajax/search",
-                esBody:
-                  query: $scope.page.query
-                  size: 0
-                  aggs:
-                    group_info:
-                      terms:
-                        field: @selectedGroup.key
-                        size: 10
-                      aggs:
-                        event_over_time:
-                          date_histogram:
-                            field: "timestamp",
-                            interval: $scope.interval + "ms"
-                          aggs:
-                            metric_value: metricValue
+                esBody: esBody
                 begin: +$scope.startDate
                 end: +$scope.endDate
               .success (json) =>
@@ -154,21 +176,25 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
 
                 $scope.drawChart chartStats, series,
                   title:
-                    text: @selectedField.name + " " + @selectedAgg.title
+                    text: title
 
             else
-              $http.post "/console/ajax/search",
-                esBody:
-                  query: $scope.page.query
-                  size: 0
-                  aggs:
-                    group_info:
-                      terms:
-                        field: @selectedGroup.key
-                        size: 10
-                      aggs:
-                        metric_value: metricValue
+              esBody =
+                query: $scope.page.query
+                size: 0
+                aggs:
+                  group_info:
+                    terms:
+                      field: @selectedGroup.key
+                      size: 10
+                    aggs:
+                      metric_value: metricValue
 
+              if !esBody.aggs.group_info.aggs.metric_value
+                delete esBody.aggs.group_info.aggs.metric_value
+
+              $http.post "/console/ajax/search",
+                esBody: esBody
                 begin: +$scope.startDate
                 end: +$scope.endDate
               .success (json) =>
@@ -177,8 +203,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 $('#chartStats').height(60 + buckets.length * 35)
 
                 $scope.drawChart chartStats, [{
-                  name: @selectedField.name + " " + @selectedAgg.title
-                  data: bucket.metric_value.value for bucket in buckets
+                  name: title
+                  data: (bucket.metric_value?.value || bucket.doc_count) for bucket in buckets
                   type: 'bar'
                 }],
                   basicChart: 1
@@ -189,31 +215,37 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                       dataLabels:
                         enabled: true
                   title:
-                    text: @selectedField.name + " " + @selectedAgg.title
+                    text: title
                   xAxis:
                     categories: (bucket.key for bucket in buckets)
                     title:
                       text: null
                   yAxis:
+                    floor : 0
                     title:
                       text: null
                     min: 0
                     labels:
                       overflow: 'justify'
-          else
+
+          else # end if @selectedGroup
+            # not @selectedGroup
 
             if @selectedChartType.value == 'line'
+              esBody = 
+                query: $scope.page.query
+                size: 0
+                aggs:
+                  event_over_time:
+                    date_histogram:
+                      field: "timestamp",
+                      interval: $scope.interval + "ms"
+                    aggs:
+                      metric_value: metricValue
+              if !esBody.aggs.event_over_time.aggs.metric_value
+                delete esBody.aggs.event_over_time.aggs.metric_value
               $http.post "/console/ajax/search",
-                esBody:
-                  query: $scope.page.query
-                  size: 0
-                  aggs:
-                    event_over_time:
-                      date_histogram:
-                        field: "timestamp",
-                        interval: $scope.interval + "ms"
-                      aggs:
-                        metric_value: metricValue
+                esBody: esBody
                 begin: +$scope.startDate
                 end: +$scope.endDate
               .success (json) =>
@@ -222,7 +254,7 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                 
                 data = getTimeData(json.aggregations, $scope)
                 series = [{
-                  name: @selectedField.name + " " + @selectedAgg.title
+                  name: title
                   type: 'line'
                   data: data
                 }]
@@ -254,12 +286,13 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
                       dataLabels:
                         enabled: true
                   title:
-                    text: @selectedField.name + " " + @selectedAgg.title
+                    text: title
                   xAxis:
                     categories: ['全部']
                     title:
                       text: null
                   yAxis:
+                    floor : 0
                     title:
                       text: null
                     min: 0

@@ -2,7 +2,7 @@
 /* jshint ignore:start */
 
 (function() {
-  var chartStats, getTimeData;
+  var chartStats, defaultAgg, getTimeData;
 
   getTimeData = function(timeAgg, $scope) {
     var add, buckets, data, date, endDate, from, minus, startDate, to, _ref;
@@ -24,7 +24,8 @@
         data.push([from, 0]);
       }
       _.each(buckets, function(bucket) {
-        data.push([bucket.key, bucket.metric_value.value]);
+        var _ref1;
+        data.push([bucket.key, ((_ref1 = bucket.metric_value) != null ? _ref1.value : void 0) || bucket.doc_count]);
       });
       if (buckets.length > 1 && to > buckets[buckets.length - 1].key) {
         data.push([to, 0]);
@@ -35,6 +36,11 @@
 
   chartStats = {
     id: 'chartStats'
+  };
+
+  defaultAgg = {
+    value: 'value_count',
+    title: '数量'
   };
 
   define(['underscore', 'scrollTo'], function(_, $scrollTo) {
@@ -50,36 +56,26 @@
               text: '柱状图'
             }
           ];
-          this.aggs = [];
+          this.aggs = [defaultAgg];
           this.groups = [];
-          return this.selectedChartType = this.chartTypes[0];
+          this.selectedChartType = this.chartTypes[0];
+          return this.selectedAgg = this.aggs[0];
         },
         setFileds: function() {
-          return this.fields = $scope.fields;
+          this.fields = $scope.fields;
+          return this.setGroups();
         },
-        changeChartType: function() {
-          return this.showStats();
-        },
-        changeField: function() {
-          var field, newAggs, oldAggValue, _i, _len, _ref, _ref1, _ref2, _ref3;
-          oldAggValue = (_ref = this.selectedAgg) != null ? _ref.value : void 0;
-          this.groups = [];
-          if (this.selectedField) {
-            _ref1 = this.fields;
-            for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-              field = _ref1[_i];
-              if (field.key !== this.selectedField.key && !field.isNumeric) {
-                this.groups.push(field);
-              }
+        setAggs: function() {
+          var newAggs;
+          newAggs = [
+            {
+              value: 'terms',
+              title: '数量'
             }
-          }
-          if (((_ref2 = this.selectedGroup) != null ? _ref2.key : void 0) === ((_ref3 = this.selectedField) != null ? _ref3.key : void 0)) {
-            this.selectedGroup = '';
-          }
-          newAggs = [];
+          ];
           if (this.selectedField) {
             if (this.selectedField.isNumeric) {
-              newAggs = [
+              newAggs = [defaultAgg].concat([
                 {
                   value: 'avg',
                   title: '平均'
@@ -93,20 +89,41 @@
                   value: 'min',
                   title: '最小值'
                 }
-              ];
+              ]);
             } else {
-              newAggs = [
+              newAggs = [defaultAgg].concat([
                 {
                   value: 'cardinality',
                   title: '唯一值数量'
                 }
-              ];
+              ]);
             }
           }
           if (newAggs.length !== this.aggs.length) {
             this.aggs = newAggs;
-            this.selectedAgg = '';
+            return this.selectedAgg = this.aggs[0];
           }
+        },
+        setGroups: function() {
+          var field, _i, _len, _ref, _ref1, _ref2, _ref3;
+          this.groups = [];
+          _ref = this.fields;
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            field = _ref[_i];
+            if (field.key !== ((_ref1 = this.selectedField) != null ? _ref1.key : void 0) && !field.isNumeric) {
+              this.groups.push(field);
+            }
+          }
+          if (((_ref2 = this.selectedGroup) != null ? _ref2.key : void 0) === ((_ref3 = this.selectedField) != null ? _ref3.key : void 0)) {
+            return this.selectedGroup = '';
+          }
+        },
+        changeChartType: function() {
+          return this.showStats();
+        },
+        changeField: function() {
+          this.setGroups();
+          this.setAggs();
           return this.showStats();
         },
         changeAgg: function() {
@@ -116,42 +133,47 @@
           return this.showStats();
         },
         showStats: function() {
-          var metricValue;
-          if (this.selectedField && this.selectedAgg) {
+          var esBody, metricValue, title;
+          if (this.selectedField || this.selectedGroup) {
             if (chartStats.highChart) {
               chartStats.highChart.showLoading();
             }
-            metricValue = _.object([this.selectedAgg.value], [
+            metricValue = this.selectedField ? _.object([this.selectedAgg.value], [
               {
                 field: this.selectedField.key
               }
-            ]);
+            ]) : null;
+            title = (this.selectedField ? this.selectedField.name + " " : "") + this.selectedAgg.title;
             if (this.selectedGroup) {
               if (this.selectedChartType.value === 'line') {
-                return $http.post("/console/ajax/search", {
-                  esBody: {
-                    query: $scope.page.query,
-                    size: 0,
-                    aggs: {
-                      group_info: {
-                        terms: {
-                          field: this.selectedGroup.key,
-                          size: 10
-                        },
-                        aggs: {
-                          event_over_time: {
-                            date_histogram: {
-                              field: "timestamp",
-                              interval: $scope.interval + "ms"
-                            },
-                            aggs: {
-                              metric_value: metricValue
-                            }
+                esBody = {
+                  query: $scope.page.query,
+                  size: 0,
+                  aggs: {
+                    group_info: {
+                      terms: {
+                        field: this.selectedGroup.key,
+                        size: 10
+                      },
+                      aggs: {
+                        event_over_time: {
+                          date_histogram: {
+                            field: "timestamp",
+                            interval: $scope.interval + "ms"
+                          },
+                          aggs: {
+                            metric_value: metricValue
                           }
                         }
                       }
                     }
-                  },
+                  }
+                };
+                if (!esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value) {
+                  delete esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value;
+                }
+                return $http.post("/console/ajax/search", {
+                  esBody: esBody,
                   begin: +$scope.startDate,
                   end: +$scope.endDate
                 }).success((function(_this) {
@@ -169,28 +191,32 @@
                     }).value().slice(0, 4);
                     return $scope.drawChart(chartStats, series, {
                       title: {
-                        text: _this.selectedField.name + " " + _this.selectedAgg.title
+                        text: title
                       }
                     });
                   };
                 })(this));
               } else {
-                return $http.post("/console/ajax/search", {
-                  esBody: {
-                    query: $scope.page.query,
-                    size: 0,
-                    aggs: {
-                      group_info: {
-                        terms: {
-                          field: this.selectedGroup.key,
-                          size: 10
-                        },
-                        aggs: {
-                          metric_value: metricValue
-                        }
+                esBody = {
+                  query: $scope.page.query,
+                  size: 0,
+                  aggs: {
+                    group_info: {
+                      terms: {
+                        field: this.selectedGroup.key,
+                        size: 10
+                      },
+                      aggs: {
+                        metric_value: metricValue
                       }
                     }
-                  },
+                  }
+                };
+                if (!esBody.aggs.group_info.aggs.metric_value) {
+                  delete esBody.aggs.group_info.aggs.metric_value;
+                }
+                return $http.post("/console/ajax/search", {
+                  esBody: esBody,
                   begin: +$scope.startDate,
                   end: +$scope.endDate
                 }).success((function(_this) {
@@ -200,13 +226,13 @@
                     $('#chartStats').height(60 + buckets.length * 35);
                     return $scope.drawChart(chartStats, [
                       {
-                        name: _this.selectedField.name + " " + _this.selectedAgg.title,
+                        name: title,
                         data: (function() {
-                          var _i, _len, _results;
+                          var _i, _len, _ref, _results;
                           _results = [];
                           for (_i = 0, _len = buckets.length; _i < _len; _i++) {
                             bucket = buckets[_i];
-                            _results.push(bucket.metric_value.value);
+                            _results.push(((_ref = bucket.metric_value) != null ? _ref.value : void 0) || bucket.doc_count);
                           }
                           return _results;
                         })(),
@@ -225,7 +251,7 @@
                         }
                       },
                       title: {
-                        text: _this.selectedField.name + " " + _this.selectedAgg.title
+                        text: title
                       },
                       xAxis: {
                         categories: (function() {
@@ -242,6 +268,7 @@
                         }
                       },
                       yAxis: {
+                        floor: 0,
                         title: {
                           text: null
                         },
@@ -256,22 +283,26 @@
               }
             } else {
               if (this.selectedChartType.value === 'line') {
-                return $http.post("/console/ajax/search", {
-                  esBody: {
-                    query: $scope.page.query,
-                    size: 0,
-                    aggs: {
-                      event_over_time: {
-                        date_histogram: {
-                          field: "timestamp",
-                          interval: $scope.interval + "ms"
-                        },
-                        aggs: {
-                          metric_value: metricValue
-                        }
+                esBody = {
+                  query: $scope.page.query,
+                  size: 0,
+                  aggs: {
+                    event_over_time: {
+                      date_histogram: {
+                        field: "timestamp",
+                        interval: $scope.interval + "ms"
+                      },
+                      aggs: {
+                        metric_value: metricValue
                       }
                     }
-                  },
+                  }
+                };
+                if (!esBody.aggs.event_over_time.aggs.metric_value) {
+                  delete esBody.aggs.event_over_time.aggs.metric_value;
+                }
+                return $http.post("/console/ajax/search", {
+                  esBody: esBody,
                   begin: +$scope.startDate,
                   end: +$scope.endDate
                 }).success((function(_this) {
@@ -281,7 +312,7 @@
                     data = getTimeData(json.aggregations, $scope);
                     series = [
                       {
-                        name: _this.selectedField.name + " " + _this.selectedAgg.title,
+                        name: title,
                         type: 'line',
                         data: data
                       }
@@ -322,7 +353,7 @@
                         }
                       },
                       title: {
-                        text: _this.selectedField.name + " " + _this.selectedAgg.title
+                        text: title
                       },
                       xAxis: {
                         categories: ['全部'],
@@ -331,6 +362,7 @@
                         }
                       },
                       yAxis: {
+                        floor: 0,
                         title: {
                           text: null
                         },

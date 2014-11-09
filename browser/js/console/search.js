@@ -387,6 +387,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       orderBy: parseInt(locationSearch.o) || 1,
       page: {
         showHostAndPath: 1,
+        tab: 'detail',
         filter: {
           field: (function() {
             try {
@@ -674,7 +675,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           query: query,
           size: 0,
           aggs: {
-            unique_number_for_attributes: {
+            group_by_field: {
               terms: {
                 field: field.key,
                 size: 300
@@ -687,7 +688,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }).success(function(json) {
         field.loading = false;
         field.buckets = json.aggregations ?
-          json.aggregations.unique_number_for_attributes.buckets :
+          json.aggregations.group_by_field.buckets :
           [];
         field.total = field.buckets.length;
 
