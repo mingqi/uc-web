@@ -128,7 +128,7 @@
 
             </div><!-- /.page-content -->
             <script type="text/ng-template" id="pageContent">
-              <div ng-if="!(page.filter.field | isEmpty)">
+              <div ng-if="!(page.filter.field | isEmpty) || !(page.filter._field | isEmpty)">
                 <span style="display: block; float:left; padding:4px 10px 0 0">字段过滤：</span>
                 <span ng-repeat="(fieldKey, fieldValues) in page.filter.field"
                     style="display: block; float: left; margin-bottom:5px">
@@ -141,6 +141,18 @@
                     </span>
                     <span ng-if="fieldValues.length==1">
                       {{getFieldName(fieldKey)}} : {{fieldValues[0] | maxStr:30}}
+                    </span>
+                  </div>
+                  &nbsp;
+                </span>
+                <span ng-repeat="(fieldKey, field) in page.filter._field"
+                    style="display: block; float: left; margin-bottom:5px">
+                  <div class="label label-xlg label-gray">
+                    <button type="button" class="close" ng-click="removeCustomField(field)">
+                      <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
+                    </button>
+                    <span>
+                      自定义{{getFieldName(fieldKey)}} : {{field.input | maxStr:30}}
                     </span>
                   </div>
                   &nbsp;

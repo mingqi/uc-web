@@ -395,7 +395,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             } catch (e) {
               return {};
             }
-          }).call(this)
+          }).call(this),
+          _field: {},
         },
         attributeAggs: 'avg',
         keywords: locationSearch.k || ''
@@ -644,14 +645,20 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }
 
       field.loading = true;
+
+      console.log($scope.page.pattern.query);
+      console.log($scope.page.query.filtered.query);
       var query = {
         filtered: {
-          query: $scope.page.pattern.query,
+          query: $scope.page.query.filtered.query,
+          // query: $scope.page.pattern.query,
           filter: {
             and: [$scope.page.filter.timerange]
           }
         }
       };
+
+      // TODO: pattern.filter 清理
       _.each($scope.page.pattern.filters, function(filter) {
         query.filtered.filter.and.push(filter);
       });
@@ -764,7 +771,18 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
     // 自定义field: key, name, input
     $scope.searchCustomField = function(field) {
-      // $scope.page.filter._field["_" + field.key] = [field.input]
+      if (!field.input) {
+        $scope.removeCustomField(field);
+      } else {
+        $scope.page.filter._field[field.key] = field;
+      }
+      $scope.search();
+    };
+
+    // 删除用户填写的 field 条件
+    $scope.removeCustomField = function(field) {
+      field.input = null;
+      delete $scope.page.filter._field[field.key];
       $scope.search();
     };
 
