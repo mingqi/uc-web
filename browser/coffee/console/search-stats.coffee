@@ -48,7 +48,7 @@ defaultAgg = {
 }
 
 define ['underscore', 'scrollTo'], (_, $scrollTo) ->
-  ($scope, $http) ->
+  ($scope, $http, $location) ->
     $scope.stats =
       init: () ->
         @chartTypes = [{
@@ -63,10 +63,34 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
         @selectedChartType = @chartTypes[0]
         @selectedAgg = @aggs[0]
 
-      serialization: () ->
-        ""
+      serialize: () ->
+        JSON.stringify
+          chartType: @selectedChartType?.value
+          field: @selectedField?.key
+          agg: @selectedAgg?.value
+          group: @selectedGroup?.key
 
-      deserialization: () ->
+      deserialize: () ->
+        str = $location.search().stats
+        try
+          selected = JSON.parse(str)
+          for chartType in @chartTypes
+            if chartType.value == selected.chartType
+              @selectedChartType = chartType
+              break;
+          for field in @fields
+            if field.key == selected.field
+              @selectedField = field
+              break;
+          for agg in @aggs
+            if agg.value == selected.agg
+              @selectedAgg = agg
+              break;
+          for group in @groups
+            if group.key == selected.group
+              @selectedGroup = group
+              break;
+        catch e
 
       setFileds: () ->
         @fields = $scope.fields
@@ -131,6 +155,8 @@ define ['underscore', 'scrollTo'], (_, $scrollTo) ->
         @showStats()
 
       showStats: () ->
+        $location.search 'stats', @serialize()
+
         if @selectedField || @selectedGroup
 
           if chartStats.highChart

@@ -317,6 +317,8 @@ var setAutoInterval = function($scope) {
   $scope.autoInterval = true;
 };
 
+var isStatsDeserialized = false;
+
 angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
         return function (obj) {
@@ -348,10 +350,10 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         });
     };
 })
-.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+.controller('Ctrl', ['$scope', '$http', '$location', '$timeout', function($scope, $http, $location, $timeout) {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 
-    searchStats($scope, $http).init();
+    searchStats($scope, $http, $location).init();
 
     $scope.drawChart = drawChart;
 
@@ -473,7 +475,14 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         });
 
         $scope.stats.setFileds();
-
+        $timeout(function() {
+          if (!isStatsDeserialized) {
+            $scope.stats.deserialize();
+            isStatsDeserialized = true;
+            $scope.stats.showStats();
+          }
+        }, 1000);
+        
         $scope.fieldGroups = [{
           group: 'base',
           title: '按日志位置过滤',
@@ -512,7 +521,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           updateDateRangePicker($scope);
         }
 
-        $location.search({
+        $location.search(_.extend($location.search(), {
           k: $scope.page.keywords || '',
           b: +startDate,
           e: +endDate,
@@ -520,9 +529,8 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           o: $scope.orderBy,
           f: JSON.stringify($scope.page.filter.field),
           _f: JSON.stringify($scope.page.filter._field),
-          i: $scope.interval,
-          s: $scope.stats.serialization()
-        });
+          i: $scope.interval
+        }));
         
         $scope.page.pattern = pattern($scope.page.keywords);
         
@@ -590,7 +598,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         }
 
         // 更新统计
-        $scope.stats.showStats();
+        if (!opts.init) {
+          $scope.stats.showStats();
+        }
 
         // 主要搜索
         $http.post("/console/ajax/search", {

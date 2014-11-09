@@ -44,7 +44,7 @@
   };
 
   define(['underscore', 'scrollTo'], function(_, $scrollTo) {
-    return function($scope, $http) {
+    return function($scope, $http, $location) {
       return $scope.stats = {
         init: function() {
           this.chartTypes = [
@@ -61,10 +61,60 @@
           this.selectedChartType = this.chartTypes[0];
           return this.selectedAgg = this.aggs[0];
         },
-        serialization: function() {
-          return "";
+        serialize: function() {
+          var _ref, _ref1, _ref2, _ref3;
+          return JSON.stringify({
+            chartType: (_ref = this.selectedChartType) != null ? _ref.value : void 0,
+            field: (_ref1 = this.selectedField) != null ? _ref1.key : void 0,
+            agg: (_ref2 = this.selectedAgg) != null ? _ref2.value : void 0,
+            group: (_ref3 = this.selectedGroup) != null ? _ref3.key : void 0
+          });
         },
-        deserialization: function() {},
+        deserialize: function() {
+          var agg, chartType, e, field, group, selected, str, _i, _j, _k, _l, _len, _len1, _len2, _len3, _ref, _ref1, _ref2, _ref3, _results;
+          str = $location.search().stats;
+          try {
+            selected = JSON.parse(str);
+            _ref = this.chartTypes;
+            for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+              chartType = _ref[_i];
+              if (chartType.value === selected.chartType) {
+                this.selectedChartType = chartType;
+                break;
+              }
+            }
+            _ref1 = this.fields;
+            for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+              field = _ref1[_j];
+              if (field.key === selected.field) {
+                this.selectedField = field;
+                break;
+              }
+            }
+            _ref2 = this.aggs;
+            for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
+              agg = _ref2[_k];
+              if (agg.value === selected.agg) {
+                this.selectedAgg = agg;
+                break;
+              }
+            }
+            _ref3 = this.groups;
+            _results = [];
+            for (_l = 0, _len3 = _ref3.length; _l < _len3; _l++) {
+              group = _ref3[_l];
+              if (group.key === selected.group) {
+                this.selectedGroup = group;
+                break;
+              } else {
+                _results.push(void 0);
+              }
+            }
+            return _results;
+          } catch (_error) {
+            e = _error;
+          }
+        },
         setFileds: function() {
           this.fields = $scope.fields;
           return this.setGroups();
@@ -138,6 +188,7 @@
         },
         showStats: function() {
           var esBody, metricValue, title;
+          $location.search('stats', this.serialize());
           if (this.selectedField || this.selectedGroup) {
             if (chartStats.highChart) {
               chartStats.highChart.showLoading();
