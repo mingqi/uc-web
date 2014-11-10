@@ -47,7 +47,7 @@ defaultAgg = {
   title: '数量'
 }
 
-define ['underscore', 'scrollTo'], (_, $scrollTo) ->
+define ['underscore'], (_) ->
   ($scope, $http, $location) ->
     $scope.stats =
       init: () ->

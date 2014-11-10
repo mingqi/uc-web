@@ -43,7 +43,7 @@
     title: '数量'
   };
 
-  define(['underscore', 'scrollTo'], function(_, $scrollTo) {
+  define(['underscore'], function(_) {
     return function($scope, $http, $location) {
       return $scope.stats = {
         init: function() {
