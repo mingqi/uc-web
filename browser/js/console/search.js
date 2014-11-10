@@ -124,8 +124,8 @@ var drawChart = function(chart, series, opts) {
                       return;
                     }
                     chosenLabel = '自定义范围';
-                    $scope.startDate = moment(event.xAxis[0].min);
-                    $scope.endDate = moment(event.xAxis[0].max);
+                    $scope.startDate = startDate = moment(event.xAxis[0].min);
+                    $scope.endDate = endDate = moment(event.xAxis[0].max);
                     emitDateRangeChange($scope);
                 }
             }
