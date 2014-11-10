@@ -241,7 +241,7 @@
                   </h5>
 
 
-                  <div id="chartStats" ng-show="stats.selectedField || stats.selectedGroup">
+                  <div id="chartStats" ng-if="stats.selectedField || stats.selectedGroup">
                     <div style="font-size:20px; padding-top:20px" class="text-center" ng-if="stats.loading">
                       Loading...
                     </div>
