@@ -232,7 +232,7 @@
                     </span>
 
                     &nbsp; 分组:
-                    <select ng-options="groupField.name for groupField in stats.groups"
+                    <select ng-options="groupField.name group by groupField.group for groupField in stats.groups"
                         ng-model="stats.selectedGroup"
                         ng-change="stats.optionsChange()">
                       <option value="">全部</option>
