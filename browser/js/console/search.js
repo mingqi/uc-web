@@ -355,6 +355,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
     searchStats($scope, $http, $location).init();
 
+
     $scope.drawChart = drawChart;
 
     var locationSearch = $location.search();

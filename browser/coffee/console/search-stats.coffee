@@ -62,6 +62,7 @@ define ['underscore'], (_) ->
         @groups = []
         @selectedChartType = @chartTypes[0]
         @selectedAgg = @aggs[0]
+        @type = 'event_count'
 
       serialize: () ->
         JSON.stringify
@@ -94,6 +95,7 @@ define ['underscore'], (_) ->
 
       setFileds: () ->
         @fields = $scope.fields
+        @selectedField = @fields[0]
         @setGroups()
 
       setAggs: () ->
@@ -135,10 +137,7 @@ define ['underscore'], (_) ->
         if @selectedGroup?.key == @selectedField?.key
           @selectedGroup = ''
 
-      changeChartType: () ->
-        @showStats()
-
-      changeField: () ->
+      optionsChange: () ->
         # groups 逻辑
         @setGroups()
 
@@ -146,189 +145,133 @@ define ['underscore'], (_) ->
         @setAggs()
 
         # 显示图表
-        @showStats()
-
-      changeAgg: () ->
-        @showStats()
-
-      changeGroup: () ->
-        @showStats()
+        @showStats()         
+      
 
       showStats: () ->
         $location.search 'stats', @serialize()
 
-        if @selectedField || @selectedGroup
+        if chartStats.highChart
+          chartStats.highChart.showLoading()
 
-          if chartStats.highChart
-            chartStats.highChart.showLoading()
+        #########
+        date_histogram = null
+        group_by_field = null
+        aggregation = null 
+        #########
 
-          metricValue = if @selectedField
-            _.object [@selectedAgg.value], [{field: @selectedField.key}]
-          else
-            null
+        ## most bottom metric, e.g. avg, sum, event_count ...
+        if @type == 'event_count'
+          aggregation = 
+            metric_value: 
+              value_count:  { }
+        else
+          agg_method = @selectedAgg.value
+          aggregation = 
+            metric_value: {}
+          aggregation.metric_value[@selectedAgg.value] = 
+            field: @selectedField.key
+              
 
-          title = (if @selectedField then @selectedField.name + " " else "") + @selectedAgg.title
+        ## split by time interval
+        if @selectedChartType.value == 'line'
+          aggregation =
+            event_over_time:
+              date_histogram:
+                field: 'timestamp',
+                interval: $scope.interval + "ms"
+              aggs: aggregation
 
-          if @selectedGroup
-            if @selectedChartType.value == 'line'
-              esBody = 
-                query: $scope.page.query
-                size: 0
-                aggs:
-                  group_info:
-                    terms:
-                      field: @selectedGroup.key
-                      size: 10
-                    aggs:
-                      event_over_time:
-                        date_histogram:
-                          field: "timestamp",
-                          interval: $scope.interval + "ms"
-                        aggs:
-                          metric_value: metricValue
-              if !esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value
-                delete esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value
-              $http.post "/console/ajax/search",
-                esBody: esBody
-                begin: +$scope.startDate
-                end: +$scope.endDate
-              .success (json) =>
-                # 分组、时间、统计
-                $('#chartStats').height(350);
+        ## group by field
+        if @selectedGroup
+          aggregation =
+            group_info:
+              terms :
+                field : @selectedGroup.key
+                size: 10
+              aggs : aggregation
 
-                series = _.chain(json.aggregations.group_info.buckets).map (bucket) ->
-                  data = getTimeData(bucket, $scope)
-                  return {
-                    name: bucket.key,
-                    type: 'line'
-                    data: data
-                  }
-                .value()[0..3]
+        esBody =
+          query: $scope.page.query
+          size: 0
+          aggs: aggregation
 
-                $scope.drawChart chartStats, series,
-                  title:
-                    text: title
-
+        title = (if @selectedField then @selectedField.name + " " else "") + @selectedAgg.title
+        $http.post "/console/ajax/search",
+          esBody: esBody
+          begin: +$scope.startDate
+          end: +$scope.endDate
+        .success (json) =>
+          chartHeight = 0
+          if @selectedChartType.value == 'line'
+            if @selectedGroup
+              chartHeight = 350
+            else 
+              chartHeight = 300
+          else if @selectedChartType.value == 'bar'
+            if @selectedGroup
+              buckets = json.aggregations.group_info.buckets
+              chartHeight = 60 + buckets.length * 35
             else
-              esBody =
-                query: $scope.page.query
-                size: 0
-                aggs:
-                  group_info:
-                    terms:
-                      field: @selectedGroup.key
-                      size: 10
-                    aggs:
-                      metric_value: metricValue
+              chartHeight = 100
 
-              if !esBody.aggs.group_info.aggs.metric_value
-                delete esBody.aggs.group_info.aggs.metric_value
+          $('#chartStats').height(chartHeight);
 
-              $http.post "/console/ajax/search",
-                esBody: esBody
-                begin: +$scope.startDate
-                end: +$scope.endDate
-              .success (json) =>
-                # 分组、统计
-                buckets = json.aggregations.group_info.buckets
-                $('#chartStats').height(60 + buckets.length * 35)
-
-                $scope.drawChart chartStats, [{
-                  name: title
-                  data: (bucket.metric_value?.value || bucket.doc_count) for bucket in buckets
-                  type: 'bar'
-                }],
-                  basicChart: 1
-                  chart:
-                    renderTo : chartStats.id
-                  plotOptions:
-                    bar:
-                      dataLabels:
-                        enabled: true
-                  title:
-                    text: title
-                  xAxis:
-                    categories: (bucket.key for bucket in buckets)
-                    title:
-                      text: null
-                  yAxis:
-                    floor : 0
-                    title:
-                      text: null
-                    min: 0
-                    labels:
-                      overflow: 'justify'
-
-          else # end if @selectedGroup
-            # not @selectedGroup
-
-            if @selectedChartType.value == 'line'
-              esBody = 
-                query: $scope.page.query
-                size: 0
-                aggs:
-                  event_over_time:
-                    date_histogram:
-                      field: "timestamp",
-                      interval: $scope.interval + "ms"
-                    aggs:
-                      metric_value: metricValue
-              if !esBody.aggs.event_over_time.aggs.metric_value
-                delete esBody.aggs.event_over_time.aggs.metric_value
-              $http.post "/console/ajax/search",
-                esBody: esBody
-                begin: +$scope.startDate
-                end: +$scope.endDate
-              .success (json) =>
-                # 时间、统计
-                $('#chartStats').height(300);
-                
-                data = getTimeData(json.aggregations, $scope)
-                series = [{
-                  name: title
+          if @selectedChartType.value == 'line'
+            if @selectedGroup  
+              series = _.chain(json.aggregations.group_info.buckets).map (bucket) ->
+                data = getTimeData(bucket, $scope)
+                return {
+                  name: bucket.key,
                   type: 'line'
                   data: data
-                }]
-                $scope.drawChart(chartStats, series)
+                }
+              .value()[0..4]
 
+              $scope.drawChart chartStats, series,
+                title:
+                  text: title
             else
-              $http.post "/console/ajax/search",
-                esBody:
-                  query: $scope.page.query
-                  size: 0
-                  aggs:
-                    metric_value: metricValue
+              data = getTimeData(json.aggregations, $scope)
+              series = [{
+                name: title
+                type: 'line'
+                data: data
+              }]
+              $scope.drawChart(chartStats, series)
+          else if @selectedChartType.value == 'bar'
+            buckets = json.aggregations.group_info.buckets
+            if @selectedGroup
+              data = (bucket.metric_value?.value || bucket.doc_count) for bucket in buckets
+              categories = (bucket.key for bucket in buckets)
+            else
+              data = [json.aggregations.metric_value.value]
+              categories = ['全部']
 
-                begin: +$scope.startDate
-                end: +$scope.endDate
-              .success (json) =>
-                # 统计
-                $('#chartStats').height(100);
-                $scope.drawChart chartStats, [{
-                  name: @selectedAgg.title
-                  data: [json.aggregations.metric_value.value]
-                  type: 'bar'
-                }],
-                  basicChart: 1
-                  chart:
-                    renderTo : chartStats.id
-                  plotOptions:
-                    bar:
-                      dataLabels:
-                        enabled: true
-                  title:
-                    text: title
-                  xAxis:
-                    categories: ['全部']
-                    title:
-                      text: null
-                  yAxis:
-                    floor : 0
-                    title:
-                      text: null
-                    min: 0
-                    labels:
-                      overflow: 'justify'
-                      enabled: false
+            $scope.drawChart chartStats, [{
+              name: title
+              data: data
+              type: 'bar'
+            }],
+              basicChart: 1
+              chart:
+                renderTo : chartStats.id
+              plotOptions:
+                bar:
+                  dataLabels:
+                    enabled: true
+              title:
+                text: title
+              xAxis:
+                categories: categories
+                title:
+                  text: null
+              yAxis:
+                floor : 0
+                title:
+                  text: null
+                min: 0
+                labels:
+                  overflow: 'justify'            
 
     

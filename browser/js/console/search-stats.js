@@ -59,7 +59,8 @@
           this.aggs = [defaultAgg];
           this.groups = [];
           this.selectedChartType = this.chartTypes[0];
-          return this.selectedAgg = this.aggs[0];
+          this.selectedAgg = this.aggs[0];
+          return this.type = 'event_count';
         },
         serialize: function() {
           var _ref, _ref1, _ref2, _ref3;
@@ -117,6 +118,7 @@
         },
         setFileds: function() {
           this.fields = $scope.fields;
+          this.selectedField = this.fields[0];
           return this.setGroups();
         },
         setAggs: function() {
@@ -172,267 +174,174 @@
             return this.selectedGroup = '';
           }
         },
-        changeChartType: function() {
-          return this.showStats();
-        },
-        changeField: function() {
+        optionsChange: function() {
           this.setGroups();
           this.setAggs();
           return this.showStats();
         },
-        changeAgg: function() {
-          return this.showStats();
-        },
-        changeGroup: function() {
-          return this.showStats();
-        },
         showStats: function() {
-          var esBody, metricValue, title;
+          var agg_method, aggregation, date_histogram, esBody, group_by_field, title;
           $location.search('stats', this.serialize());
-          if (this.selectedField || this.selectedGroup) {
-            if (chartStats.highChart) {
-              chartStats.highChart.showLoading();
-            }
-            metricValue = this.selectedField ? _.object([this.selectedAgg.value], [
-              {
-                field: this.selectedField.key
+          if (chartStats.highChart) {
+            chartStats.highChart.showLoading();
+          }
+          date_histogram = null;
+          group_by_field = null;
+          aggregation = null;
+          if (this.type === 'event_count') {
+            aggregation = {
+              metric_value: {
+                value_count: {}
               }
-            ]) : null;
-            title = (this.selectedField ? this.selectedField.name + " " : "") + this.selectedAgg.title;
-            if (this.selectedGroup) {
-              if (this.selectedChartType.value === 'line') {
-                esBody = {
-                  query: $scope.page.query,
-                  size: 0,
-                  aggs: {
-                    group_info: {
-                      terms: {
-                        field: this.selectedGroup.key,
-                        size: 10
-                      },
-                      aggs: {
-                        event_over_time: {
-                          date_histogram: {
-                            field: "timestamp",
-                            interval: $scope.interval + "ms"
-                          },
-                          aggs: {
-                            metric_value: metricValue
-                          }
-                        }
-                      }
-                    }
-                  }
-                };
-                if (!esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value) {
-                  delete esBody.aggs.group_info.aggs.event_over_time.aggs.metric_value;
-                }
-                return $http.post("/console/ajax/search", {
-                  esBody: esBody,
-                  begin: +$scope.startDate,
-                  end: +$scope.endDate
-                }).success((function(_this) {
-                  return function(json) {
-                    var series;
-                    $('#chartStats').height(350);
-                    series = _.chain(json.aggregations.group_info.buckets).map(function(bucket) {
-                      var data;
-                      data = getTimeData(bucket, $scope);
-                      return {
-                        name: bucket.key,
-                        type: 'line',
-                        data: data
-                      };
-                    }).value().slice(0, 4);
-                    return $scope.drawChart(chartStats, series, {
-                      title: {
-                        text: title
-                      }
-                    });
-                  };
-                })(this));
-              } else {
-                esBody = {
-                  query: $scope.page.query,
-                  size: 0,
-                  aggs: {
-                    group_info: {
-                      terms: {
-                        field: this.selectedGroup.key,
-                        size: 10
-                      },
-                      aggs: {
-                        metric_value: metricValue
-                      }
-                    }
-                  }
-                };
-                if (!esBody.aggs.group_info.aggs.metric_value) {
-                  delete esBody.aggs.group_info.aggs.metric_value;
-                }
-                return $http.post("/console/ajax/search", {
-                  esBody: esBody,
-                  begin: +$scope.startDate,
-                  end: +$scope.endDate
-                }).success((function(_this) {
-                  return function(json) {
-                    var bucket, buckets;
-                    buckets = json.aggregations.group_info.buckets;
-                    $('#chartStats').height(60 + buckets.length * 35);
-                    return $scope.drawChart(chartStats, [
-                      {
-                        name: title,
-                        data: (function() {
-                          var _i, _len, _ref, _results;
-                          _results = [];
-                          for (_i = 0, _len = buckets.length; _i < _len; _i++) {
-                            bucket = buckets[_i];
-                            _results.push(((_ref = bucket.metric_value) != null ? _ref.value : void 0) || bucket.doc_count);
-                          }
-                          return _results;
-                        })(),
-                        type: 'bar'
-                      }
-                    ], {
-                      basicChart: 1,
-                      chart: {
-                        renderTo: chartStats.id
-                      },
-                      plotOptions: {
-                        bar: {
-                          dataLabels: {
-                            enabled: true
-                          }
-                        }
-                      },
-                      title: {
-                        text: title
-                      },
-                      xAxis: {
-                        categories: (function() {
-                          var _i, _len, _results;
-                          _results = [];
-                          for (_i = 0, _len = buckets.length; _i < _len; _i++) {
-                            bucket = buckets[_i];
-                            _results.push(bucket.key);
-                          }
-                          return _results;
-                        })(),
-                        title: {
-                          text: null
-                        }
-                      },
-                      yAxis: {
-                        floor: 0,
-                        title: {
-                          text: null
-                        },
-                        min: 0,
-                        labels: {
-                          overflow: 'justify'
-                        }
-                      }
-                    });
-                  };
-                })(this));
+            };
+          } else {
+            agg_method = this.selectedAgg.value;
+            aggregation = {
+              metric_value: {}
+            };
+            aggregation.metric_value[this.selectedAgg.value] = {
+              field: this.selectedField.key
+            };
+          }
+          if (this.selectedChartType.value === 'line') {
+            aggregation = {
+              event_over_time: {
+                date_histogram: {
+                  field: 'timestamp',
+                  interval: $scope.interval + "ms"
+                },
+                aggs: aggregation
               }
-            } else {
-              if (this.selectedChartType.value === 'line') {
-                esBody = {
-                  query: $scope.page.query,
-                  size: 0,
-                  aggs: {
-                    event_over_time: {
-                      date_histogram: {
-                        field: "timestamp",
-                        interval: $scope.interval + "ms"
-                      },
-                      aggs: {
-                        metric_value: metricValue
-                      }
-                    }
-                  }
-                };
-                if (!esBody.aggs.event_over_time.aggs.metric_value) {
-                  delete esBody.aggs.event_over_time.aggs.metric_value;
+            };
+          }
+          if (this.selectedGroup) {
+            aggregation = {
+              group_info: {
+                terms: {
+                  field: this.selectedGroup.key,
+                  size: 10
+                },
+                aggs: aggregation
+              }
+            };
+          }
+          esBody = {
+            query: $scope.page.query,
+            size: 0,
+            aggs: aggregation
+          };
+          title = (this.selectedField ? this.selectedField.name + " " : "") + this.selectedAgg.title;
+          return $http.post("/console/ajax/search", {
+            esBody: esBody,
+            begin: +$scope.startDate,
+            end: +$scope.endDate
+          }).success((function(_this) {
+            return function(json) {
+              var bucket, buckets, categories, chartHeight, data, series, _i, _len, _ref;
+              chartHeight = 0;
+              if (_this.selectedChartType.value === 'line') {
+                if (_this.selectedGroup) {
+                  chartHeight = 350;
+                } else {
+                  chartHeight = 300;
                 }
-                return $http.post("/console/ajax/search", {
-                  esBody: esBody,
-                  begin: +$scope.startDate,
-                  end: +$scope.endDate
-                }).success((function(_this) {
-                  return function(json) {
-                    var data, series;
-                    $('#chartStats').height(300);
-                    data = getTimeData(json.aggregations, $scope);
-                    series = [
-                      {
-                        name: title,
-                        type: 'line',
-                        data: data
+              } else if (_this.selectedChartType.value === 'bar') {
+                if (_this.selectedGroup) {
+                  buckets = json.aggregations.group_info.buckets;
+                  chartHeight = 60 + buckets.length * 35;
+                } else {
+                  chartHeight = 100;
+                }
+              }
+              $('#chartStats').height(chartHeight);
+              if (_this.selectedChartType.value === 'line') {
+                if (_this.selectedGroup) {
+                  series = _.chain(json.aggregations.group_info.buckets).map(function(bucket) {
+                    var data;
+                    data = getTimeData(bucket, $scope);
+                    return {
+                      name: bucket.key,
+                      type: 'line',
+                      data: data
+                    };
+                  }).value().slice(0, 5);
+                  return $scope.drawChart(chartStats, series, {
+                    title: {
+                      text: title
+                    }
+                  });
+                } else {
+                  data = getTimeData(json.aggregations, $scope);
+                  series = [
+                    {
+                      name: title,
+                      type: 'line',
+                      data: data
+                    }
+                  ];
+                  return $scope.drawChart(chartStats, series);
+                }
+              } else if (_this.selectedChartType.value === 'bar') {
+                buckets = json.aggregations.group_info.buckets;
+                if (_this.selectedGroup) {
+                  for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                    bucket = buckets[_i];
+                    data = ((_ref = bucket.metric_value) != null ? _ref.value : void 0) || bucket.doc_count;
+                  }
+                  categories = (function() {
+                    var _j, _len1, _results;
+                    _results = [];
+                    for (_j = 0, _len1 = buckets.length; _j < _len1; _j++) {
+                      bucket = buckets[_j];
+                      _results.push(bucket.key);
+                    }
+                    return _results;
+                  })();
+                } else {
+                  data = [json.aggregations.metric_value.value];
+                  categories = ['全部'];
+                }
+                return $scope.drawChart(chartStats, [
+                  {
+                    name: title,
+                    data: data,
+                    type: 'bar'
+                  }
+                ], {
+                  basicChart: 1,
+                  chart: {
+                    renderTo: chartStats.id
+                  },
+                  plotOptions: {
+                    bar: {
+                      dataLabels: {
+                        enabled: true
                       }
-                    ];
-                    return $scope.drawChart(chartStats, series);
-                  };
-                })(this));
-              } else {
-                return $http.post("/console/ajax/search", {
-                  esBody: {
-                    query: $scope.page.query,
-                    size: 0,
-                    aggs: {
-                      metric_value: metricValue
                     }
                   },
-                  begin: +$scope.startDate,
-                  end: +$scope.endDate
-                }).success((function(_this) {
-                  return function(json) {
-                    $('#chartStats').height(100);
-                    return $scope.drawChart(chartStats, [
-                      {
-                        name: _this.selectedAgg.title,
-                        data: [json.aggregations.metric_value.value],
-                        type: 'bar'
-                      }
-                    ], {
-                      basicChart: 1,
-                      chart: {
-                        renderTo: chartStats.id
-                      },
-                      plotOptions: {
-                        bar: {
-                          dataLabels: {
-                            enabled: true
-                          }
-                        }
-                      },
-                      title: {
-                        text: title
-                      },
-                      xAxis: {
-                        categories: ['全部'],
-                        title: {
-                          text: null
-                        }
-                      },
-                      yAxis: {
-                        floor: 0,
-                        title: {
-                          text: null
-                        },
-                        min: 0,
-                        labels: {
-                          overflow: 'justify',
-                          enabled: false
-                        }
-                      }
-                    });
-                  };
-                })(this));
+                  title: {
+                    text: title
+                  },
+                  xAxis: {
+                    categories: categories,
+                    title: {
+                      text: null
+                    }
+                  },
+                  yAxis: {
+                    floor: 0,
+                    title: {
+                      text: null
+                    },
+                    min: 0,
+                    labels: {
+                      overflow: 'justify'
+                    }
+                  }
+                });
               }
-            }
-          }
+            };
+          })(this));
         }
       };
     };
