@@ -871,6 +871,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     $scope.changeTab = function(tab) {
       $location.search('t', tab);
       $scope.page.tab = tab;
+      $scope.stats.showStats();
     }
 }]); // end angular
 

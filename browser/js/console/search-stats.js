@@ -181,6 +181,9 @@
         },
         showStats: function() {
           var agg_method, aggregation, date_histogram, esBody, group_by_field, title;
+          if ($scope.page.tab !== 'stats') {
+            return;
+          }
           $location.search('stats', this.serialize());
           if (chartStats.highChart) {
             chartStats.highChart.showLoading();

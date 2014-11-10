@@ -145,10 +145,11 @@ define ['underscore'], (_) ->
         @setAggs()
 
         # 显示图表
-        @showStats()         
-      
+        @showStats()   
 
       showStats: () ->
+        return if $scope.page.tab != 'stats'
+
         $location.search 'stats', @serialize()
 
         if chartStats.highChart
