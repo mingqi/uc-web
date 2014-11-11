@@ -334,5 +334,5 @@ define ['underscore'], (_) ->
               title:
                 text: title
               tooltip: 
-                pointFormat: '<b>{point.percentage:.1f}</b>'
+                pointFormat: '<b>{point.percentage:.1f} %</b>'
     
