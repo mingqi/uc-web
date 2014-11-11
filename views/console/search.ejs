@@ -145,14 +145,14 @@
                   </div>
                   &nbsp;
                 </span>
-                <span ng-repeat="(fieldKey, field) in page.filter._field"
+                <span ng-repeat="(fieldKey, fieldValue) in page.filter._field"
                     style="display: block; float: left; margin-bottom:5px">
                   <div class="label label-xlg label-gray">
-                    <button type="button" class="close" ng-click="removeCustomField(field)">
+                    <button type="button" class="close" ng-click="removeCustomField(fieldKey)">
                       <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
                     </button>
                     <span>
-                      {{getFieldName(fieldKey)}} : {{field.input | maxStr:30}}
+                      {{getFieldName(fieldKey)}} : {{fieldValue | maxStr:30}}
                     </span>
                   </div>
                   &nbsp;
@@ -229,7 +229,6 @@
                       <input type="radio" ng-model="stats.type" value="statistics" ng-change="stats.optionsChange()">
                       统计字段
                     </label>
-
                     <span ng-if="stats.type == 'statistics'">
                       &nbsp; 选择字段:
                       <select ng-options="field.name group by field.group for field in stats.fields"
@@ -252,7 +251,6 @@
                     </select>
 
                   </h5>
-
 
                   <div id="chartStats" ng-if="stats.selectedField || stats.selectedGroup">
                     <div style="font-size:20px; padding-top:20px" class="text-center" ng-if="stats.loading">

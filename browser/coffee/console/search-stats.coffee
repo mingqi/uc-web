@@ -55,7 +55,7 @@ define ['underscore'], (_) ->
         },{
           value: 'pie'
           text: '饼图'
-          }]
+        }]
         @aggs = []
         @groups = []
         @selectedChartType = @chartTypes[0]
@@ -99,7 +99,7 @@ define ['underscore'], (_) ->
       setAggs: () ->
         if @selectedField
           if @selectedField.isNumeric
-            newAggs = [].concat [{
+            newAggs = [{
               value: 'avg'
               title: '平均'
             }, {
@@ -113,7 +113,7 @@ define ['underscore'], (_) ->
               title: '最小值'
             }]
           else
-            newAggs = [].concat [{
+            newAggs = [{
               value: 'cardinality'
               title: '不重复数量'
             }]
@@ -137,7 +137,6 @@ define ['underscore'], (_) ->
             @selectedGroup = ''
 
       chartTypeChange : (type) ->
-        console.log("aaaaa = #{type}")
         @selectedChartType = type
         @optionsChange() 
 
@@ -149,7 +148,7 @@ define ['underscore'], (_) ->
         @setAggs()
 
         # 显示图表
-        @showStats()   
+        @showStats()
 
       showStats: () ->
         return if $scope.page.tab != 'stats'
@@ -313,8 +312,6 @@ define ['underscore'], (_) ->
                 data = ([bucket.key, bucket.metric_value.value] for bucket in buckets)
               else
                 data = [['全部', json.aggregations.metric_value.value]]
-
-            console.log "mingqi ccc: #{data}"
 
             $scope.drawChart chartStats, [{
               data: data

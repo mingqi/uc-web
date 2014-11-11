@@ -123,7 +123,7 @@
           var newAggs;
           if (this.selectedField) {
             if (this.selectedField.isNumeric) {
-              newAggs = [].concat([
+              newAggs = [
                 {
                   value: 'avg',
                   title: '平均'
@@ -137,14 +137,14 @@
                   value: 'min',
                   title: '最小值'
                 }
-              ]);
+              ];
             } else {
-              newAggs = [].concat([
+              newAggs = [
                 {
                   value: 'cardinality',
                   title: '不重复数量'
                 }
-              ]);
+              ];
             }
           }
           if (newAggs.length !== this.aggs.length) {
@@ -173,7 +173,6 @@
           }
         },
         chartTypeChange: function(type) {
-          console.log("aaaaa = " + type);
           this.selectedChartType = type;
           return this.optionsChange();
         },
@@ -427,7 +426,6 @@
                     data = [['全部', json.aggregations.metric_value.value]];
                   }
                 }
-                console.log("mingqi ccc: " + data);
                 return $scope.drawChart(chartStats, [
                   {
                     data: data

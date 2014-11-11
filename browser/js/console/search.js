@@ -472,7 +472,17 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         _.each(fields, function(field) {
           var oldField = oldFieldMap[field.key];
 
-          $scope.fields.push(oldField || field);
+          var newField = oldField || field;
+
+          if (oldField && !oldField.name) {
+            // 来自 _field 复制网址
+            newField = _.extend(field, {
+              input: oldField.input
+            });
+            $scope.toggleField(newField);
+          }
+
+          $scope.fields.push(newField);
         });
 
         $scope.stats.setFileds();
@@ -553,6 +563,23 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         };
 
         // 增加 $scope.page.query.filtered.query
+        if (opts.init) {
+          // 增加 _field 过滤
+          if (!$scope.fields) {
+            $scope.fields = [];
+          }
+          var fieldMap = _.indexBy($scope.fields, 'key');
+          _.each($scope.page.filter._field || {}, function(value, key) {
+            if (fieldMap[key]) {
+              fieldMap[key].input = value;
+            } else {
+              $scope.fields.push({
+                key: key,
+                input: value
+              })
+            }
+          });
+        }
         _.each($scope.fields, function(field) {
           if ($scope.page.query.filtered.query == null) {
             $scope.page.query.filtered.query = {
@@ -661,8 +688,6 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
       field.loading = true;
 
-      console.log($scope.page.pattern.query);
-      console.log($scope.page.query.filtered.query);
       var query = {
         filtered: {
           query: $scope.page.query.filtered.query,
@@ -787,17 +812,22 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
     // 自定义field: key, name, input
     $scope.searchCustomField = function(field) {
       if (!field.input) {
-        $scope.removeCustomField(field);
+        $scope.removeCustomField(field.key);
       } else {
-        $scope.page.filter._field[field.key] = field;
+        $scope.page.filter._field[field.key] = field.input;
       }
       $scope.search();
     };
 
     // 删除用户填写的 field 条件
-    $scope.removeCustomField = function(field) {
-      field.input = null;
-      delete $scope.page.filter._field[field.key];
+    $scope.removeCustomField = function(fieldKey) {
+      _.some($scope.fields, function(field) {
+        if (field.key == fieldKey) {
+          field.input = '';
+          return true;
+        }
+      });
+      delete $scope.page.filter._field[fieldKey];
       $scope.search();
     };
 
