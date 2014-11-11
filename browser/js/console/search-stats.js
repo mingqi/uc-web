@@ -44,12 +44,15 @@
         init: function() {
           this.chartTypes = [
             {
+              icon: 'fa-line-chart',
               value: 'line',
               text: '折线图'
             }, {
+              icon: 'fa-bar-chart',
               value: 'bar',
               text: '柱状图'
             }, {
+              icon: 'fa-pie-chart',
               value: 'pie',
               text: '饼图'
             }

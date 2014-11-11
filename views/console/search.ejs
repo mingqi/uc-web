@@ -202,12 +202,16 @@
                   <h5>
                     <span class="dropdown">
                       <a data-toggle="dropdown" href="#" style="text-decoration:none">
-                        <span >{{ stats.selectedChartType.text}}</span>
+                        <i class="fa" ng-class="stats.selectedChartType.icon"></i>
+                        <span>{{stats.selectedChartType.text}}</span>
                         <span class="caret"></span>
                       </a>
                       <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
                         <li ng-repeat="chartType in stats.chartTypes">
-                          <a ng-click="stats.chartTypeChange(chartType)">{{chartType.text}}</a>
+                          <a ng-click="stats.chartTypeChange(chartType)">
+                            <i class="fa" ng-class="chartType.icon"></i>
+                            {{chartType.text}}
+                          </a>
                         </li>
                       </ul>
                     </span>
