@@ -2,7 +2,7 @@
 /* jshint ignore:start */
 
 (function() {
-  var chartStats, defaultAgg, getTimeData;
+  var chartStats, getTimeData;
 
   getTimeData = function(timeAgg, $scope) {
     var add, buckets, data, date, endDate, from, minus, startDate, to, _ref;
@@ -38,11 +38,6 @@
     id: 'chartStats'
   };
 
-  defaultAgg = {
-    value: 'value_count',
-    title: '数量'
-  };
-
   define(['underscore'], function(_) {
     return function($scope, $http, $location) {
       return $scope.stats = {
@@ -54,9 +49,12 @@
             }, {
               value: 'bar',
               text: '柱状图'
+            }, {
+              value: 'pie',
+              text: '饼图'
             }
           ];
-          this.aggs = [defaultAgg];
+          this.aggs = [];
           this.groups = [];
           this.selectedChartType = this.chartTypes[0];
           this.selectedAgg = this.aggs[0];
@@ -123,15 +121,9 @@
         },
         setAggs: function() {
           var newAggs;
-          newAggs = [
-            {
-              value: 'terms',
-              title: '数量'
-            }
-          ];
           if (this.selectedField) {
             if (this.selectedField.isNumeric) {
-              newAggs = [defaultAgg].concat([
+              newAggs = [].concat([
                 {
                   value: 'avg',
                   title: '平均'
@@ -147,10 +139,10 @@
                 }
               ]);
             } else {
-              newAggs = [defaultAgg].concat([
+              newAggs = [].concat([
                 {
                   value: 'cardinality',
-                  title: '唯一值数量'
+                  title: '不重复数量'
                 }
               ]);
             }
@@ -166,13 +158,24 @@
           _ref = this.fields;
           for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             field = _ref[_i];
-            if (field.key !== ((_ref1 = this.selectedField) != null ? _ref1.key : void 0) && !field.isNumeric) {
-              this.groups.push(field);
+            if (field.isNumeric) {
+              continue;
+            }
+            if (this.type !== 'event_count' && field.key === ((_ref1 = this.selectedField) != null ? _ref1.key : void 0)) {
+              continue;
+            }
+            this.groups.push(field);
+          }
+          if (this.type !== 'event_count') {
+            if (((_ref2 = this.selectedGroup) != null ? _ref2.key : void 0) === ((_ref3 = this.selectedField) != null ? _ref3.key : void 0)) {
+              return this.selectedGroup = '';
             }
           }
-          if (((_ref2 = this.selectedGroup) != null ? _ref2.key : void 0) === ((_ref3 = this.selectedField) != null ? _ref3.key : void 0)) {
-            return this.selectedGroup = '';
-          }
+        },
+        chartTypeChange: function(type) {
+          console.log("aaaaa = " + type);
+          this.selectedChartType = type;
+          return this.optionsChange();
         },
         optionsChange: function() {
           this.setGroups();
@@ -180,23 +183,17 @@
           return this.showStats();
         },
         showStats: function() {
-          var agg_method, aggregation, date_histogram, esBody, group_by_field, title;
+          var agg_method, aggregation, esBody, title;
           if ($scope.page.tab !== 'stats') {
             return;
           }
           $location.search('stats', this.serialize());
-          if (chartStats.highChart) {
+          if (chartStats.highChart != null) {
             chartStats.highChart.showLoading();
           }
-          date_histogram = null;
-          group_by_field = null;
           aggregation = null;
           if (this.type === 'event_count') {
-            aggregation = {
-              metric_value: {
-                value_count: {}
-              }
-            };
+            aggregation = {};
           } else {
             agg_method = this.selectedAgg.value;
             aggregation = {
@@ -233,14 +230,26 @@
             size: 0,
             aggs: aggregation
           };
-          title = (this.selectedField ? this.selectedField.name + " " : "") + this.selectedAgg.title;
+
+          /* chart title */
+          title = '';
+          if (this.type === 'event_count') {
+            title = '日志数量';
+          } else {
+            if (this.selectedField) {
+              title += this.selectedField.name;
+            }
+            if (this.selectedAgg) {
+              title += ' - ' + this.selectedAgg.title;
+            }
+          }
           return $http.post("/console/ajax/search", {
             esBody: esBody,
             begin: +$scope.startDate,
             end: +$scope.endDate
           }).success((function(_this) {
             return function(json) {
-              var bucket, buckets, categories, chartHeight, data, series, _i, _len, _ref;
+              var bucket, buckets, categories, chartHeight, data, series;
               chartHeight = 0;
               if (_this.selectedChartType.value === 'line') {
                 if (_this.selectedGroup) {
@@ -255,6 +264,8 @@
                 } else {
                   chartHeight = 100;
                 }
+              } else if (_this.selectedChartType.value === 'pie') {
+                chartHeight = 300;
               }
               $('#chartStats').height(chartHeight);
               if (_this.selectedChartType.value === 'line') {
@@ -267,7 +278,7 @@
                       type: 'line',
                       data: data
                     };
-                  }).value().slice(0, 5);
+                  }).value();
                   return $scope.drawChart(chartStats, series, {
                     title: {
                       text: title
@@ -282,27 +293,63 @@
                       data: data
                     }
                   ];
-                  return $scope.drawChart(chartStats, series);
+                  return $scope.drawChart(chartStats, series, {
+                    title: {
+                      text: title
+                    }
+                  });
                 }
               } else if (_this.selectedChartType.value === 'bar') {
-                buckets = json.aggregations.group_info.buckets;
-                if (_this.selectedGroup) {
-                  for (_i = 0, _len = buckets.length; _i < _len; _i++) {
-                    bucket = buckets[_i];
-                    data = ((_ref = bucket.metric_value) != null ? _ref.value : void 0) || bucket.doc_count;
+                if (_this.type === 'event_count') {
+                  if (_this.selectedGroup) {
+                    buckets = json.aggregations.group_info.buckets;
+                    data = (function() {
+                      var _i, _len, _results;
+                      _results = [];
+                      for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                        bucket = buckets[_i];
+                        _results.push(bucket.doc_count);
+                      }
+                      return _results;
+                    })();
+                    categories = (function() {
+                      var _i, _len, _results;
+                      _results = [];
+                      for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                        bucket = buckets[_i];
+                        _results.push(bucket.key);
+                      }
+                      return _results;
+                    })();
+                  } else {
+                    data = [json.hits.total];
+                    categories = ['全部'];
                   }
-                  categories = (function() {
-                    var _j, _len1, _results;
-                    _results = [];
-                    for (_j = 0, _len1 = buckets.length; _j < _len1; _j++) {
-                      bucket = buckets[_j];
-                      _results.push(bucket.key);
-                    }
-                    return _results;
-                  })();
                 } else {
-                  data = [json.aggregations.metric_value.value];
-                  categories = ['全部'];
+                  if (_this.selectedGroup) {
+                    buckets = json.aggregations.group_info.buckets;
+                    data = (function() {
+                      var _i, _len, _results;
+                      _results = [];
+                      for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                        bucket = buckets[_i];
+                        _results.push(bucket.metric_value.value);
+                      }
+                      return _results;
+                    })();
+                    categories = (function() {
+                      var _i, _len, _results;
+                      _results = [];
+                      for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                        bucket = buckets[_i];
+                        _results.push(bucket.key);
+                      }
+                      return _results;
+                    })();
+                  } else {
+                    data = [json.aggregations.metric_value.value];
+                    categories = ['全部'];
+                  }
                 }
                 return $scope.drawChart(chartStats, [
                   {
@@ -318,12 +365,18 @@
                   plotOptions: {
                     bar: {
                       dataLabels: {
-                        enabled: true
+                        enabled: true,
+                        formatter: function() {
+                          return Highcharts.numberFormat(this.y, 0);
+                        }
                       }
                     }
                   },
                   title: {
                     text: title
+                  },
+                  tooltip: {
+                    valueDecimals: 0
                   },
                   xAxis: {
                     categories: categories,
@@ -340,6 +393,66 @@
                     labels: {
                       overflow: 'justify'
                     }
+                  }
+                });
+              } else if (_this.selectedChartType.value === 'pie') {
+                if (_this.type === 'event_count') {
+                  if (_this.selectedGroup) {
+                    buckets = json.aggregations.group_info.buckets;
+                    data = (function() {
+                      var _i, _len, _results;
+                      _results = [];
+                      for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                        bucket = buckets[_i];
+                        _results.push([bucket.key, bucket.doc_count]);
+                      }
+                      return _results;
+                    })();
+                  } else {
+                    data = [['全部', json.hits.total]];
+                  }
+                } else {
+                  if (_this.selectedGroup) {
+                    buckets = json.aggregations.group_info.buckets;
+                    data = (function() {
+                      var _i, _len, _results;
+                      _results = [];
+                      for (_i = 0, _len = buckets.length; _i < _len; _i++) {
+                        bucket = buckets[_i];
+                        _results.push([bucket.key, bucket.metric_value.value]);
+                      }
+                      return _results;
+                    })();
+                  } else {
+                    data = [['全部', json.aggregations.metric_value.value]];
+                  }
+                }
+                console.log("mingqi ccc: " + data);
+                return $scope.drawChart(chartStats, [
+                  {
+                    data: data
+                  }
+                ], {
+                  basicChart: 1,
+                  chart: {
+                    renderTo: chartStats.id,
+                    type: 'pie'
+                  },
+                  plotOptions: {
+                    pie: {
+                      allowPointSelect: true,
+                      cursor: 'pointer',
+                      dataLabels: {
+                        enabled: true,
+                        format: '<b>{point.name}</b>: {point.percentage:.1f} %'
+                      }
+                    }
+                  },
+                  title: {
+                    text: title
+                  },
+                  tooltip: {
+                    pointFormat: '{point.percentage:.1f}%</b>'
                   }
                 });
               }

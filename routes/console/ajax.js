@@ -46,7 +46,7 @@ exports.search = function(req, res, next) {
         begin = begin.add(1, 'day');
     }
 
-    console.log(JSON.stringify(esBody,null,4))
+    console.log(JSON.stringify(esBody,null,2))
     esClient.search({
         index: index.join(','),
         type: type,

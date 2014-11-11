@@ -247,31 +247,31 @@ var baseFields = [{
 
 var nginxKeyMap = {
   'nginx.http_method': {
-    name: '请求方法'
+    name: 'http_method'
   },
   'nginx.referer': {
-    name: '来源',
+    name: 'referer',
     customizable: true
   },
   'nginx.remote_address': {
-    name: 'IP'
+    name: 'remote_address'
   },
   'nginx.request_uri': {
-    name: '网址',
+    name: 'request_uri',
     customizable: true
   },
   'nginx.response_size': {
-    name: '响应大小',
+    name: 'response_size',
     isNumeric: true
   },
   'nginx.response_status': {
-    name: '响应状态码'
+    name: 'response_status'
   },
   'nginx.user_agent': {
-    name: 'User Agent'
+    name: 'user_agent'
   },
   'nginx.spider': {
-    name: '蜘蛛(Spider)'
+    name: 'spider'
   }
 };
 

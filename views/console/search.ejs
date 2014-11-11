@@ -77,7 +77,7 @@
                       <li ng-if="field.customizable">
                         <div style="padding: 7px 10px 9px 37px;">
                           <span class="input-icon input-icon-right" style="width: 100%">
-                            <input type="text" ng-model="field.input" style="width: 100%" placeholder="自定义{{field.name}}" ng-enter="searchCustomField(field)">
+                            <input type="text" ng-model="field.input" style="width: 100%" placeholder="字符串过滤" ng-enter="searchCustomField(field)">
                             <i class="icon-none green fa fa-search" ng-click="searchCustomField(field)"></i>
                           </span>
                         </div>
@@ -152,7 +152,7 @@
                       <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
                     </button>
                     <span>
-                      自定义{{getFieldName(fieldKey)}} : {{field.input | maxStr:30}}
+                      {{getFieldName(fieldKey)}} : {{field.input | maxStr:30}}
                     </span>
                   </div>
                   &nbsp;
@@ -200,21 +200,34 @@
 
                 <div ng-show="page.tab == 'stats'">
                   <h5>
+                    <span class="dropdown">
+                      <a data-toggle="dropdown" href="#" style="text-decoration:none">
+                        <span >{{ stats.selectedChartType.text}}</span>
+                        <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <li ng-repeat="chartType in stats.chartTypes">
+                          <a ng-click="stats.chartTypeChange(chartType)">{{chartType.text}}</a>
+                        </li>
+                      </ul>
+                    </span>
+                    <!-- 
                     <select ng-options="type.text for type in stats.chartTypes"
                         ng-model="stats.selectedChartType"
-                        ng-change="stats.changeChartType()">
+                        ng-change="stats.optionsChange()">
                     </select>
+                    -->
 
                     &nbsp;
                     <label>
-                      <input type="radio" ng-model="stats.type" value="event_count">
-                      数量
+                      <input type="radio" ng-model="stats.type" value="event_count" ng-change="stats.optionsChange()">
+                      日志数量
                     </label>
                     
                     &nbsp;
                     <label>
-                      <input type="radio" ng-model="stats.type" value="statistics">
-                      指定字段
+                      <input type="radio" ng-model="stats.type" value="statistics" ng-change="stats.optionsChange()">
+                      统计字段
                     </label>
 
                     <span ng-if="stats.type == 'statistics'">
@@ -235,7 +248,7 @@
                     <select ng-options="groupField.name group by groupField.group for groupField in stats.groups"
                         ng-model="stats.selectedGroup"
                         ng-change="stats.optionsChange()">
-                      <option value="">全部</option>
+                      <option value="">不分组</option>
                     </select>
 
                   </h5>

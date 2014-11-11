@@ -42,11 +42,6 @@ getTimeData = (timeAgg, $scope) ->
 
 chartStats = {id: 'chartStats'}
 
-defaultAgg = {
-  value: 'value_count'
-  title: '数量'
-}
-
 define ['underscore'], (_) ->
   ($scope, $http, $location) ->
     $scope.stats =
@@ -57,8 +52,11 @@ define ['underscore'], (_) ->
         }, {
           value: 'bar'
           text: '柱状图'
-        }]
-        @aggs = [defaultAgg]
+        },{
+          value: 'pie'
+          text: '饼图'
+          }]
+        @aggs = []
         @groups = []
         @selectedChartType = @chartTypes[0]
         @selectedAgg = @aggs[0]
@@ -99,13 +97,9 @@ define ['underscore'], (_) ->
         @setGroups()
 
       setAggs: () ->
-        newAggs = [{
-          value: 'terms'
-          title: '数量'
-        }]
         if @selectedField
           if @selectedField.isNumeric
-            newAggs = [defaultAgg].concat [{
+            newAggs = [].concat [{
               value: 'avg'
               title: '平均'
             }, {
@@ -119,9 +113,9 @@ define ['underscore'], (_) ->
               title: '最小值'
             }]
           else
-            newAggs = [defaultAgg].concat [{
+            newAggs = [].concat [{
               value: 'cardinality'
-              title: '唯一值数量'
+              title: '不重复数量'
             }]
 
         if newAggs.length != @aggs.length
@@ -132,10 +126,20 @@ define ['underscore'], (_) ->
         @groups = []
         # if @selectedField
         for field in @fields
-          if field.key != @selectedField?.key and !field.isNumeric
-            @groups.push field
-        if @selectedGroup?.key == @selectedField?.key
-          @selectedGroup = ''
+          if field.isNumeric
+            continue
+          if @type != 'event_count' and field.key == @selectedField?.key 
+            continue
+          @groups.push field
+
+        if @type != 'event_count'
+          if @selectedGroup?.key == @selectedField?.key
+            @selectedGroup = ''
+
+      chartTypeChange : (type) ->
+        console.log("aaaaa = #{type}")
+        @selectedChartType = type
+        @optionsChange() 
 
       optionsChange: () ->
         # groups 逻辑
@@ -152,27 +156,20 @@ define ['underscore'], (_) ->
 
         $location.search 'stats', @serialize()
 
-        if chartStats.highChart
+        if chartStats.highChart?
           chartStats.highChart.showLoading()
 
-        #########
-        date_histogram = null
-        group_by_field = null
         aggregation = null 
-        #########
 
         ## most bottom metric, e.g. avg, sum, event_count ...
         if @type == 'event_count'
-          aggregation = 
-            metric_value: 
-              value_count:  { }
+          aggregation = {}
         else
           agg_method = @selectedAgg.value
           aggregation = 
             metric_value: {}
           aggregation.metric_value[@selectedAgg.value] = 
             field: @selectedField.key
-              
 
         ## split by time interval
         if @selectedChartType.value == 'line'
@@ -197,7 +194,17 @@ define ['underscore'], (_) ->
           size: 0
           aggs: aggregation
 
-        title = (if @selectedField then @selectedField.name + " " else "") + @selectedAgg.title
+
+        ### chart title ###
+        title =  ''
+        if @type == 'event_count'
+          title = '日志数量'
+        else
+          if @selectedField
+            title += @selectedField.name
+          if @selectedAgg
+            title += ' - ' + @selectedAgg.title
+
         $http.post "/console/ajax/search",
           esBody: esBody
           begin: +$scope.startDate
@@ -215,6 +222,8 @@ define ['underscore'], (_) ->
               chartHeight = 60 + buckets.length * 35
             else
               chartHeight = 100
+          else if @selectedChartType.value == 'pie'
+            chartHeight = 300
 
           $('#chartStats').height(chartHeight);
 
@@ -227,7 +236,7 @@ define ['underscore'], (_) ->
                   type: 'line'
                   data: data
                 }
-              .value()[0..4]
+              .value()
 
               $scope.drawChart chartStats, series,
                 title:
@@ -239,15 +248,26 @@ define ['underscore'], (_) ->
                 type: 'line'
                 data: data
               }]
-              $scope.drawChart(chartStats, series)
+              $scope.drawChart chartStats, series,
+                title:
+                  text: title
           else if @selectedChartType.value == 'bar'
-            buckets = json.aggregations.group_info.buckets
-            if @selectedGroup
-              data = (bucket.metric_value?.value || bucket.doc_count) for bucket in buckets
-              categories = (bucket.key for bucket in buckets)
+            if @type == 'event_count'
+              if @selectedGroup
+                buckets = json.aggregations.group_info.buckets
+                data = (bucket.doc_count for bucket in buckets)
+                categories = (bucket.key for bucket in buckets)
+              else
+                data = [json.hits.total]
+                categories = ['全部']
             else
-              data = [json.aggregations.metric_value.value]
-              categories = ['全部']
+              if @selectedGroup
+                buckets = json.aggregations.group_info.buckets
+                data = (bucket.metric_value.value for bucket in buckets)
+                categories = (bucket.key for bucket in buckets)
+              else
+                data = [json.aggregations.metric_value.value]
+                categories = ['全部']
 
             $scope.drawChart chartStats, [{
               name: title
@@ -261,8 +281,13 @@ define ['underscore'], (_) ->
                 bar:
                   dataLabels:
                     enabled: true
+                    formatter: () ->
+                      return Highcharts.numberFormat(this.y,0)
+                    
               title:
                 text: title
+              tooltip: 
+                valueDecimals: 0
               xAxis:
                 categories: categories
                 title:
@@ -274,5 +299,39 @@ define ['underscore'], (_) ->
                 min: 0
                 labels:
                   overflow: 'justify'            
+          else if @selectedChartType.value == 'pie'
+            if @type == 'event_count'
+              if @selectedGroup
+                buckets = json.aggregations.group_info.buckets
+                data = ([bucket.key, bucket.doc_count] for bucket in buckets)
+              else
+                data = [['全部',json.hits.total]]
+            else
+              if @selectedGroup
+                buckets = json.aggregations.group_info.buckets
+                data = ([bucket.key, bucket.metric_value.value] for bucket in buckets)
+              else
+                data = [['全部', json.aggregations.metric_value.value]]
 
+            console.log "mingqi ccc: #{data}"
+
+            $scope.drawChart chartStats, [{
+              data: data
+            }],
+              basicChart: 1
+              chart:
+                renderTo : chartStats.id
+                type: 'pie'
+              plotOptions:
+                pie:
+                  allowPointSelect: true,
+                  cursor: 'pointer',
+                  dataLabels:
+                    enabled: true
+                    format: '<b>{point.name}</b>: {point.percentage:.1f} %',
+
+              title:
+                text: title
+              tooltip: 
+                pointFormat: '{point.percentage:.1f}%</b>'
     
