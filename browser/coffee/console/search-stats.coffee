@@ -270,7 +270,7 @@ define ['underscore'], (_) ->
                 categories = ['全部']
 
             $scope.drawChart chartStats, [{
-              name: title
+              # name: title
               data: data
               type: 'bar'
             }],
@@ -288,6 +288,7 @@ define ['underscore'], (_) ->
                 text: title
               tooltip: 
                 valueDecimals: 0
+                pointFormat: '<b>{point.y}</b>'
               xAxis:
                 categories: categories
                 title:
@@ -333,5 +334,5 @@ define ['underscore'], (_) ->
               title:
                 text: title
               tooltip: 
-                pointFormat: '{point.percentage:.1f}%</b>'
+                pointFormat: '<b>{point.percentage:.1f}</b>'
     

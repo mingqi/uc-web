@@ -353,7 +353,6 @@
                 }
                 return $scope.drawChart(chartStats, [
                   {
-                    name: title,
                     data: data,
                     type: 'bar'
                   }
@@ -376,7 +375,8 @@
                     text: title
                   },
                   tooltip: {
-                    valueDecimals: 0
+                    valueDecimals: 0,
+                    pointFormat: '<b>{point.y}</b>'
                   },
                   xAxis: {
                     categories: categories,
@@ -452,7 +452,7 @@
                     text: title
                   },
                   tooltip: {
-                    pointFormat: '{point.percentage:.1f}%</b>'
+                    pointFormat: '<b>{point.percentage:.1f}</b>'
                   }
                 });
               }
