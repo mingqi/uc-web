@@ -1,6 +1,6 @@
-require(['jquery', 'underscore', 'con', 'moment', 'scrollTo', 'pattern',
+require(['jquery', 'underscore', 'con', 'moment', 'scrollTo', 'pattern', 'searchStats',
          'highstock', 'daterangepicker', 'pattern', 'angular-sanitize'],
-function($, _, con, moment, $scrollTo, pattern) {
+function($, _, con, moment, $scrollTo, pattern, searchStats) {
 
 Highcharts.setOptions({
     global : {
@@ -60,6 +60,12 @@ var dateRangePickerOptions = {
     endDate: endDate
 };
 
+var emitDateRangeChange = function($scope) {
+  setAutoInterval($scope);
+  $scope.availableIntervals = getAvailableIntervals();
+  $scope.search();
+};
+
 var initDateRangePicker = function($scope, locationSearch) {
   if (locationSearch.b && locationSearch.e) {
     var b = moment(parseFloat(locationSearch.b));
@@ -73,12 +79,15 @@ var initDateRangePicker = function($scope, locationSearch) {
     }
   }
 
+  $scope.startDate = startDate;
+  $scope.endDate = endDate;
+
   $('#daterange').daterangepicker(dateRangePickerOptions);
   $('#daterange').on('apply.daterangepicker', function(ev, picker) {
       chosenLabel = picker.chosenLabel;
-      startDate = picker.startDate;
-      endDate = picker.endDate;
-      $scope.search();
+      $scope.startDate = startDate = picker.startDate;
+      $scope.endDate = endDate = picker.endDate;
+      emitDateRangeChange($scope);
   });
 };
 
@@ -90,7 +99,6 @@ var updateDateRangePicker = function($scope) {
     $scope.dateRange = chosenLabel;
   }
 
-
   var opts = _.extend(dateRangePickerOptions, {
     ranges: ranges,
     startDate: startDate,
@@ -101,11 +109,12 @@ var updateDateRangePicker = function($scope) {
   $('#daterange').data('daterangepicker').setOptions(opts);
 };
 
-var drawChart = function(chart, series, $scope) {
+var drawChart = function(chart, series, opts) {
+    $scope = this;
     if (chart.highChart) {
         chart.highChart.destroy();
     }
-    var opts = {
+    var defaultOpts = {
         chart : {
             renderTo : chart.id,
             zoomType : 'x',
@@ -115,9 +124,9 @@ var drawChart = function(chart, series, $scope) {
                       return;
                     }
                     chosenLabel = '自定义范围';
-                    startDate = moment(event.xAxis[0].min);
-                    endDate = moment(event.xAxis[0].max);
-                    $scope.search();
+                    $scope.startDate = startDate = moment(event.xAxis[0].min);
+                    $scope.endDate = endDate = moment(event.xAxis[0].max);
+                    emitDateRangeChange($scope);
                 }
             }
         },
@@ -177,7 +186,18 @@ var drawChart = function(chart, series, $scope) {
             }
         }
     };
-    chart.highChart = new Highcharts.StockChart(opts);
+
+    if (opts) {
+      opts = _.extend(defaultOpts, opts);
+    } else {
+      opts = defaultOpts;
+    }
+
+    if (opts.basicChart) {
+      chart.highChart = new Highcharts.Chart(opts);
+    } else {
+      chart.highChart = new Highcharts.StockChart(opts);
+    }
 };
 
 var handleSearchResult = function($scope, esResponse) {
@@ -215,6 +235,90 @@ var getESBody = function($scope) {
   }
 };
 
+var baseFields = [{
+  key: 'host',
+  name: '主机',
+  group: 'base'
+}, {
+  key: 'path',
+  name: '路径',
+  group: 'base'
+}];
+
+var nginxKeyMap = {
+  'nginx.http_method': {
+    name: 'http_method'
+  },
+  'nginx.referer': {
+    name: 'referer',
+    customizable: true
+  },
+  'nginx.remote_address': {
+    name: 'remote_address'
+  },
+  'nginx.request_uri': {
+    name: 'request_uri',
+    customizable: true
+  },
+  'nginx.response_size': {
+    name: 'response_size',
+    isNumeric: true
+  },
+  'nginx.response_status': {
+    name: 'response_status'
+  },
+  'nginx.user_agent': {
+    name: 'user_agent'
+  },
+  'nginx.spider': {
+    name: 'spider'
+  }
+};
+
+var nginxFieldKeys = _.map(('remote_address,http_method,request_uri,response_status,response_size,' +
+    'referer,user_agent,spider').split(','), function(name) {
+  return 'nginx.' + name;
+});
+
+var intervals = [{
+  title: '1分钟',
+  ms: 1000 * 60
+}, {
+  title: '5分钟',
+  ms: 1000 * 60 * 5
+}, {
+  title: '20分钟',
+  ms: 1000 * 60 * 20
+}, {
+  title: '1小时',
+  ms: 1000 * 3600
+}, {
+  title: '4小时',
+  ms: 1000 * 3600 * 4
+}, {
+  title: '1天',
+  ms: 1000 * 3600 * 24
+}];
+
+var getAvailableIntervals = function() {
+  var result = _.chain(intervals).map(function(interval) {
+    var points = (endDate - startDate) / interval.ms;
+    if (points > 1 && points < 100) {
+      return interval;
+    }
+    return null;
+  }).filter().value().reverse();
+  return result;
+};
+
+var setAutoInterval = function($scope) {
+  var points = Math.min(30, parseInt((endDate - startDate) / 1000) + 1);
+  $scope.interval = parseInt((endDate - startDate)/points);
+  $scope.autoInterval = true;
+};
+
+var isStatsDeserialized = false;
+
 angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 .filter('isEmpty', function () {
         return function (obj) {
@@ -225,6 +329,13 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             }
             return true;
         };
+})
+.filter('maxStr', function() {
+  return function(str, len) {
+    return (str && str.length > len) ?
+      str.substr(0, len) + "..." :
+      str;
+  };
 })
 .directive('ngEnter', function () {
     return function (scope, element, attrs) {
@@ -239,11 +350,20 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
         });
     };
 })
-.controller('Ctrl', ['$scope', '$http', '$location', function($scope, $http, $location) {
+.controller('Ctrl', ['$scope', '$http', '$location', '$timeout', function($scope, $http, $location, $timeout) {
     $http.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+
+    searchStats($scope, $http, $location).init();
+
+
+    $scope.drawChart = drawChart;
 
     var locationSearch = $location.search();
     initDateRangePicker($scope, locationSearch)
+
+    var chartCount = {
+      id: 'chartCount'
+    };
 
     var currentPage = (function() {
       var p = parseInt(locationSearch.p) || 1;
@@ -252,6 +372,22 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }
       return p;
     } ());
+
+    // interval
+    var i = parseInt(locationSearch.i);
+    if (i) {
+      $scope.interval = i;
+    } else {
+      setAutoInterval($scope);
+    }
+
+    var parseJsonStr = function(str) {
+      try {
+        return JSON.parse(str);
+      } catch (e) {
+        return {};
+      }
+    };
 
     _.extend($scope, {
       _: _,
@@ -262,64 +398,153 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       orderBy: parseInt(locationSearch.o) || 1,
       page: {
         showHostAndPath: 1,
+        tab: locationSearch.t || 'detail',
         filter: {
-          field: (function() {
-            try {
-              return JSON.parse(locationSearch.f);
-            } catch (e) {
-              return {};
-            }
-          }).call(this)
+          field: parseJsonStr(locationSearch.f),
+          _field: parseJsonStr(locationSearch._f)
         },
         attributeAggs: 'avg',
         keywords: locationSearch.k || ''
-      },
-      fields: [{
-        key: 'host',
-        name: '主机'
-      }, {
-        key: 'path',
-        name: '路径'
-      }],
-      chartCount: {
-        id: 'chartCount'
       }
     });
 
-    var fieldMap = _.indexBy($scope.fields, 'key');
     $scope.getFieldName = function(key) {
+      var fieldMap = _.indexBy($scope.fields, 'key');
       return fieldMap[key] && fieldMap[key].name;
     }
 
+    var parepareDynamicFields = function() {
+      var query = {
+        filtered: {
+          query: null,
+          filter: {
+            and: [$scope.page.filter.timerange]
+          }
+        }
+      };
+
+      _.each($scope.page.filter.field, function(fieldValues, fieldKey) {
+        if (!_.contains(['path', 'host'], fieldKey)) {
+          return;
+        }
+        query.filtered.filter.and.push({
+          or: _.map(fieldValues, function(fieldValue) {
+            return {
+              term: _.object([[fieldKey, fieldValue]])
+            }
+          })
+          // term: _.object([[field, value]])
+        });
+      });
+
+      $http.post("/console/ajax/search", {
+        keywords: $scope.page.keywords || '',
+        type: 'attributes',
+        esBody: {
+          query: query,
+          aggs: {
+            field_aggs: {
+              terms: {
+                field: "attribute"
+              }
+            }
+          },
+          size: 0
+        },
+        begin: +startDate,
+        end: +endDate
+      }).success(function(json) {
+        var fields = json.aggregations && _.chain(json.aggregations.field_aggs.buckets).map(function(bucket) {
+          var key = bucket.key;
+          if (key.indexOf('_') === 0) {
+            return null;
+          }
+          var group = key.indexOf('.') > 0 ? key.substr(0, key.indexOf('.')) : 'unknow';
+          return _.extend({
+            key: key,
+            group: group
+          }, nginxKeyMap[key]);
+        }).filter().value();
+
+        var oldFieldMap = _.indexBy($scope.fields || [], 'key');
+
+        $scope.fields = _.clone(baseFields);
+        _.each(fields, function(field) {
+          var oldField = oldFieldMap[field.key];
+
+          var newField = oldField || field;
+
+          if (oldField && !oldField.name) {
+            // 来自 _field 复制网址
+            newField = _.extend(field, {
+              input: oldField.input
+            });
+            $scope.toggleField(newField);
+          }
+
+          $scope.fields.push(newField);
+        });
+
+        $scope.stats.setFileds();
+        $timeout(function() {
+          if (!isStatsDeserialized) {
+            $scope.stats.deserialize();
+            isStatsDeserialized = true;
+            $scope.stats.showStats();
+          }
+        }, 1000);
+        
+        $scope.fieldGroups = [{
+          group: 'base',
+          title: '按日志位置过滤',
+          fields: baseFields
+        }];
+
+        var groupMap = _.groupBy($scope.fields, 'group');
+        if (groupMap.nginx) {
+          var fieldMap = _.indexBy(groupMap.nginx, 'key');
+          $scope.fieldGroups.push({
+            group: 'nginx',
+            title: 'Nginx / Apache',
+            fields: _.map(nginxFieldKeys, function(fieldKey) {
+              return fieldMap[fieldKey];
+            })
+          });
+        }
+
+      });
+    };
+
     $scope.search = function(opts) {
-        // opts: init
+        // opts: init, intervalOnly
         opts = opts || {};
 
-        if (!opts.init) {
+        if (opts.init) {
+          // 第一次搜索
+          $scope.availableIntervals = getAvailableIntervals();
+        } else {
           // 不是第一次搜索(第一次根据url显示页码)，显示第一页
           $scope.currentPage = 1;
         }
 
-        updateDateRangePicker($scope);
+        if (!opts.intervalOnly) {
+          // 只更新间隔时间，不刷新 date range picker
+          updateDateRangePicker($scope);
+        }
 
-        _.extend($scope.chartCount, {
-            begin: startDate,
-            end: endDate
-        });
-
-        $location.search({
+        $location.search(_.extend($location.search(), {
           k: $scope.page.keywords || '',
           b: +startDate,
           e: +endDate,
           p: $scope.currentPage,
           o: $scope.orderBy,
-          f: JSON.stringify($scope.page.filter.field)
-        });
+          f: JSON.stringify($scope.page.filter.field),
+          _f: JSON.stringify($scope.page.filter._field),
+          i: $scope.interval
+        }));
         
         $scope.page.pattern = pattern($scope.page.keywords);
-
-        var points = Math.min(30, parseInt((endDate - startDate) / 1000) + 1);
-        var interval = $scope.interval = parseInt((endDate - startDate)/points);
+        
         $scope.page.filter.timerange = {
           range: {
               timestamp: {
@@ -336,6 +561,46 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             }
           }
         };
+
+        // 增加 $scope.page.query.filtered.query
+        if (opts.init) {
+          // 增加 _field 过滤
+          if (!$scope.fields) {
+            $scope.fields = [];
+          }
+          var fieldMap = _.indexBy($scope.fields, 'key');
+          _.each($scope.page.filter._field || {}, function(value, key) {
+            if (fieldMap[key]) {
+              fieldMap[key].input = value;
+            } else {
+              $scope.fields.push({
+                key: key,
+                input: value
+              })
+            }
+          });
+        }
+        _.each($scope.fields, function(field) {
+          if ($scope.page.query.filtered.query == null) {
+            $scope.page.query.filtered.query = {
+              bool: {
+                must: []
+              }
+            }
+          }
+
+          if (field.input) {
+            $scope.page.query.filtered.query.bool.must.push({
+              match_phrase: _.object(["_" + field.key], [field.input])
+            })
+          }
+        });
+
+        if ($scope.page.query.filtered.query && $scope.page.query.filtered.query.bool.must.length === 0) {
+          $scope.page.query.filtered.query = null;
+        }
+
+        // 增加 $scope.page.query.filtered.filter 
         _.each($scope.page.filter.field, function(fieldValues, fieldKey) {
           $scope.page.query.filtered.filter.and.push({
             or: _.map(fieldValues, function(fieldValue) {
@@ -350,17 +615,30 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           $scope.page.query.filtered.filter.and.push(filter);
         });
 
-        if ($scope.chartCount.highChart) {
-            $scope.chartCount.highChart.showLoading();
+        if (chartCount.highChart) {
+            chartCount.highChart.showLoading();
         }
 
+        if (!opts.intervalOnly) {
+          //  不仅更新间隔时间
+          parepareDynamicFields();
+          _.each($scope.fields, refreshFieldInfo);
+        }
+
+        // 更新统计
+        if (!opts.init) {
+          $scope.stats.showStats();
+        }
+
+        // 主要搜索
         $http.post("/console/ajax/search", {
+          keywords: $scope.page.keywords || '',
           esBody: _.extend(getESBody($scope), {
             aggs: {
               event_over_time: {
                 date_histogram: {
                   field: "timestamp",
-                  interval: interval + "ms"
+                  interval: $scope.interval + "ms"
                 }
               }
             }
@@ -372,12 +650,12 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           var buckets = json.aggregations ? json.aggregations.event_over_time.buckets : [];
           var data = [];
           if (buckets.length === 0) {
-            for (var date = +startDate; date <= +endDate; date += interval) {
+            for (var date = +startDate; date <= +endDate; date += $scope.interval) {
               data.push([date, 0]);
             }
           } else {
-            var add = (buckets[0].key - startDate) % interval;
-            var minus = (endDate - buckets[0].key) % interval;
+            var add = (buckets[0].key - startDate) % $scope.interval;
+            var minus = (endDate - buckets[0].key) % $scope.interval;
             var from = startDate + add;
             var to = endDate - minus;
 
@@ -397,11 +675,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
             type: 'column',
             data: data
           }];
-          drawChart($scope.chartCount, series, $scope);
+          $scope.drawChart(chartCount, series);
 
         }); // end success
-
-        _.each($scope.fields, refreshFieldInfo);
     }
 
     var refreshFieldInfo = function(field) {
@@ -411,14 +687,18 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }
 
       field.loading = true;
+
       var query = {
         filtered: {
-          query: $scope.page.pattern.query,
+          query: $scope.page.query.filtered.query,
+          // query: $scope.page.pattern.query,
           filter: {
             and: [$scope.page.filter.timerange]
           }
         }
       };
+
+      // TODO: pattern.filter 清理
       _.each($scope.page.pattern.filters, function(filter) {
         query.filtered.filter.and.push(filter);
       });
@@ -437,11 +717,12 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       });
 
       $http.post("/console/ajax/search", {
+        keywords: $scope.page.keywords || '',
         esBody: {
           query: query,
           size: 0,
           aggs: {
-            unique_number_for_attributes: {
+            group_by_field: {
               terms: {
                 field: field.key,
                 size: 300
@@ -454,9 +735,34 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       }).success(function(json) {
         field.loading = false;
         field.buckets = json.aggregations ?
-          json.aggregations.unique_number_for_attributes.buckets :
+          json.aggregations.group_by_field.buckets :
           [];
-        // add 0 number
+        field.total = field.buckets.length;
+
+        // 查看 attributes 总数
+        if (field.total >= 300) {
+          field.total = 'loading';
+          $http.post("/console/ajax/search", {
+            keywords: $scope.page.keywords || '',
+            esBody: {
+              query: query,
+              size: 0,
+              aggs: {
+                unique_attributes_count: {
+                  cardinality: {
+                    field: field.key
+                  }
+                }
+              }
+            },
+            begin: +startDate,
+            end: +endDate
+          }).success(function(json) {
+            field.total = json.aggregations.unique_attributes_count.value;
+          });
+        }
+
+        // 如果已经选中，虽然没有数据，也会显示数量位0
         var fieldValues = $scope.page.filter.field[field.key];
         if (fieldValues) {
           var fieldBucketKeys = _.map(field.buckets, function(bucket) {
@@ -479,23 +785,53 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       refreshFieldInfo(field);
     };
 
+    /*
+    * 设置某个 filter field，包含增加 field 和移除 field
+    * field: {key, name}
+    * bucket: {key, doc_count}
+    */
     $scope.filterField = function(field, bucket) {
-      // field.key, bucket.key
-      var fields = $scope.page.filter.field[field.key] || [];
-      if (_.contains(fields, bucket.key)) {
-        fields = _.without(fields, bucket.key);
-        if (fields.length) {
-          $scope.page.filter.field[field.key] = fields;
+      // fieldValues: [value1, value2, value3]
+      var fieldValues = $scope.page.filter.field[field.key] || [];
+      if (_.contains(fieldValues, bucket.key)) {
+        // 移除 field
+        fieldValues = _.without(fieldValues, bucket.key);
+        if (fieldValues.length) {
+          $scope.page.filter.field[field.key] = fieldValues;
         } else {
           delete $scope.page.filter.field[field.key]
         }
       } else {
-        fields.push(bucket.key);
-        $scope.page.filter.field[field.key] = fields;
+        // 增加 field
+        fieldValues.push(bucket.key);
+        $scope.page.filter.field[field.key] = fieldValues;
       }
       $scope.search();
     };
 
+    // 自定义field: key, name, input
+    $scope.searchCustomField = function(field) {
+      if (!field.input) {
+        $scope.removeCustomField(field.key);
+      } else {
+        $scope.page.filter._field[field.key] = field.input;
+      }
+      $scope.search();
+    };
+
+    // 删除用户填写的 field 条件
+    $scope.removeCustomField = function(fieldKey) {
+      _.some($scope.fields, function(field) {
+        if (field.key == fieldKey) {
+          field.input = '';
+          return true;
+        }
+      });
+      delete $scope.page.filter._field[fieldKey];
+      $scope.search();
+    };
+
+    // 删除某个 field 的全部
     $scope.removeFieldFilter = function(key) {
       // field.key, bucket.key
       delete $scope.page.filter.field[key];
@@ -514,6 +850,7 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
 
     var refreshResult = function(callback) {
       $http.post("/console/ajax/search", {
+          keywords: $scope.page.keywords || '',
           esBody: getESBody($scope),
           begin: startDate,
           end: endDate
@@ -547,6 +884,24 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
       refreshResult(function() {
         con.done();
       });
+    }
+
+    $scope.changeInterval = function(interval) {
+      if (interval === 'auto') {
+        setAutoInterval($scope);
+      } else {
+        $scope.interval = interval;
+        $scope.autoInterval = false;
+      }
+      $scope.search({
+        intervalOnly: 1
+      });
+    };
+
+    $scope.changeTab = function(tab) {
+      $location.search('t', tab);
+      $scope.page.tab = tab;
+      $scope.stats.showStats();
     }
 }]); // end angular
 

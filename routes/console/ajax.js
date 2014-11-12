@@ -8,6 +8,7 @@ var moment = require('moment');
 var QiriError = require('../../lib/qiri-err');
 var config = require('../../config');
 var m = require('../../lib/models');
+var logger = require('../../lib/logger')(__filename);
 
 var esClient = new elasticsearch.Client({
   hosts: config.es.hosts,
@@ -27,6 +28,10 @@ exports.search = function(req, res, next) {
     var begin = moment(req.body.begin).zone("+08:00").startOf('day');
     var end = moment(req.body.end).zone("+08:00");
     var esBody = req.body.esBody;
+    var type = req.body.type || 'event';
+    var keywords = req.body.keywords;
+
+    logger.info("search type:" + type + " keywords:" + (keywords || '无'));
 
     var filters = esBody.query.filtered.filter.and;
     filters.push({
@@ -41,9 +46,10 @@ exports.search = function(req, res, next) {
         begin = begin.add(1, 'day');
     }
 
+    console.log(JSON.stringify(esBody,null,2))
     esClient.search({
         index: index.join(','),
-        type: 'event',
+        type: type,
         ignoreUnavailable: true,
         body: esBody
     }, function(error, response) {

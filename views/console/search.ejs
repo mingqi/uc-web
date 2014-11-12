@@ -8,7 +8,24 @@
 <link rel="stylesheet" href="/s/css/search.css?5" />
 
 {% include include/requirejs %}
-<script data-main="console/search" src="/s/js/lib/require.js"></script>
+<script async data-main="console/search" src="/s/js/lib/require.js"></script>
+
+<style>
+.intervals span {
+  float: right;
+  display: block;
+  margin: 0 4px;
+  padding: 2px 4px;
+}
+.availableInterval {
+  display: block;
+  border: 1px solid #CCC;
+  cursor: pointer;
+}
+.availableInterval.active {
+  background-color: #DDD;
+}
+</style>
 </head>
 
 <body ng-controller="Ctrl">
@@ -23,14 +40,14 @@
         <div class="sidebar" id="sidebar" style="height:0">
             <ul class="nav nav-list" ng-include="'navList'"></ul>
             <script type="text/ng-template" id="navList">
-            <li>
+            <li ng-repeat="fieldGroup in fieldGroups">
               <a>
                   <i class="icon-none fa fa-search"></i>
-                  <span class="menu-text">按条件过滤</span>
+                  <span class="menu-text">{{fieldGroup.title}}</span>
               </a>
 
               <ul class="submenu" style="display:block">
-                <li ng-repeat="field in fields">
+                <li ng-repeat="field in fieldGroup.fields">
                   <a ng-click="toggleField(field)">
                       <i class="icon-none fa fa-angle-double-right"></i>
                       
@@ -57,10 +74,19 @@
                           </a>
                       </li>
 
+                      <li ng-if="field.customizable">
+                        <div style="padding: 7px 10px 9px 37px;">
+                          <span class="input-icon input-icon-right" style="width: 100%">
+                            <input type="text" ng-model="field.input" style="width: 100%" placeholder="字符串过滤" ng-enter="searchCustomField(field)">
+                            <i class="icon-none green fa fa-search" ng-click="searchCustomField(field)"></i>
+                          </span>
+                        </div>
+                      </li>
+
                       <li ng-if="field.buckets.length>5">
                         <a class="text-right" style="padding-right:5px;" ng-click="showFieldKeys(field)">
                           
-                          查看所有({{field.buckets.length}})
+                          查看更多({{field.total}})
                           <i class="fa fa-angle-double-right"></i>
                         </a>
                       </li>
@@ -72,7 +98,6 @@
         </div>
 
         <div class="main-content">
-
             <div class="page-content" style="padding-top:15px">
               <div class="col-sm-5">
                   <div class="input-group">
@@ -103,8 +128,10 @@
 
             </div><!-- /.page-content -->
             <script type="text/ng-template" id="pageContent">
-              <div ng-if="!(page.filter.field | isEmpty)">字段过滤：
-                <span ng-repeat="(fieldKey, fieldValues) in page.filter.field">
+              <div ng-if="!(page.filter.field | isEmpty) || !(page.filter._field | isEmpty)">
+                <span style="display: block; float:left; padding:4px 10px 0 0">字段过滤：</span>
+                <span ng-repeat="(fieldKey, fieldValues) in page.filter.field"
+                    style="display: block; float: left; margin-bottom:5px">
                   <div class="label label-xlg label-gray">
                     <button type="button" class="close" ng-click="removeFieldFilter(fieldKey)">
                       <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
@@ -113,19 +140,43 @@
                       {{getFieldName(fieldKey)}} : 已选择{{fieldValues.length}}个
                     </span>
                     <span ng-if="fieldValues.length==1">
-                      {{getFieldName(fieldKey)}} : {{fieldValues[0]}}
+                      {{getFieldName(fieldKey)}} : {{fieldValues[0] | maxStr:30}}
                     </span>
                   </div>
                   &nbsp;
                 </span>
-                <hr>
+                <span ng-repeat="(fieldKey, fieldValue) in page.filter._field"
+                    style="display: block; float: left; margin-bottom:5px">
+                  <div class="label label-xlg label-gray">
+                    <button type="button" class="close" ng-click="removeCustomField(fieldKey)">
+                      <i class="fa fa-times" style="font-size: 13px;float: right;margin: 3px 0 0 5px;"></i>
+                    </button>
+                    <span>
+                      {{getFieldName(fieldKey)}} : {{fieldValue | maxStr:30}}
+                    </span>
+                  </div>
+                  &nbsp;
+                </span>
+                <div class="clearfix"></div>
+                <hr style="margin-top:15px">
               </div>
               
-
               <div ng-if="page.searchResult">
-                  <div class="col-sm-12">
+                  <div class="col-xs-6">
                       <h4 style="margin-top:0">{{page.searchResult.hits.total | number:0}} 条记录，
                       用时 {{page.searchResult.took / 1000 | number}} 秒</h4>
+                  </div>
+                  <div class="col-xs-6 text-right intervals">
+                      <span ng-repeat="availableInterval in availableIntervals" class="availableInterval"
+                           ng-class="{active: availableInterval.ms == interval}"
+                           ng-click="changeInterval(availableInterval.ms)">
+                        {{availableInterval.title}}
+                      </span>
+                      <span class="availableInterval" ng-class="{active: autoInterval}"
+                            ng-click="changeInterval('auto')">
+                        自动
+                      </span>
+                      <span>分组间隔:</span>
                   </div>
                   
                   <div class="clearfix"></div>
@@ -137,85 +188,163 @@
 
               <div id="resultList" style="overflow-x:auto"
                   ng-if="page.searchResult && page.searchResult.hits.hits.length">
-                <h5>
-                  排序: 
-                  <span class="dropdown">
-                    <a data-toggle="dropdown" href="#" style="text-decoration:none">
-                      <span ng-if="orderBy>0">按时间顺序</span>
-                      <span ng-if="orderBy<0">按时间倒序</span>
-                      <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                      <li>
-                        <a ng-if="orderBy>0" ng-click="toggleOrderBy()">按时间倒序</a>
-                        <a ng-if="orderBy<0" ng-click="toggleOrderBy()">按时间顺序</a>
-                      </li>
-                    </ul>
-                  </span>
-                  &nbsp; &nbsp; &nbsp;
-                  主机和路径: 
-                  <span class="dropdown">
-                    <a data-toggle="dropdown" href="#" style="text-decoration:none">
-                      <span ng-if="page.showHostAndPath==1">显示</span>
-                      <span ng-if="page.showHostAndPath==0">不显示</span>
-                      <span class="caret"></span>
-                    </a>
-                    <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
-                      <li>
-                        <a ng-if="page.showHostAndPath==0" ng-click="page.showHostAndPath=1">显示</a>
-                        <a ng-if="page.showHostAndPath==1" ng-click="page.showHostAndPath=0">不显示</a>
-                      </li>
-                    </ul>
-                  </span>
-                  
-                </h5>
-                <table class="table table-striped table-bordered table-hover">
-                  <thead>
-                      <tr>
-                          <th>时间</th>
-                          <th>内容</th>
-                      </tr>
-                  </thead>
-                  <tbody>
-                      <tr ng-repeat="hit in page.searchResult.hits.hits">
-                          <td style="white-space: nowrap;">
-                            {{moment(moment.utc(hit._source.timestamp).toDate())
-                              .format('YYYY-MM-DD HH:mm:ss')}}</td>
-                          <td style="word-break:break-word">
-                            <div ng-if="page.showHostAndPath">
-                              <span class="event-facet" style="margin-right:20px">
-                                <span style="color:#707070">主机:</span>
-                                {{hit._source.host}}
-                              </span>
-                              <span class="event-facet">
-                                <span style="color:#707070">路径:</span>
-                                {{hit._source.path}}
-                              </span>
-                              <br/>
-                            </div>
-                            <span ng-if="hit.highlightMsg" ng-bind-html="hit.highlightMsg"></span>
-                            <span ng-if="!hit.highlightMsg">{{hit._source.message}}</span>
-                          </td>
-                      </tr>
-                  </tbody>
-                </table>
 
-                <ul class="pagination">
-                  <li ng-if="currentPage>4">
-                    <a ng-click="toPage(1)">第一页</a>
-                  </li>
-                  <li ng-if="currentPage>1">
-                    <a ng-click="toPage(currentPage-1)">上一页</a>
-                  </li>
-                  <li ng-class="{active: currentPage==p}"
-                    ng-repeat="p in _.range(Math.max(1, currentPage-3), Math.min(currentPage+3, pageCount) + 1)">
-                    <a ng-click="toPage(p)">{{p}}</a>
-                  </li>
-                  <li ng-if="pageCount>currentPage">
-                    <a ng-click="toPage(currentPage+1)">下一页</a>
-                  </li>
+                <ul class="nav nav-tabs" id="recent-tab" style="margin-bottom: 15px;">
+                    <li ng-class="{active : page.tab == 'detail'}">
+                        <a ng-click="changeTab('detail')">结果列表</a>
+                    </li>
+                    <li ng-class="{active : page.tab == 'stats'}">
+                        <a ng-click="changeTab('stats')">统计分析</a>
+                    </li>
                 </ul>
-              </div>
+
+                <div ng-show="page.tab == 'stats'">
+                  <h5>
+                    <span class="dropdown">
+                      <a data-toggle="dropdown" href="#" style="text-decoration:none">
+                        <i class="fa" ng-class="stats.selectedChartType.icon"></i>
+                        <span>{{stats.selectedChartType.text}}</span>
+                        <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <li ng-repeat="chartType in stats.chartTypes">
+                          <a ng-click="stats.chartTypeChange(chartType)">
+                            <i class="fa" ng-class="chartType.icon"></i>
+                            {{chartType.text}}
+                          </a>
+                        </li>
+                      </ul>
+                    </span>
+                    <!-- 
+                    <select ng-options="type.text for type in stats.chartTypes"
+                        ng-model="stats.selectedChartType"
+                        ng-change="stats.optionsChange()">
+                    </select>
+                    -->
+
+                    &nbsp;
+                    <label>
+                      <input type="radio" ng-model="stats.type" value="event_count" ng-change="stats.optionsChange()">
+                      日志数量
+                    </label>
+                    
+                    &nbsp;
+                    <label>
+                      <input type="radio" ng-model="stats.type" value="statistics" ng-change="stats.optionsChange()">
+                      统计字段
+                    </label>
+                    <span ng-if="stats.type == 'statistics'">
+                      &nbsp; 选择字段:
+                      <select ng-options="field.name group by field.group for field in stats.fields"
+                          ng-model="stats.selectedField"
+                          ng-change="stats.optionsChange()">
+                      </select>
+                    
+                      &nbsp; 统计方法:
+                      <select ng-options="agg.title for agg in stats.aggs"
+                          ng-model="stats.selectedAgg"
+                          ng-change="stats.optionsChange()">
+                      </select>
+                    </span>
+
+                    &nbsp; 分组:
+                    <select ng-options="groupField.name group by groupField.group for groupField in stats.groups"
+                        ng-model="stats.selectedGroup"
+                        ng-change="stats.optionsChange()">
+                      <option value="">不分组</option>
+                    </select>
+
+                  </h5>
+
+                  <div id="chartStats" ng-if="stats.selectedField || stats.selectedGroup">
+                    <div style="font-size:20px; padding-top:20px" class="text-center" ng-if="stats.loading">
+                      Loading...
+                    </div>
+                  </div>
+                </div> <!-- end tab stats -->
+
+
+                <div ng-show="page.tab == 'detail'">
+                  <h5>
+                    排序: 
+                    <span class="dropdown">
+                      <a data-toggle="dropdown" href="#" style="text-decoration:none">
+                        <span ng-if="orderBy>0">按时间顺序</span>
+                        <span ng-if="orderBy<0">按时间倒序</span>
+                        <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <li>
+                          <a ng-if="orderBy>0" ng-click="toggleOrderBy()">按时间倒序</a>
+                          <a ng-if="orderBy<0" ng-click="toggleOrderBy()">按时间顺序</a>
+                        </li>
+                      </ul>
+                    </span>
+                    &nbsp; &nbsp; &nbsp;
+                    主机和路径: 
+                    <span class="dropdown">
+                      <a data-toggle="dropdown" href="#" style="text-decoration:none">
+                        <span ng-if="page.showHostAndPath==1">显示</span>
+                        <span ng-if="page.showHostAndPath==0">不显示</span>
+                        <span class="caret"></span>
+                      </a>
+                      <ul class="dropdown-menu" role="menu" aria-labelledby="dLabel">
+                        <li>
+                          <a ng-if="page.showHostAndPath==0" ng-click="page.showHostAndPath=1">显示</a>
+                          <a ng-if="page.showHostAndPath==1" ng-click="page.showHostAndPath=0">不显示</a>
+                        </li>
+                      </ul>
+                    </span>
+                    
+                  </h5>
+                  <table class="table table-striped table-bordered table-hover">
+                    <thead>
+                        <tr>
+                            <th>时间</th>
+                            <th>内容</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr ng-repeat="hit in page.searchResult.hits.hits">
+                            <td style="white-space: nowrap;">
+                              {{moment(moment.utc(hit._source.timestamp).toDate())
+                                .format('YYYY-MM-DD HH:mm:ss')}}</td>
+                            <td style="word-break:break-word">
+                              <div ng-if="page.showHostAndPath">
+                                <span class="event-facet" style="margin-right:20px">
+                                  <span style="color:#707070">主机:</span>
+                                  {{hit._source.host}}
+                                </span>
+                                <span class="event-facet">
+                                  <span style="color:#707070">路径:</span>
+                                  {{hit._source.path}}
+                                </span>
+                                <br/>
+                              </div>
+                              <span ng-if="hit.highlightMsg" ng-bind-html="hit.highlightMsg"></span>
+                              <span ng-if="!hit.highlightMsg">{{hit._source.message}}</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                  </table>
+
+                  <ul class="pagination">
+                    <li ng-if="currentPage>4">
+                      <a ng-click="toPage(1)">第一页</a>
+                    </li>
+                    <li ng-if="currentPage>1">
+                      <a ng-click="toPage(currentPage-1)">上一页</a>
+                    </li>
+                    <li ng-class="{active: currentPage==p}"
+                      ng-repeat="p in _.range(Math.max(1, currentPage-3), Math.min(currentPage+3, pageCount) + 1)">
+                      <a ng-click="toPage(p)">{{p}}</a>
+                    </li>
+                    <li ng-if="pageCount>currentPage">
+                      <a ng-click="toPage(currentPage+1)">下一页</a>
+                    </li>
+                  </ul>
+                </div>
+              </div><!-- end tab 'detail' -->
             </script>
 
         </div><!-- /.main-content -->
@@ -245,6 +374,7 @@
         <table class="table table-striped table-bordered table-hover">
           <thead>
               <tr>
+                  <th>排名</th>
                   <th>{{getFieldName(modalFieldData.field.key)}}</th>
                   <th>数量</th>
               </tr>
@@ -252,6 +382,7 @@
 
           <tbody>
               <tr ng-repeat="bucket in modalFieldData.buckets | filter:modalFieldData.filter">
+                  <td>{{$index+1}}</td>
                   <td style="word-break: break-all">
                     <a ng-click="filterField(modalFieldData.field, bucket)">
                       <i class="fa" ng-class="{

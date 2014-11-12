@@ -15,7 +15,8 @@ var stageConfig = {
               type: 'stdio',
               levels: ['error', 'warning']
             }]
-        }
+        },
+        logDir: path.join(process.cwd(), '/var/logs')
     },
     production : {
         mongodb : "mongodb://es1/uclogs?poolSize=10&bufferMaxEntries=0",
@@ -49,7 +50,7 @@ var config = {
     register: {
         needInviteCode: true
     },
-    agentVersion: '1.0.1'
+    agentVersion: '1.0.2'
 };
 
 var env = process.env.NODE_ENV || 'development';

@@ -14,7 +14,8 @@ var require = {
 		moment: 'lib/moment',
 		daterangepicker: 'lib/daterangepicker',
 		con: 'console/con',
-		pattern: 'console/log_pattern'
+		pattern: 'console/log_pattern',
+		searchStats: 'console/search-stats'
 	},
 
 	shim: {

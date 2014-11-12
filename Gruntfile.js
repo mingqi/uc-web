@@ -38,12 +38,12 @@ module.exports = function(grunt) {
             'public/cc/css/bootstrap/bootstrap.css',
             'public/cc/css/compiled/bootstrap-overrides.css',
             'public/cc/css/compiled/theme.css',
-            'public/s/font-awesome-4.1.0/css/font-awesome.css',
+            'public/s/font-awesome/css/font-awesome.css',
           ],
           'public/s/css/console.css': [
             'public/ace/assets/css/uncompressed/bootstrap.css',
             'public/ace/assets/css/uncompressed/ace.css',
-            'public/s/font-awesome-4.1.0/css/font-awesome.css',
+            'public/s/font-awesome/css/font-awesome.css',
             'browser/css/lib/tablesort.css',
             'browser/css/console/console.css'
           ],
@@ -56,11 +56,13 @@ module.exports = function(grunt) {
     },
 
     coffee: {
-      compile: {
-        files: {
-          'browser/js/console/log_pattern.js': 'browser/coffee/log_pattern.coffee',
-        }
-      },
+      multiple: {
+        expand: true,
+        cwd: 'browser/coffee',
+        src: ['**/*.coffee'],
+        dest: 'browser/js',
+        ext: ".js"
+      }
     },
 
     uglify: {
@@ -84,6 +86,11 @@ module.exports = function(grunt) {
       sass: {
         files: ['public/cc/css/scss/*.scss'],
         tasks: ['sass']
+      },
+
+      coffee: {
+        files: ['browser/coffee/**/*.coffee'],
+        tasks: ['coffee']
       }
     },
 
@@ -182,5 +189,5 @@ module.exports = function(grunt) {
   grunt.registerTask('css', ['sass', 'less', 'cssmin', 'string-replace:cssVersion']);
   grunt.registerTask('js', ['coffee', 'uglify']);
   grunt.registerTask('rjs', ['requirejs', 'string-replace:jsVersion']);
-  grunt.registerTask('default', ['css', 'js', 'watch']);
+  grunt.registerTask('default', ['css', 'coffee', 'watch']);
 };
