@@ -189,6 +189,9 @@
           if ($scope.page.tab !== 'stats') {
             return;
           }
+          if (!$scope.page.searchResult || $scope.page.searchResult.hits.total === 0) {
+            return;
+          }
           $location.search('stats', this.serialize());
           if (chartStats.highChart != null) {
             chartStats.highChart.showLoading();
@@ -429,7 +432,7 @@
                     data = [['全部', json.aggregations.metric_value.value]];
                   }
                 }
-                console.log("pie data=" + (JSON.stringify(data)));
+                console.log("aaaaaaaaa: " + (JSON.stringify(data)));
                 data = data.map(function(_arg) {
                   var name, value;
                   name = _arg[0], value = _arg[1];

@@ -155,6 +155,7 @@ define ['underscore'], (_) ->
 
       showStats: () ->
         return if $scope.page.tab != 'stats'
+        return if not $scope.page.searchResult or $scope.page.searchResult.hits.total == 0
 
         $location.search 'stats', @serialize()
 
@@ -316,8 +317,8 @@ define ['underscore'], (_) ->
               else
                 data = [['全部', json.aggregations.metric_value.value]]
 
-            console.log "pie data=#{JSON.stringify data}"
-            ## convert the point name to string
+            ## convert the point name to string ##
+            console.log "aaaaaaaaa: #{JSON.stringify data}"
             data = data.map ([name, value]) ->
               if _.isNumber name
                 name = name.toString()
