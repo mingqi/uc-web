@@ -316,6 +316,13 @@ define ['underscore'], (_) ->
               else
                 data = [['全部', json.aggregations.metric_value.value]]
 
+            console.log "pie data=#{JSON.stringify data}"
+            ## convert the point name to string
+            data = data.map ([name, value]) ->
+              if _.isNumber name
+                name = name.toString()
+              [name, value]
+
             $scope.drawChart chartStats, [{
               data: data
             }],

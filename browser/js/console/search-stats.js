@@ -429,6 +429,15 @@
                     data = [['全部', json.aggregations.metric_value.value]];
                   }
                 }
+                console.log("pie data=" + (JSON.stringify(data)));
+                data = data.map(function(_arg) {
+                  var name, value;
+                  name = _arg[0], value = _arg[1];
+                  if (_.isNumber(name)) {
+                    name = name.toString();
+                  }
+                  return [name, value];
+                });
                 return $scope.drawChart(chartStats, [
                   {
                     data: data
