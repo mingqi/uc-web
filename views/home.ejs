@@ -7,8 +7,15 @@
     <link rel="stylesheet" href="/css/compiled/index.css?2" type="text/css" media="screen" />
     <meta name="keywords" content="云日志, log, logs, 日志, 分析, debug" />
     <meta name="description" content="实时日志收集、搜索、分析"/>
+
+    <style>
+        .feature img {
+            border: 1px solid #e0e0e0;
+            border-bottom: 0;
+        }
+    </style>
 </head>
-<body style="background-color:#e6e6e6">
+<body>
     <div class="navbar navbar-inverse navbar-static-top" role="navigation" style="margin-bottom:0">
     {% include include/navbar %}
     </div>
@@ -31,27 +38,13 @@
                 <div class="col-md-8 img">
                     <img src="/s/img/home-2.png" />
                 </div>
-                <!-- <img src="/s/img/home-1.png" />
-                <div class="info">
-                    <h2>实时日志<br>收集、搜索、分析</h2>
-
-                    <div style="margin:30px 0 30px">
-                        {% if (visitor) { %}
-                            <a class="btn btn-warning btn-lg" href="/console/" style="font-family: verdana; font-weight: bold;">免费试用</a>
-                        {% } else { %}
-                            <a class="btn btn-warning btn-lg" href="/account/register" style="font-family: verdana; font-weight: bold;">免费试用</a>
-                        {% } %}
-                      
-                    </div>
-                    <span style="color:white">无需硬件投入，无需授权费用，按需收费</span>
-                </div> -->
 
             </div>
         </article>
         
     </section>
 
-    <div id="showcase">
+    <div id="showcase" style="background-color:#e6e6e6; padding:20px 0 30px 0">
         <div class="container">
             <div class="row feature_wrapper">
                 <!-- Features Row -->
@@ -72,7 +65,7 @@
                         <div class="text">
                             <h6>检索 分析</h6>
                             <p>
-                                你还在用greg/sed/awk等命令来分析和查找日志吗？忘掉哪些命令吧，我们能够帮你在几十毫秒之内，从海量的日志中找到你想要的信息，我们并且能够自动结构化你的日志，通过我们的各种统计和过滤功能，得到图形化的分析结果。
+                                你还在用greg/sed/awk等命令来分析和查找日志吗？忘掉哪些命令吧，我们能够帮你在几十毫秒之内，从海量的日志中找到你想要的信息。并且我们能够自动结构化你的日志，通过各种统计和过滤功能，得到图形化的分析结果。
                             </p>
                         </div>
                     </div>
@@ -90,6 +83,68 @@
 
             </div>
             <div style="height:20px"></div>
+        </div>
+    </div>
+
+
+    <div id="features" class="features_page">
+        <div class="container">
+            <!-- Feature Wrapper -->
+            <div class="feature_wrapper option1">
+                <div class="section_header">
+                    <h3>产品特性</h3>
+                </div>
+                <div class="row feature">
+                    <div class="col-sm-5 info">
+                        <h3 id="metrics">
+                            自动收集
+                        </h3>
+                        <p>我们的日志收集器会实时、自动地收集您的日志到我们的云端集群，只需要两个步骤就能够完成所有配置</p>
+                        
+                    </div>
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-1.png" class="img-responsive" /> 
+                    </div>
+                </div>
+                <div class="row feature">
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-2.png" class="img-responsive" /> 
+                    </div>
+                    <div class="col-sm-5 info">
+                        <h3 id="metrics">
+                            集中管理, 自动解析
+                        </h3>
+                        <p>不需要在登录到多台服务器上查看日志，所有日志都能通过uclogs的控制台访问. 并且我们能自动的识别和解析日志内容，将日志的内容结构化处理，方便进一步的深度分析。</p>
+                        
+                    </div>
+                </div>
+                <div class="row feature">
+                    <div class="col-sm-5 info">
+                        <h3 id="metrics">
+                            快速检索
+                        </h3>
+                        <p>我们对所有的日志都做了全文检索，您只需要输入相应的关键字，指定时间段，几十毫秒就能查找到相关日志。</p>
+                        
+                    </div>
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-3.png" class="img-responsive" /> 
+                    </div>
+                </div>
+                <div class="row feature last">
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-4.png" class="img-responsive" /> 
+                    </div>
+                    <div class="col-sm-5 info">
+                        <h3 id="metrics">
+                            统计和分析
+                        </h3>
+                        <p>uclogs对日志做自动的结构化解析之后，您能按照任何字段进行组合过滤, 还能够正对各个字段，做各种的统计和分析</p>
+                        
+                    </div>
+                </div>
+            </div>
+
+
         </div>
     </div>
 

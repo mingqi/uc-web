@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>产品 - UCLogs</title>
+<title>常见问题 - UCLogs</title>
 {% include ../include/inheader %}
 <link rel="stylesheet" href="/css/compiled/services.css" type="text/css" media="screen" />
 
@@ -12,6 +12,8 @@
     box-shadow: 1px 1px 2px 1px #cfcfcf;
     border-bottom:0;
 }
+#faq h4 {margin: 50px 0 20px}
+#faq p {margin: 15px 0;}
 </style>
 
 </head>
@@ -23,8 +25,11 @@
 
     <div id="faq">
         <div class="container">
+            <div class="section_header">
+                <h3>常见问题</h3>
+            </div>
             <h4>如何上传日志?</h4>
-            <p>我们有一个自主开发的，高性能的收集器安装在你的服务器上，你只需要在我们的UI上配置一下需要手机的文件的目录，收集器会自动实时的收集您的日志</p>
+            <p>我们有一个自主开发的，高性能的收集器安装在你的服务器上，你只需要在我们的UI上配置一下需要手机的文件的目录，收集器会自动实时的收集您的日志。</p>
             <h4>这个收集器运行在我的服务器上，会影响我的服务器的性能么？</h4>
             <p>我们的收集器是经过精心优化的，收集器大概需要占用60M左右的内存，CPU资源占用的非常非常小，可以忽略不计。</p>
             <h4>是否支持syslog协议？</h4>
@@ -35,11 +40,11 @@
             <p>我们的数据在传输的时候，都是通过ssl来传输的，在在存储的时候都是加密存储的。</p>
             <h4>日志自动解析，都支持哪些格式的日志？</h4>
             <p>
-            目前我们支持的格式是缺省的apache和nginx的combine格式.<br/>
+            目前我们支持的格式是缺省的apache和nginx的combine格式。<br/><br>
             Apache: <br/>
             <pre>%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\”</pre>
             
-            Nginx: <br/>
+            <br>Nginx: <br/><br>
             <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent "$http_referer” "$http_user_agent"</pre>
             <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent "$http_referer” "$http_user_agent" "$http_x_forwarded_for” </pre>
             </p>
