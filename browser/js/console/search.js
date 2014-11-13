@@ -23,8 +23,7 @@ var getRanges = function() {
      '今天': [moment().startOf('day'), moment()],
      '昨天': [moment().subtract(1, 'day').startOf('day'), moment().subtract(1, 'day').endOf('day')],
      '过去1天': [moment().subtract(1, 'day'), moment()],
-     '过去1周': [moment().subtract(1, 'week'), moment()],
-     '过去15天': [moment().subtract(15, 'day'), moment()]
+     '过去7天': [moment().subtract(1, 'week'), moment()]
   };
 
   var range = ranges[chosenLabel];
@@ -42,7 +41,7 @@ var dateRangePickerOptions = {
     timePickerIncrement: 15,
     ranges: getRanges(),
     format: dateFormat,
-    minDate: moment().subtract(15, 'day'),
+    minDate: moment().subtract(7, 'day'),
     maxDate: moment(),
     separator: " 到 ",
     locale: {
@@ -103,7 +102,7 @@ var updateDateRangePicker = function($scope) {
     ranges: ranges,
     startDate: startDate,
     endDate: endDate,
-    minDate: moment().subtract(15, 'day'),
+    minDate: moment().subtract(7, 'day'),
     maxDate: moment(),
   });
   $('#daterange').data('daterangepicker').setOptions(opts);
