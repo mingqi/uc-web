@@ -44,9 +44,12 @@ exports.search = function(req, res, next) {
     while (begin.isBefore(end)) {
         index.push('uclogs-' + begin.format('YYYYMMDD'));
         begin = begin.add(1, 'day');
+        if (index.length > 10) {
+            // 最多10天
+            break;
+        }
     }
 
-    console.log(JSON.stringify(esBody,null,2))
     esClient.search({
         index: index.join(','),
         type: type,

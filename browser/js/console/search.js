@@ -70,7 +70,7 @@ var initDateRangePicker = function($scope, locationSearch) {
     var b = moment(parseFloat(locationSearch.b));
     var e = moment(parseFloat(locationSearch.e));
     if (b.isValid() && e.isValid() && b.isBefore(e) &&
-        moment().subtract(20, 'day').isBefore(b) &&
+        moment().subtract(10, 'day').isBefore(b) &&
         moment().add(1, 'day').isAfter(e)) {
       startDate = b;
       endDate = e;
