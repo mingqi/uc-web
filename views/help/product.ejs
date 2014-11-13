@@ -26,114 +26,59 @@
             <!-- Feature Wrapper -->
             <div class="feature_wrapper option1">
                 <div class="section_header">
-                    <h3>概述</h3>
+                    <h3>产品特性</h3>
                 </div>
-
-                <p>UCLogs 是云服务平台，可以帮您收集应用程序的数据，图形化展示数据，并监控你的应用程序。 这一切对你将非常容易，你需要做的仅仅是告诉我们你的数据在哪里。我们的引擎会自动收集你的数据到我们的服务器，并生成各种统计图像报表。当数据停止更新，或者超过设定的阈值时，我们的报警系统会自动提醒你，不会让你因为应用程序问题而遭到损失。</p>
-                
-
                 <div class="row feature">
-                    <div class="col-sm-8 info">
+                    <div class="col-sm-5 info">
                         <h3 id="metrics">
-                            收集数据
+                            自动收集
                         </h3>
-                        <p>目前我们支持三种方式来收集应用程序的数据：日志文件、数据库查询、shell命令。</p>
-                        <ul>
-                          <li>日志文件：监控日志文件，通过设置正则表达式，从日志中过滤并且得到你的数据。</li>
-                          <li>数据库查询：通过执行特定的 Sql 语句或者 Mongo 脚本来获取数据。</li>
-                          <li>Shell 命令：在的服务器上定期运行shell命令。例如，您可以输入 <code>ls -1 /you/path/ | wc -l</code> 来获取和监控一个文件夹下得文件数目。</li>
-                        </ul>
+                        <p>我们的日志收集器会实时、自动地收集您的日志到我们的云端集群，只需要两个步骤就能够完成所有配置</p>
+                        
                     </div>
-                    <div class="col-sm-4 info">
-                        <h3 id="alert">
-                            报警
-                        </h3>
-                        <p>
-                            当数据停止更新，或者超过设定的阈值时，UCLogs 会通过 Email 或者 PagerDuty 自动提醒你，不会让你因为应用程序问题而遭到损失。
-                        </p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Feature Wrapper -->
-            <div class="feature_wrapper option1">
-                <div class="section_header">
-                    <h3>使用非常简单，只需3步</h3>
-                </div>
-
-                <div class="row feature">
-                    <div class="col-sm-6 pic-right">
-                        <img src="/s/img/help/agent.png" class="img-responsive" />
-                    </div>
-                    <div class="col-sm-6 info info-left">
-                        <h3>
-                            <span class="label label-primary" style="font-size:20px">1</span>
-                            在服务器上安装 Agent
-                        </h3>
-                        <p>
-                            你的服务器上安装 Agent，来收集应用程序数据。按照提示输入命令即可，安装过程非常简单。
-                        </p>
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-1.png" class="img-responsive" /> 
                     </div>
                 </div>
                 <div class="row feature">
-                    <div class="col-sm-6">
-                        <img src="/s/img/help/config.png" class="img-responsive" />
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-2.png" class="img-responsive" /> 
                     </div>
-                    <div class="col-sm-6 info">
-                        <h3>
-                            <span class="label label-primary" style="font-size:20px">2</span>
-                            配置你的数据来源
+                    <div class="col-sm-5 info">
+                        <h3 id="metrics">
+                            集中管理, 自动解析
                         </h3>
-                        <p>
-                            输入你的数据相关信息，其余事情全部交给我们即可。
-                        </p>
+                        <p>不需要在登录到多台服务器上查看日志，所有日志都能通过uclogs的控制台访问. 并且我们能自动的识别和解析日志内容，将日志的内容结构化处理，方便进一步的深度分析。</p>
+                        
                     </div>
                 </div>
                 <div class="row feature">
-                    <div class="col-sm-7 pic-right">
-                        <img src="/s/img/help/metric.png" class="pull-right img-responsive" />
-                    </div>
-                    <div class="col-sm-5 info info-left">
-                        <h3>
-                            <span class="label label-primary" style="font-size:20px">3.a</span>
-                            搞定，查看你的数据报表
+                    <div class="col-sm-5 info">
+                        <h3 id="metrics">
+                            快速检索
                         </h3>
-                        <p>
-                            几分钟后，你就可以根据时间段、不同指标来查看数据报表。
-                        </p>
-                    </div>                    
+                        <p>我们对所有的日志都做了全文检索，您只需要输入相应的关键字，指定时间段，几十毫秒就能查找到相关日志。</p>
+                        
+                    </div>
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-3.png" class="img-responsive" /> 
+                    </div>
                 </div>
                 <div class="row feature last">
-                    <div class="col-sm-7 pic-right">
-                        <img src="/s/img/help/alert.png" class="img-responsive" />
+                    <div class="col-sm-7">
+                        <img src="/s/img/help/feature-4.png" class="img-responsive" /> 
                     </div>
-                    <div class="col-sm-5 info info-left">
-                        <h3>
-                            <span class="label label-primary" style="font-size:20px">3.b</span>
-                            设置报警
+                    <div class="col-sm-5 info">
+                        <h3 id="metrics">
+                            统计和分析
                         </h3>
-                        <p>
-                            当数据停止更新，或者超过设定的阈值时，会自动提醒你，不会让你因为应用程序问题而遭到损失。
-                        </p>
+                        <p>uclogs对日志做自动的结构化解析之后，您能按照任何字段进行组合过滤, 还能够正对各个字段，做各种的统计和分析</p>
+                        
                     </div>
                 </div>
             </div>
-                
 
-            <!-- Feature Wrapper -->
-            <div class="feature_wrapper option1">
-                <div class="section_header">
-                    <h3 id="free">完全免费</h3>
-                </div>
 
-                <p>
-                    是的，我们完全免费！无需硬件投入，无需授权费用，没有收费计划。我们商业模式是免费，以后将会针对更强大的功能推出收费计划。但目前所有功能都是免费的，并且没有任何使用限制。
-                </p>
-            </div>
-
-            <div style="margin:0 0 20px" class="text-center">
-                <a class="btn btn-primary btn-lg" href="/account/register" style="font-family: verdana; font-weight: bold;">免费试用</a>
-            </div>
         </div>
     </div>
     
