@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>产品 - UCLogs</title>
+{% include ../include/inheader %}
+<link rel="stylesheet" href="/css/compiled/services.css" type="text/css" media="screen" />
+
+<style>
+.img-responsive {
+    border: 7px solid #fff;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px 1px #cfcfcf;
+    border-bottom:0;
+}
+</style>
+
+</head>
+<body>
+    
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+    {% include ../include/navbar %}
+    </div>
+
+    <div id="faq">
+        <div class="container">
+            <h4>如何上传日志?</h4>
+            <p>我们有一个自主开发的，高性能的收集器安装在你的服务器上，你只需要在我们的UI上配置一下需要手机的文件的目录，收集器会自动实时的收集您的日志</p>
+            <h4>这个收集器运行在我的服务器上，会影响我的服务器的性能么？</h4>
+            <p>我们的收集器是经过精心优化的，收集器大概需要占用60M左右的内存，CPU资源占用的非常非常小，可以忽略不计。</p>
+            <h4>是否支持syslog协议？</h4>
+            <p>目前还不支持，过一段时间会支持。</p>
+            <h4>我的日志安全么，会不会丢失？</h4>
+            <p>我们的数据在存放的时候，做了冗余的多份备份，所以数据安全性是是99.9%以上，目前缺省是保存最近15天的数据，15天之前的数据将会被删除。</p>
+            <h4>隐私安全如何保证？</h4>
+            <p>我们的数据在传输的时候，都是通过ssl来传输的，在在存储的时候都是加密存储的。</p>
+            <h4>日志自动解析，都支持哪些格式的日志？</h4>
+            <p>
+            目前我们支持的格式是缺省的apache和nginx的combine格式.<br/>
+            Apache: <br/>
+            <pre>%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\”</pre>
+            
+            Nginx: <br/>
+            <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent "$http_referer” "$http_user_agent"</pre>
+            <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent "$http_referer” "$http_user_agent" "$http_x_forwarded_for” </pre>
+            </p>
+        </div>
+    </div>
+    
+    {% include ../include/footer %}
+</body>
+</html>

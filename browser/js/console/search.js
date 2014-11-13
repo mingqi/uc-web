@@ -506,9 +506,9 @@ angular.module('consoleApp', ['tableSort', 'ngSanitize'])
           $scope.fieldGroups.push({
             group: 'nginx',
             title: 'Nginx / Apache',
-            fields: _.map(nginxFieldKeys, function(fieldKey) {
+            fields: _.chain(nginxFieldKeys).map(function(fieldKey) {
               return fieldMap[fieldKey];
-            })
+            }).filter().value()
           });
         }
 
