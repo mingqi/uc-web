@@ -22,6 +22,7 @@ console/con.js
 lib/moment.js
 lib/jquery.scrollTo.js
 console/log_pattern.js
+console/search-stats.js
 lib/highstock.js
 lib/daterangepicker.js
 lib/angular-sanitize.js

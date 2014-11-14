@@ -10,11 +10,11 @@ var stageConfig = {
         port : 5001,
         es: {
             hosts: ['es-dev-1.uclogs.com:9200'],
-            // log: 'trace'
             log: [{
               type: 'stdio',
               levels: ['error', 'warning']
-            }]
+            }],
+            log: 'trace',
         },
         logDir: path.join(process.cwd(), '/var/logs')
     },

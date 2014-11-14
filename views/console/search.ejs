@@ -199,7 +199,7 @@
                 </ul>
 
                 <div ng-show="page.tab == 'stats'">
-                  <h5>
+                  <h5 style="line-height: 180%">
                     <span class="dropdown">
                       <a data-toggle="dropdown" href="#" style="text-decoration:none">
                         <i class="fa" ng-class="stats.selectedChartType.icon"></i>
@@ -233,26 +233,32 @@
                       <input type="radio" ng-model="stats.type" value="statistics" ng-change="stats.optionsChange()">
                       分析某字段
                     </label>
-                    <span ng-if="stats.type == 'statistics'">
-                      &nbsp; 选择字段:
-                      <select ng-options="field.name group by field.group for field in stats.fields"
-                          ng-model="stats.selectedField"
-                          ng-change="stats.optionsChange()">
-                      </select>
                     
-                      &nbsp; 统计方法:
-                      <select ng-options="agg.title for agg in stats.aggs"
-                          ng-model="stats.selectedAgg"
+                    &nbsp; 
+
+                    <span style="white-space: nowrap">
+                      <span ng-if="stats.type == 'statistics'">
+                        选择字段:
+                        <select ng-options="field.name group by field.group for field in stats.fields"
+                            ng-model="stats.selectedField"
+                            ng-change="stats.optionsChange()">
+                        </select>
+                      
+                        &nbsp; 统计方法:
+                        <select ng-options="agg.title for agg in stats.aggs"
+                            ng-model="stats.selectedAgg"
+                            ng-change="stats.optionsChange()">
+                        </select>
+                      </span>
+
+                      
+                      &nbsp; 分组:
+                      <select ng-options="groupField.name group by groupField.group for groupField in stats.groups"
+                          ng-model="stats.selectedGroup"
                           ng-change="stats.optionsChange()">
+                        <option value="">不分组</option>
                       </select>
                     </span>
-
-                    &nbsp; 分组:
-                    <select ng-options="groupField.name group by groupField.group for groupField in stats.groups"
-                        ng-model="stats.selectedGroup"
-                        ng-change="stats.optionsChange()">
-                      <option value="">不分组</option>
-                    </select>
 
                   </h5>
 
