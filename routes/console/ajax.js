@@ -33,6 +33,13 @@ exports.search = function(req, res, next) {
 
     logger.info("search type:" + type + " keywords:" + (keywords || '无'));
 
+    var filters = esBody.query.filtered.filter.and;
+    filters.push({
+        term: {
+            userId: visitor.id
+        }
+    });
+
     var index = [];
     while (begin.isBefore(end)) {
         index.push('uclogs-' + begin.format('YYYYMMDD'));
