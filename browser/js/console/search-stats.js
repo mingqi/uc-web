@@ -119,7 +119,7 @@
         },
         setFileds: function() {
           this.fields = $scope.fields;
-          this.selectedField = this.fields[0];
+          this.selectedField || (this.selectedField = this.fields[0]);
           return this.setGroups();
         },
         setAggs: function() {
