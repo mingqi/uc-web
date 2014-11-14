@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>产品 - UCLogs</title>
+{% include ../include/inheader %}
+<link rel="stylesheet" href="/css/compiled/services.css" type="text/css" media="screen" />
+
+<style>
+.img-responsive {
+    border: 7px solid #fff;
+    border-radius: 5px;
+    box-shadow: 1px 1px 2px 1px #cfcfcf;
+    border-bottom:0;
+}
+</style>
+
+</head>
+<body>
+    
+    <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+    {% include ../include/navbar %}
+    </div>
+
+    <div id="service_2">
+        <div class="container">
+            <div class="row perk">
+                <div class="col-sm-12 description_wrapper">
+                    <h5>SEO优化</h5>
+                    <strong>1. 查看和统计错误页面</strong>
+                    <p>通过对http状态码的过滤，能查看到每天都有多少出错的页面，不但能够查看出错页面的明细，还能够按照URI分组。</p>
+                    <img src="/s/img/help/usercase-1-1.png" class="img-responsive" /> 
+                    <br/>
+                    <strong>2. 分析搜索引擎的爬虫都爬了哪些不重复的页面</strong>
+                    <p>选择时间段，然后通过统计的功能，选择柱状图，字段选择“request_uri”，统计方法选择”不重复数量"， 在分组选择“爬虫”，就能够看到每一个爬虫在过去时间段一共爬了多少网页</p>
+                    <img src="/s/img/help/usercase-1-2.png" class="img-responsive" /> 
+                    <br/>
+                    <p>如果想进一步分析某一个爬虫，针对某一个页面类型（比如商品的详情页 /detail/）爬了多少次，可以在左侧的爬虫属性选择一个过滤，然后在URI的属性里面，输入符合条件的URI，就能够通过统计查看到针对某一个页面类型，爬虫一共爬了多少个页面。</p>
+                    <img src="/s/img/help/usercase-1-3.png" class="img-responsive" /> 
+                </div>
+            </div>  
+
+            <div class="row perk">
+                <div class="col-sm-12 description_wrapper">
+                    <h5>页面带宽分析和优化</h5>
+                    <p>如果我们想分析一下网站页面的带宽使用情况，考虑是否需要购买CDN服务，我们可以这样：首先在统计选项里面选择“响应大小”，统计方法选择“sum”，就能够看到每一个时间段整个网站的带宽使用情况。</p>
+                    <img src="/s/img/help/usercase-2-1.png" class="img-responsive" /> 
+                    <br/>
+                    <p>或者想进一步分析图片(/img/目录)所占用带宽的情况，可以在request_uri输入/img/作为过滤条件，然后选择“request_uri”分组，能够看到各个图片的带宽使用情况</p>
+                    <img src="/s/img/help/usercase-2-2.png" class="img-responsive" /> 
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% include ../include/footer %}
+</body>
+</html>
