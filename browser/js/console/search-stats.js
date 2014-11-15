@@ -229,6 +229,13 @@
                 aggs: aggregation
               }
             };
+            if (this.selectedChartType.value !== 'line') {
+              if (aggregation.group_info.aggs.metric_value != null) {
+                aggregation.group_info.terms.order = {
+                  "metric_value": "desc"
+                };
+              }
+            }
           }
           esBody = {
             query: $scope.page.query,
