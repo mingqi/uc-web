@@ -192,6 +192,11 @@ define ['underscore'], (_) ->
                 size: 10
               aggs : aggregation
 
+          ## order by the field aggregator value
+          if @selectedChartType.value != 'line'
+            if aggregation.group_info.aggs.metric_value?
+              aggregation.group_info.terms.order = { "metric_value" : "desc" }
+
         esBody =
           query: $scope.page.query
           size: 0
@@ -318,7 +323,6 @@ define ['underscore'], (_) ->
                 data = [['全部', json.aggregations.metric_value.value]]
 
             ## convert the point name to string ##
-            console.log "aaaaaaaaa: #{JSON.stringify data}"
             data = data.map ([name, value]) ->
               if _.isNumber name
                 name = name.toString()
