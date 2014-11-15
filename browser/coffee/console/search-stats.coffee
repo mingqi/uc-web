@@ -96,7 +96,7 @@ define ['underscore'], (_) ->
 
       setFileds: () ->
         @fields = $scope.fields
-        @selectedField = @fields[0]
+        @selectedField ||= @fields[0]
         @setGroups()
 
       setAggs: () ->
