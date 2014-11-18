@@ -36,6 +36,7 @@
                     <p>发送邮件到<b>support#uclogs.com</b>，告诉我们你的基本信息和需求：</p> 
                     <ul>
                         <li>你的联系方式。email或者电话， 如果可能会主动联系你了解一下对产品的使用情况和建议。</li>
+                        <li>你的操作系统：Linux，Windows或者其他</li>
                         <li>你需要管理的日志的类型：操作系统日志，Apache / Nginx日志， 还是应用程序的日志等</li>
                         <li>公司的名字。我们当然欢迎个人用户，但是如果是是公司的话，最好能告诉我们公司的名字。</li>
                         <li>每天的日志数量，大小（比如100M）或者条数（比如10万条）</li>
@@ -54,7 +55,7 @@
                     <p>
                     目前我们支持的格式是缺省的 apache 和 nginx 的 combine 格式。<br/><br>
                     Apache: <br/><br>
-                    <pre>%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\”</pre>
+                    <pre>%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"</pre>
                     
                     <br>Nginx: <br/><br>
                     <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent "$http_referer” "$http_user_agent"</pre>
