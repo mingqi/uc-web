@@ -14,7 +14,7 @@ var stageConfig = {
               type: 'stdio',
               levels: ['error', 'warning']
             }],
-            log: 'trace',
+            // log: 'trace',
         },
         logDir: path.join(process.cwd(), '/var/logs')
     },
