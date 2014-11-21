@@ -48,7 +48,7 @@ var config = {
         }
     },
     register: {
-        needInviteCode: true
+        needInviteCode: false
     },
     agentVersion: '1.0.2'
 };
