@@ -191,9 +191,9 @@ exports.postRegister = function(req, res, next) {
             html = tools.render('mail/register', {});
             console.log('html='+html);
             utils.sendMail({
-                to : user.email,
-                subject : '欢迎注册 UCLogs 云日志',
-                html : tools.render('register', {})
+                to: user.email,
+                subject: '欢迎注册 UCLogs 云日志',
+                html: html
             }, function(err, response) {
                 if (err) {
                     console.error(err);
