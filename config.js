@@ -36,14 +36,14 @@ var stageConfig = {
 var config = {
     pwdSecret : secretConfig.pwdSecret,
     sendMail : {
-        from : "UCLogs 云日志 <no-reply@uclogs.com>",
+        from : "UCLogs 云日志 <uclogs-support@uclogs.com>",
         smtp: {
             host: "smtp.exmail.qq.com",
             secure: true,
             port: 465,
             auth: {
-                user : "no-reply@uclogs.com",
-                pass : "uclogs2014noReply"
+                user : "uclogs-support@uclogs.com",
+                pass : "uclogs2014support"
             }
         }
     },

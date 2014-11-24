@@ -15,6 +15,7 @@ var config = require('../config');
 var m = require('../lib/models');
 var QiriError = require('../lib/qiri-err');
 var utils = require('../lib/utils');
+var tools = require('../lib/tools');
 var logger = require('../lib/logger')(__filename);
 
 var getPwdMd5 = function(password) {
@@ -181,6 +182,23 @@ exports.postRegister = function(req, res, next) {
                 passwordMd5: getPwdMd5(user.password),
                 licenseKey : rand.generate(20),
             }, callback);
+        }],
+        sendMail : [ 'newUser', function(callback, results) {
+            if (!results.newUser) {
+                return callback();
+            }
+            callback(null);
+            html = tools.render('mail/register', {});
+            console.log('html='+html);
+            utils.sendMail({
+                to : user.email,
+                subject : '欢迎注册 UCLogs 云日志',
+                html : tools.render('register', {})
+            }, function(err, response) {
+                if (err) {
+                    console.error(err);
+                }
+            });
         }],
         updateInviteCode: ['newUser', function(callback, results) {
             if (!results.inviteCode) {
