@@ -192,7 +192,7 @@ exports.postRegister = function(req, res, next) {
             console.log('html='+html);
             utils.sendMail({
                 to: user.email,
-                subject: '欢迎注册 UCLogs 云日志',
+                subject: '欢迎注册云日志',
                 html: html
             }, function(err, response) {
                 if (err) {
