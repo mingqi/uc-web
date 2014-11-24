@@ -43,7 +43,7 @@ var config = {
             port: 465,
             auth: {
                 user : "uclogs-support@uclogs.com",
-                pass : "uclogs2014support"
+                pass : "uclogs2014supportw"
             }
         }
     },
