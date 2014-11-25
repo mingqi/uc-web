@@ -55,11 +55,13 @@
                     <p>我们的数据在传输的时候，都是通过ssl来传输的，在在存储的时候都是加密存储的。</p>
                     <h4>日志自动解析，都支持哪些格式的日志？</h4>
                     <p>
-                    目前我们支持的格式是缺省的 apache 和 nginx 的 combine 格式。<br/><br>
+                    目前我们支持的格式是缺省的 apache 和 nginx 的 common和combine 格式。<br/><br>
                     Apache: <br/><br>
                     <pre>%h %l %u %t \"%r\" %>s %b \"%{Referer}i\" \"%{User-agent}i\"</pre>
+                    <pre>%h %l %u %t \"%r\" %>s %b</pre>
                     
                     <br>Nginx: <br/><br>
+                    <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent</pre>
                     <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent "$http_referer” "$http_user_agent"</pre>
                     <pre>$remote_addr - $remote_user [$time_local] "$request” $status $body_bytes_sent "$http_referer” "$http_user_agent" "$http_x_forwarded_for” </pre>
                     </p>
