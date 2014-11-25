@@ -72,8 +72,8 @@ var initDateRangePicker = function($scope, locationSearch) {
     if (b.isValid() && e.isValid() && b.isBefore(e) &&
         moment().subtract(10, 'day').isBefore(b) &&
         moment().add(1, 'day').isAfter(e)) {
-      startDate = b;
-      endDate = e;
+      $scope.startDate = startDate = b;
+      $scope.endDate = endDate = e;
       chosenLabel = "自定义范围";
     }
   }
