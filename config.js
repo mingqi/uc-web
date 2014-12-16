@@ -9,7 +9,7 @@ var stageConfig = {
         domain: 'dev.uclogs.com',
         port : 5001,
         es: {
-            hosts: ['es-dev-1.uclogs.com:9200'],
+            hosts: ['es-dev-1:9200', 'es-dev-2:9200'],
             log: [{
               type: 'stdio',
               levels: ['error', 'warning']
